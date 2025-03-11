@@ -1,6 +1,6 @@
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP/terraform-provider-for-sap-cloud-connector)](https://api.reuse.software/info/github.com/SAP/terraform-provider-for-sap-cloud-connector)
 
-![Golang](https://img.shields.io/badge/Go-1.23-informational)
+![Golang](https://img.shields.io/badge/Go-1.24-informational)
 
 ## About This Project
 

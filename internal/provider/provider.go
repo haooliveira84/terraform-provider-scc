@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"os"
@@ -103,6 +104,7 @@ func (c *cloudConnectorProvider) Configure(ctx context.Context, req provider.Con
 		return
 	}
 
+	// Ensure instance url is set using `export CC_INSTANCE_URL="https://example.com:port"` or pass it as a parameter.
 	instance_url := os.Getenv("CC_INSTANCE_URL")
 	username := os.Getenv("CC_USERNAME")
 	password := os.Getenv("CC_PASSWORD")
@@ -158,7 +160,8 @@ func (c *cloudConnectorProvider) Configure(ctx context.Context, req provider.Con
 		resp.Diagnostics.AddAttributeError(
 			path.Root("instance_url"),
 			"Error while parsing Cloud Connector Instance URL",
-			"The provider cannot create the Cloud Connector client as there is an error while parsing the provided Cloud Connector Instance URL.")
+			fmt.Sprintf("The provider cannot create the Cloud Connector client as there is an error while parsing the provided Cloud Connector Instance URL: %s. Error: %v", instance_url, err),
+		)
 	}
 	client := api.NewRestApiClient(c.httpClient, u, username, password)
 	resp.DataSourceData = client
@@ -175,6 +178,7 @@ func (c *cloudConnectorProvider) DataSources(_ context.Context) []func() datasou
 		NewSystemMappingResourcesDataSource,
 		NewSystemMappingResourceDataSource,
 		NewDomainMappingsDataSource,
+		NewDomainMappingDataSource,
 		NewSubaccountServiceChannelK8SDataSource,
 		NewSubaccountServiceChannelsK8SDataSource,
 	}

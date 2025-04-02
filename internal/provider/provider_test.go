@@ -2,17 +2,13 @@ package provider
 
 import (
 	"context"
-	"strings"
-
-	// "crypto/tls"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"regexp"
 	"strconv"
-
-	// "strings"
+	"strings"
 	"testing"
 
 	"github.com/SAP/terraform-provider-cloudconnector/validation/uuidvalidator"
@@ -42,7 +38,7 @@ var redactedTestUser = User{
 }
 
 func providerConfig(_ string, testUser User) string {
-	instance_url := "https://10.52.109.11:8443"
+	instance_url := "https://10.52.101.149:8443"
 	return fmt.Sprintf(`
 	provider "cloudconnector" {
 	instance_url= "%s"
@@ -223,7 +219,7 @@ func TestCCProvider_AllResources(t *testing.T) {
 		"cloudconnector_subaccount",
 		"cloudconnector_system_mapping_resource",
 		"cloudconnector_system_mapping",
-		"cloudconnector_subaccount_service_channel_k8s",
+		"cloudconnector_subaccount_k8s_service_channel",
 	}
 
 	ctx := context.Background()
@@ -243,15 +239,16 @@ func TestCCProvider_AllResources(t *testing.T) {
 func TestCCProvider_AllDataSources(t *testing.T) {
 
 	expectedDataSources := []string{
+		"cloudconnector_domain_mapping",
 		"cloudconnector_domain_mappings",
-		"cloudconnector_subaccount",
+		"cloudconnector_subaccount_configuration",
 		"cloudconnector_subaccounts",
 		"cloudconnector_system_mapping_resource",
 		"cloudconnector_system_mapping_resources",
 		"cloudconnector_system_mapping",
 		"cloudconnector_system_mappings",
-		"cloudconnector_subaccount_service_channel_k8s",
-		"cloudconnector_subaccount_service_channels_k8s",
+		"cloudconnector_subaccount_k8s_service_channel",
+		"cloudconnector_subaccount_k8s_service_channels",
 	}
 
 	ctx := context.Background()

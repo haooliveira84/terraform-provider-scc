@@ -19,23 +19,24 @@ func sendGetRequest(client *api.RestApiClient, endpoint string) (*http.Response,
 }
 
 func sendPostOrPutRequest(client *api.RestApiClient, planBody map[string]string, endpoint string, action string) (*http.Response, error) {
-
+	var response *http.Response
 	requestByteBody, err := json.Marshal(planBody)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal API request body from plan: %v", err)
 	}
 
-	if action != "Create" {
-		response, err := client.PutRequest(endpoint, requestByteBody)
+	if action == "Create" {
+		response, err = client.PostRequest(endpoint, requestByteBody)
 		if err != nil {
 			return nil, fmt.Errorf("failed to send PUT request to %s: %v", endpoint, err)
 		}
-		return response, nil
 	}
 
-	response, err := client.PostRequest(endpoint, requestByteBody)
-	if err != nil {
-		return nil, fmt.Errorf("failed to send POST request to %s: %v", endpoint, err)
+	if action == "Update" {
+		response, err = client.PutRequest(endpoint, requestByteBody)
+		if err != nil {
+			return nil, fmt.Errorf("failed to send POST request to %s: %v", endpoint, err)
+		}
 	}
 
 	return response, nil

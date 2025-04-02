@@ -27,29 +27,33 @@ func (d *SystemMappingResourcesDataSource) Metadata(ctx context.Context, req dat
 
 func (r *SystemMappingResourcesDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Cloud Connector System Mapping Resources Data Source",
+		MarkdownDescription: `Cloud Connector System Mapping Resources Data Source.
+				
+__Tips:__
+* You must be assigned to the following roles:
+	* Administrator
+	* Subaccount Administrator
+	* Display
+	* Support
+
+__Further documentation:__
+<https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/system-mapping-resources>`,
 		Attributes: map[string]schema.Attribute{
-			"credentials": schema.SingleNestedAttribute{
-				MarkdownDescription: "Input parameters required to configure the subaccount connected to cloud connector.",
+			"region_host": schema.StringAttribute{
+				MarkdownDescription: "Region Host Name.",
 				Required:            true,
-				Attributes: map[string]schema.Attribute{
-					"region_host": schema.StringAttribute{
-						MarkdownDescription: "Region Host Name.",
-						Required:            true,
-					},
-					"subaccount": schema.StringAttribute{
-						MarkdownDescription: "The ID of the subaccount.",
-						Required:            true,
-					},
-					"virtual_host": schema.StringAttribute{
-						MarkdownDescription: "Virtual host used on the cloud side.",
-						Required:            true,
-					},
-					"virtual_port": schema.StringAttribute{
-						MarkdownDescription: "Virtual port used on the cloud side.",
-						Required:            true,
-					},
-				},
+			},
+			"subaccount": schema.StringAttribute{
+				MarkdownDescription: "The ID of the subaccount.",
+				Required:            true,
+			},
+			"virtual_host": schema.StringAttribute{
+				MarkdownDescription: "Virtual host used on the cloud side.",
+				Required:            true,
+			},
+			"virtual_port": schema.StringAttribute{
+				MarkdownDescription: "Virtual port used on the cloud side.",
+				Required:            true,
 			},
 			"system_mapping_resources": schema.ListNestedAttribute{
 				MarkdownDescription: "A list of system mapping resource. ",
@@ -107,7 +111,7 @@ func (d *SystemMappingResourcesDataSource) Configure(ctx context.Context, req da
 }
 
 func (d *SystemMappingResourcesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data SystemMappingResourcesData
+	var data SystemMappingResourcesConfig
 	var respObj apiobjects.SystemMappingResources
 	diags := req.Config.Get(ctx, &data)
 
@@ -116,10 +120,10 @@ func (d *SystemMappingResourcesDataSource) Read(ctx context.Context, req datasou
 		return
 	}
 
-	region_host := data.Credentials.RegionHost.ValueString()
-	subaccount := data.Credentials.Subaccount.ValueString()
-	virtual_host := data.Credentials.VirtualHost.ValueString()
-	virtual_port := data.Credentials.VirtualPort.ValueString()
+	region_host := data.RegionHost.ValueString()
+	subaccount := data.Subaccount.ValueString()
+	virtual_host := data.VirtualHost.ValueString()
+	virtual_port := data.VirtualPort.ValueString()
 	endpoint := endpoints.GetSystemMappingResourceBaseEndpoint(region_host, subaccount, virtual_host, virtual_port)
 
 	err := requestAndUnmarshal(d.client, &respObj.SystemMappingResources, "GET", endpoint, nil, true)
@@ -128,7 +132,7 @@ func (d *SystemMappingResourcesDataSource) Read(ctx context.Context, req datasou
 		return
 	}
 
-	responseModel, err := SystemMappingResourcesFrom(ctx, data, respObj)
+	responseModel, err := SystemMappingResourcesValueFrom(ctx, data, respObj)
 	if err != nil {
 		resp.Diagnostics.AddError("error mapping system mapping resources value", fmt.Sprintf("%s", err))
 		return

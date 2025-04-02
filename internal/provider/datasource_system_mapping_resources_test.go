@@ -29,10 +29,10 @@ func TestDataSourceSystemMappingResources(t *testing.T) {
 				{
 					Config: providerConfig("", user) + DataSourceSystemMappingResources("test", "cf.eu12.hana.ondemand.com", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8", "testterraformvirtual", "900"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("data.cloudconnector_system_mapping_resources.test", "credentials.region_host", "cf.eu12.hana.ondemand.com"),
-						resource.TestMatchResourceAttr("data.cloudconnector_system_mapping_resources.test", "credentials.subaccount", regexpValidUUID),
-						resource.TestCheckResourceAttr("data.cloudconnector_system_mapping_resources.test", "credentials.virtual_host", "testterraformvirtual"),
-						resource.TestCheckResourceAttr("data.cloudconnector_system_mapping_resources.test", "credentials.virtual_port", "900"),
+						resource.TestCheckResourceAttr("data.cloudconnector_system_mapping_resources.test", "region_host", "cf.eu12.hana.ondemand.com"),
+						resource.TestMatchResourceAttr("data.cloudconnector_system_mapping_resources.test", "subaccount", regexpValidUUID),
+						resource.TestCheckResourceAttr("data.cloudconnector_system_mapping_resources.test", "virtual_host", "testterraformvirtual"),
+						resource.TestCheckResourceAttr("data.cloudconnector_system_mapping_resources.test", "virtual_port", "900"),
 
 						resource.TestCheckResourceAttr("data.cloudconnector_system_mapping_resources.test", "system_mapping_resources.#", "1"),
 						resource.TestCheckResourceAttr("data.cloudconnector_system_mapping_resources.test", "system_mapping_resources.0.id", "/google.com"),
@@ -53,12 +53,10 @@ func TestDataSourceSystemMappingResources(t *testing.T) {
 func DataSourceSystemMappingResources(datasourceName string, regionHost string, subaccount string, virtualHost string, virtualPort string) string {
 	return fmt.Sprintf(`
 	data "cloudconnector_system_mapping_resources" "%s" {
-    credentials= {
-        region_host= "%s"
-        subaccount= "%s"
-        virtual_host= "%s"
-        virtual_port= "%s"
-    }
+	region_host= "%s"
+	subaccount= "%s"
+	virtual_host= "%s"
+	virtual_port= "%s"
 	}
 	`, datasourceName, regionHost, subaccount, virtualHost, virtualPort)
 }

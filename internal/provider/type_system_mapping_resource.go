@@ -17,77 +17,79 @@ type SystemMappingResourceData struct {
 	Description             types.String `tfsdk:"description"`
 }
 
-type SystemMappingResourceCredentials struct {
-	RegionHost  types.String `tfsdk:"region_host"`
-	Subaccount  types.String `tfsdk:"subaccount"`
-	VirtualHost types.String `tfsdk:"virtual_host"`
-	VirtualPort types.String `tfsdk:"virtual_port"`
+type SystemMappingResourceConfig struct {
+	RegionHost              types.String `tfsdk:"region_host"`
+	Subaccount              types.String `tfsdk:"subaccount"`
+	VirtualHost             types.String `tfsdk:"virtual_host"`
+	VirtualPort             types.String `tfsdk:"virtual_port"`
+	ID                      types.String `tfsdk:"id"`
+	Enabled                 types.Bool   `tfsdk:"enabled"`
+	ExactMatchOnly          types.Bool   `tfsdk:"exact_match_only"`
+	WebsocketUpgradeAllowed types.Bool   `tfsdk:"websocket_upgrade_allowed"`
+	CreationDate            types.String `tfsdk:"creation_date"`
+	Description             types.String `tfsdk:"description"`
 }
 
-type SystemMappingResourceDataSourceData struct {
-	Credentials           SystemMappingResourceCredentials `tfsdk:"credentials"`
-	SystemMappingResource SystemMappingResourceData        `tfsdk:"system_mapping_resource"`
+type SystemMappingResourcesConfig struct {
+	RegionHost             types.String                `tfsdk:"region_host"`
+	Subaccount             types.String                `tfsdk:"subaccount"`
+	VirtualHost            types.String                `tfsdk:"virtual_host"`
+	VirtualPort            types.String                `tfsdk:"virtual_port"`
+	SystemMappingResources []SystemMappingResourceData `tfsdk:"system_mapping_resources"`
 }
 
-type SystemMappingResourcesData struct {
-	Credentials            SystemMappingResourceCredentials `tfsdk:"credentials"`
-	SystemMappingResources []SystemMappingResourceData      `tfsdk:"system_mapping_resources"`
-}
-
-func SystemMappingResourceFrom(ctx context.Context, plan SystemMappingResourceDataSourceData, value apiobjects.SystemMappingResourceDataSource) (SystemMappingResourceDataSourceData, error) {
-	system_mapping_resource := SystemMappingResourceData{
-		ID:                      types.StringValue(value.SystemMappingResource.ID),
-		Enabled:                 types.BoolValue(value.SystemMappingResource.Enabled),
-		ExactMatchOnly:          types.BoolValue(value.SystemMappingResource.ExactMatchOnly),
-		WebsocketUpgradeAllowed: types.BoolValue(value.SystemMappingResource.WebsocketUpgradeAllowed),
-		CreationDate:            types.StringValue(value.SystemMappingResource.CreationDate),
-		Description:             types.StringValue(value.SystemMappingResource.Description),
-	}
-
-	systemMappingResourceCredentials := SystemMappingResourceCredentials{
-		RegionHost:  plan.Credentials.RegionHost,
-		Subaccount:  plan.Credentials.Subaccount,
-		VirtualHost: plan.Credentials.VirtualHost,
-		VirtualPort: plan.Credentials.VirtualPort,
-	}
-
-	model := &SystemMappingResourceDataSourceData{
-		Credentials:           systemMappingResourceCredentials,
-		SystemMappingResource: system_mapping_resource,
+func SystemMappingResourceValueFrom(ctx context.Context, plan SystemMappingResourceConfig, value apiobjects.SystemMappingResource) (SystemMappingResourceConfig, error) {
+	model := &SystemMappingResourceConfig{
+		RegionHost:              plan.RegionHost,
+		Subaccount:              plan.Subaccount,
+		VirtualHost:             plan.VirtualHost,
+		VirtualPort:             plan.VirtualPort,
+		ID:                      types.StringValue(value.ID),
+		Enabled:                 types.BoolValue(value.Enabled),
+		ExactMatchOnly:          types.BoolValue(value.ExactMatchOnly),
+		WebsocketUpgradeAllowed: types.BoolValue(value.WebsocketUpgradeAllowed),
+		CreationDate:            types.StringValue(value.CreationDate),
+		Description:             types.StringValue(value.Description),
 	}
 
 	return *model, nil
 }
 
-func SystemMappingResourcesFrom(ctx context.Context, plan SystemMappingResourcesData, value apiobjects.SystemMappingResources) (SystemMappingResourcesData, error) {
+func SystemMappingResourcesValueFrom(ctx context.Context, plan SystemMappingResourcesConfig, value apiobjects.SystemMappingResources) (SystemMappingResourcesConfig, error) {
 	system_mapping_resources := []SystemMappingResourceData{}
-	for _, resource := range value.SystemMappingResources {
+	for _, smr := range value.SystemMappingResources {
 		r := SystemMappingResourceData{
-			ID:                      types.StringValue(resource.ID),
-			Enabled:                 types.BoolValue(resource.Enabled),
-			ExactMatchOnly:          types.BoolValue(resource.ExactMatchOnly),
-			WebsocketUpgradeAllowed: types.BoolValue(resource.WebsocketUpgradeAllowed),
-			CreationDate:            types.StringValue(resource.CreationDate),
-			Description:             types.StringValue(resource.Description),
+			ID:                      types.StringValue(smr.ID),
+			Enabled:                 types.BoolValue(smr.Enabled),
+			ExactMatchOnly:          types.BoolValue(smr.ExactMatchOnly),
+			WebsocketUpgradeAllowed: types.BoolValue(smr.WebsocketUpgradeAllowed),
+			CreationDate:            types.StringValue(smr.CreationDate),
+			Description:             types.StringValue(smr.Description),
 		}
 		system_mapping_resources = append(system_mapping_resources, r)
 	}
 
-	systemMappingResourceCredentials := SystemMappingResourceCredentials{
-		RegionHost:  plan.Credentials.RegionHost,
-		Subaccount:  plan.Credentials.Subaccount,
-		VirtualHost: plan.Credentials.VirtualHost,
-		VirtualPort: plan.Credentials.VirtualPort,
-	}
-
-	model := &SystemMappingResourcesData{
-		Credentials:            systemMappingResourceCredentials,
+	model := &SystemMappingResourcesConfig{
+		RegionHost:             plan.RegionHost,
+		Subaccount:             plan.Subaccount,
+		VirtualHost:            plan.VirtualHost,
+		VirtualPort:            plan.VirtualPort,
 		SystemMappingResources: system_mapping_resources,
 	}
 
 	return *model, nil
 }
 
+/*
+CreateEncodedResourceID encodes the given resource ID to make it safe for use in a URI path.
+
+According to the encoding rules, it replaces specific characters to avoid collisions:
+- '+' is replaced with '+2B'
+- '-' is replaced with '+2D'
+- '/' is replaced with '-'
+
+This ensures the resource ID can be safely used in URI paths without misinterpretation.
+*/
 func CreateEncodedResourceID(input string) (encodedResourceID string) {
 	input = strings.ReplaceAll(input, "+", "+2B")
 	input = strings.ReplaceAll(input, "-", "+2D")

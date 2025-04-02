@@ -12,21 +12,21 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
-var _ datasource.DataSource = &DomainMappingsDataSource{}
+var _ datasource.DataSource = &DomainMappingDataSource{}
 
-func NewDomainMappingsDataSource() datasource.DataSource {
-	return &DomainMappingsDataSource{}
+func NewDomainMappingDataSource() datasource.DataSource {
+	return &DomainMappingDataSource{}
 }
 
-type DomainMappingsDataSource struct {
+type DomainMappingDataSource struct {
 	client *api.RestApiClient
 }
 
-func (d *DomainMappingsDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_domain_mappings"
+func (d *DomainMappingDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_domain_mapping"
 }
 
-func (r *DomainMappingsDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *DomainMappingDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: `Cloud Connector Domain Mapping Data Source.
 
@@ -49,26 +49,19 @@ __Further documentation:__
 					uuidvalidator.ValidUUID(),
 				},
 			},
-			"domain_mappings": schema.ListNestedAttribute{
-				Computed: true,
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"virtual_domain": schema.StringAttribute{
-							MarkdownDescription: "Domain used on the cloud side.",
-							Computed:            true,
-						},
-						"internal_domain": schema.StringAttribute{
-							MarkdownDescription: "Domain used on the on-premise side.",
-							Computed:            true,
-						},
-					},
-				},
+			"virtual_domain": schema.StringAttribute{
+				MarkdownDescription: "Domain used on the cloud side.",
+				Computed:            true,
+			},
+			"internal_domain": schema.StringAttribute{
+				MarkdownDescription: "Domain used on the on-premise side.",
+				Required:            true,
 			},
 		},
 	}
 }
 
-func (d *DomainMappingsDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *DomainMappingDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -87,8 +80,8 @@ func (d *DomainMappingsDataSource) Configure(ctx context.Context, req datasource
 	d.client = client
 }
 
-func (d *DomainMappingsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data DomainMappingsConfig
+func (d *DomainMappingDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var data DomainMappingConfig
 	var respObj apiobjects.DomainMappings
 	diags := req.Config.Get(ctx, &data)
 
@@ -99,17 +92,25 @@ func (d *DomainMappingsDataSource) Read(ctx context.Context, req datasource.Read
 
 	region_host := data.RegionHost.ValueString()
 	subaccount := data.Subaccount.ValueString()
+	internal_domain := data.InternalDomain.ValueString()
+
 	endpoint := fmt.Sprintf("/api/v1/configuration/subaccounts/%s/%s/domainMappings", region_host, subaccount)
 
 	err := requestAndUnmarshal(d.client, &respObj.DomainMappings, "GET", endpoint, nil, true)
 	if err != nil {
-		resp.Diagnostics.AddError("error fetching the cloud connector domain mappings", err.Error())
+		resp.Diagnostics.AddError("error fetching the cloud connector domain mapping", err.Error())
 		return
 	}
 
-	responseModel, err := DomainMappingsValueFrom(ctx, data, respObj)
+	mappingRespObj, err := GetDomainMapping(respObj, internal_domain)
 	if err != nil {
-		resp.Diagnostics.AddError("error mapping domain mappings value", fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("error getting Domain Mapping", fmt.Sprintf("%s", err))
+		return
+	}
+
+	responseModel, err := DomainMappingValueFrom(ctx, data, *mappingRespObj)
+	if err != nil {
+		resp.Diagnostics.AddError("error mapping domain mapping value", fmt.Sprintf("%s", err))
 		return
 	}
 	diags = resp.State.Set(ctx, &responseModel)

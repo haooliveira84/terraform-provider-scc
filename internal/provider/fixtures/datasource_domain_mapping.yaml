@@ -6,13 +6,13 @@ interactions:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
-        content_length: 79
+        content_length: 0
         transfer_encoding: []
         trailer: {}
         host: 10.52.101.149:8443
         remote_addr: ""
         request_uri: ""
-        body: '{"internalDomain":"testtfinternaldomain","virtualDomain":"testtfvirtualdomain"}'
+        body: ""
         form: {}
         headers:
             Accept:
@@ -21,35 +21,35 @@ interactions:
                 - redacted
             Content-Type:
                 - application/json
-        url: https://10.52.101.149:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/d3bbbcd7-d5e0-483b-a524-6dee7205f8e8/domainMappings
-        method: POST
+        url: https://10.52.101.149:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/0bcb0012-a982-42f9-bda4-0a5cb15f88c8/domainMappings
+        method: GET
       response:
         proto: HTTP/1.1
         proto_major: 1
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 0
+        content_length: 290
         uncompressed: false
-        body: ""
+        body: '[{"virtualDomain":"testterraformvirtualdomain","internalDomain":"testterraforminternaldomain","_links":"redacted"}}]'
         headers:
             Cache-Control:
                 - no-store
             Content-Length:
-                - "0"
+                - "290"
+            Content-Type:
+                - application/json
             Date:
-                - Wed, 02 Apr 2025 09:52:27 GMT
-            Location:
-                - https://10.52.101.149:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/d3bbbcd7-d5e0-483b-a524-6dee7205f8e8/domainMappings/testtfinternaldomain
+                - Wed, 02 Apr 2025 09:52:26 GMT
             Server:
                 - Cloud Connector
             Set-Cookie:
                 - redacted
             X-Csrf-Token:
                 - redacted
-        status: '201 '
-        code: 201
-        duration: 10.95825ms
+        status: '200 '
+        code: 200
+        duration: 22.472541ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -70,7 +70,7 @@ interactions:
                 - redacted
             Content-Type:
                 - application/json
-        url: https://10.52.101.149:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/d3bbbcd7-d5e0-483b-a524-6dee7205f8e8/domainMappings
+        url: https://10.52.101.149:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/0bcb0012-a982-42f9-bda4-0a5cb15f88c8/domainMappings
         method: GET
       response:
         proto: HTTP/1.1
@@ -78,18 +78,18 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 269
+        content_length: 290
         uncompressed: false
-        body: '[{"virtualDomain":"testtfvirtualdomain","internalDomain":"testtfinternaldomain","_links":"redacted"}}]'
+        body: '[{"virtualDomain":"testterraformvirtualdomain","internalDomain":"testterraforminternaldomain","_links":"redacted"}}]'
         headers:
             Cache-Control:
                 - no-store
             Content-Length:
-                - "269"
+                - "290"
             Content-Type:
                 - application/json
             Date:
-                - Wed, 02 Apr 2025 09:52:27 GMT
+                - Wed, 02 Apr 2025 09:52:26 GMT
             Server:
                 - Cloud Connector
             Set-Cookie:
@@ -98,7 +98,7 @@ interactions:
                 - redacted
         status: '200 '
         code: 200
-        duration: 1.293333ms
+        duration: 1.403292ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -119,7 +119,7 @@ interactions:
                 - redacted
             Content-Type:
                 - application/json
-        url: https://10.52.101.149:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/d3bbbcd7-d5e0-483b-a524-6dee7205f8e8/domainMappings
+        url: https://10.52.101.149:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/0bcb0012-a982-42f9-bda4-0a5cb15f88c8/domainMappings
         method: GET
       response:
         proto: HTTP/1.1
@@ -127,18 +127,18 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 269
+        content_length: 290
         uncompressed: false
-        body: '[{"virtualDomain":"testtfvirtualdomain","internalDomain":"testtfinternaldomain","_links":"redacted"}}]'
+        body: '[{"virtualDomain":"testterraformvirtualdomain","internalDomain":"testterraforminternaldomain","_links":"redacted"}}]'
         headers:
             Cache-Control:
                 - no-store
             Content-Length:
-                - "269"
+                - "290"
             Content-Type:
                 - application/json
             Date:
-                - Wed, 02 Apr 2025 09:52:27 GMT
+                - Wed, 02 Apr 2025 09:52:26 GMT
             Server:
                 - Cloud Connector
             Set-Cookie:
@@ -147,49 +147,4 @@ interactions:
                 - redacted
         status: '200 '
         code: 200
-        duration: 1.651917ms
-    - id: 3
-      request:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        content_length: 0
-        transfer_encoding: []
-        trailer: {}
-        host: 10.52.101.149:8443
-        remote_addr: ""
-        request_uri: ""
-        body: ""
-        form: {}
-        headers:
-            Accept:
-                - '*/*'
-            Authorization:
-                - redacted
-            Content-Type:
-                - application/json
-        url: https://10.52.101.149:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/d3bbbcd7-d5e0-483b-a524-6dee7205f8e8/domainMappings/testtfinternaldomain
-        method: DELETE
-      response:
-        proto: HTTP/1.1
-        proto_major: 1
-        proto_minor: 1
-        transfer_encoding: []
-        trailer: {}
-        content_length: 0
-        uncompressed: false
-        body: ""
-        headers:
-            Cache-Control:
-                - no-store
-            Date:
-                - Wed, 02 Apr 2025 09:52:27 GMT
-            Server:
-                - Cloud Connector
-            Set-Cookie:
-                - redacted
-            X-Csrf-Token:
-                - redacted
-        status: '204 '
-        code: 204
-        duration: 2.895709ms
+        duration: 1.249541ms

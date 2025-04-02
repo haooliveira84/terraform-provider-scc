@@ -27,19 +27,23 @@ func (d *SystemMappingsDataSource) Metadata(ctx context.Context, req datasource.
 
 func (r *SystemMappingsDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Cloud Connector System Mappings Data Source",
+		MarkdownDescription: `Cloud Connector System Mappings Data Source.
+				
+__Tips:__
+* You must be assigned to the following roles:
+	* Administrator
+	* Subaccount Administrator
+	* Display
+	* Support
+
+__Further documentation:__
+<https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/system-mappings>`,
 		Attributes: map[string]schema.Attribute{
-			"credentials": schema.SingleNestedAttribute{
-				MarkdownDescription: "Input parameters required to configure the subaccount connected to cloud connector.",
-				Required:            true,
-				Attributes: map[string]schema.Attribute{
-					"region_host": schema.StringAttribute{
-						Required: true,
-					},
-					"subaccount": schema.StringAttribute{
-						Required: true,
-					},
-				},
+			"region_host": schema.StringAttribute{
+				Required: true,
+			},
+			"subaccount": schema.StringAttribute{
+				Required: true,
 			},
 			"system_mappings": schema.ListNestedAttribute{
 				MarkdownDescription: "List of System Mappings between Virtual and Internal System.",
@@ -156,7 +160,7 @@ func (d *SystemMappingsDataSource) Configure(ctx context.Context, req datasource
 }
 
 func (d *SystemMappingsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data SystemMappingsData
+	var data SystemMappingsConfig
 	var respObj apiobjects.SystemMappings
 	diags := req.Config.Get(ctx, &data)
 
@@ -165,8 +169,8 @@ func (d *SystemMappingsDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 
-	region_host := data.Credentials.RegionHost.ValueString()
-	subaccount := data.Credentials.Subaccount.ValueString()
+	region_host := data.RegionHost.ValueString()
+	subaccount := data.Subaccount.ValueString()
 	endpoint := endpoints.GetSystemMappingBaseEndpoint(region_host, subaccount)
 
 	err := requestAndUnmarshal(d.client, &respObj.SystemMappings, "GET", endpoint, nil, true)

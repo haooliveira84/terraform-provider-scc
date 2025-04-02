@@ -31,125 +31,125 @@ func (r *SystemMappingResource) Metadata(ctx context.Context, req resource.Metad
 
 func (r *SystemMappingResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Cloud Connector System Mapping Resource",
+		MarkdownDescription: `Cloud Connector System Mapping Resource.
+				
+__Tips:__
+* You must be assigned to the following roles:
+	* Administrator
+	* Subaccount Administrator
+
+__Further documentation:__
+<https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/system-mappings>`,
 		Attributes: map[string]schema.Attribute{
-			"credentials": schema.SingleNestedAttribute{
-				MarkdownDescription: "Input parameters required to configure the subaccount connected to cloud connector.",
+			"region_host": schema.StringAttribute{
+				MarkdownDescription: "Region Host Name.",
 				Required:            true,
-				Attributes: map[string]schema.Attribute{
-					"region_host": schema.StringAttribute{
-						MarkdownDescription: "Region Host Name.",
-						Required:            true,
-					},
-					"subaccount": schema.StringAttribute{
-						MarkdownDescription: "The ID of the subaccount.",
-						Required:            true,
-					},
+			},
+			"subaccount": schema.StringAttribute{
+				MarkdownDescription: "The ID of the subaccount.",
+				Required:            true,
+			},
+			"virtual_host": schema.StringAttribute{
+				MarkdownDescription: "Virtual host used on the cloud side. Cannot be updated after creation.",
+				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"system_mapping": schema.SingleNestedAttribute{
-				Required: true,
-				Attributes: map[string]schema.Attribute{
-					"virtual_host": schema.StringAttribute{
-						MarkdownDescription: "Virtual host used on the cloud side. Cannot be updated after creation.",
-						Required:            true,
-						PlanModifiers: []planmodifier.String{
-							stringplanmodifier.UseStateForUnknown(),
-						},
-					},
-					"virtual_port": schema.StringAttribute{
-						MarkdownDescription: "Virtual port used on the cloud side.",
-						Required:            true,
-						PlanModifiers: []planmodifier.String{
-							stringplanmodifier.UseStateForUnknown(),
-						},
-					},
-					"local_host": schema.StringAttribute{
-						MarkdownDescription: "Host on the on-premise side.",
-						Required:            true,
-					},
-					"local_port": schema.StringAttribute{
-						MarkdownDescription: "Port on the on-premise side.",
-						Required:            true,
-					},
-					"creation_date": schema.StringAttribute{
-						MarkdownDescription: "Date of creation of system mapping.",
-						Computed:            true,
-					},
-					"protocol": schema.StringAttribute{
-						MarkdownDescription: "Protocol used when sending requests and receiving responses, which must be one of the following values:" +
-							getFormattedValueAsTableRow("protocol", "description") +
-							getFormattedValueAsTableRow("---", "---") +
-							getFormattedValueAsTableRow("HTTP", "") +
-							getFormattedValueAsTableRow("HTTPS", "") +
-							getFormattedValueAsTableRow("RFC", "") +
-							getFormattedValueAsTableRow("RFCS", "") +
-							getFormattedValueAsTableRow("LDAP", "") +
-							getFormattedValueAsTableRow("LDAPS", "") +
-							getFormattedValueAsTableRow("TCP", "") +
-							getFormattedValueAsTableRow("TCPS", ""),
-						Required: true,
-					},
-					"backend_type": schema.StringAttribute{
-						MarkdownDescription: "Type of the backend system. Valid values are:" +
-							getFormattedValueAsTableRow("protocol", "description") +
-							getFormattedValueAsTableRow("---", "---") +
-							getFormattedValueAsTableRow("abapSys", "") +
-							getFormattedValueAsTableRow("netweaverCE", "") +
-							getFormattedValueAsTableRow("netweaverGW", "") +
-							getFormattedValueAsTableRow("applServerJava", "") +
-							getFormattedValueAsTableRow("PI", "") +
-							getFormattedValueAsTableRow("hana", "") +
-							getFormattedValueAsTableRow("otherSAPsys", "") +
-							getFormattedValueAsTableRow("nonSAPsys", ""),
-						Required: true,
-					},
-					"authentication_mode": schema.StringAttribute{
-						MarkdownDescription: "Authentication mode to be used on the backend side, which must be one of the following:" +
-							getFormattedValueAsTableRow("protocol", "description") +
-							getFormattedValueAsTableRow("---", "---") +
-							getFormattedValueAsTableRow("NONE", "") +
-							getFormattedValueAsTableRow("NONE_RESTRICTED", "") +
-							getFormattedValueAsTableRow("X509_GENERAL", "") +
-							getFormattedValueAsTableRow("X509_RESTRICTED", "") +
-							getFormattedValueAsTableRow("KERBEROS", ""),
-						Required: true,
-					},
-					"host_in_header": schema.StringAttribute{
-						MarkdownDescription: "Policy for setting the host in the response header. This property is applicable to HTTP(S) protocols only.",
-						Required:            true,
-					},
-					"sid": schema.StringAttribute{
-						MarkdownDescription: "The ID of the system.",
-						Computed:            true,
-						Optional:            true,
-					},
-					"total_resources_count": schema.Int64Attribute{
-						MarkdownDescription: "The total number of resources.",
-						Computed:            true,
-					},
-					"enabled_resources_count": schema.Int64Attribute{
-						MarkdownDescription: "The number of enabled resources.",
-						Computed:            true,
-					},
-					"description": schema.StringAttribute{
-						MarkdownDescription: "Description for the system mapping.",
-						Computed:            true,
-						Optional:            true,
-					},
-					"sap_router": schema.StringAttribute{
-						MarkdownDescription: "SAP router route, required only if an SAP router is used.",
-						Computed:            true,
-						Optional:            true,
-					},
+			"virtual_port": schema.StringAttribute{
+				MarkdownDescription: "Virtual port used on the cloud side.",
+				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
 				},
+			},
+			"local_host": schema.StringAttribute{
+				MarkdownDescription: "Host on the on-premise side.",
+				Required:            true,
+			},
+			"local_port": schema.StringAttribute{
+				MarkdownDescription: "Port on the on-premise side.",
+				Required:            true,
+			},
+			"creation_date": schema.StringAttribute{
+				MarkdownDescription: "Date of creation of system mapping.",
+				Computed:            true,
+			},
+			"protocol": schema.StringAttribute{
+				MarkdownDescription: "Protocol used when sending requests and receiving responses, which must be one of the following values:" +
+					getFormattedValueAsTableRow("protocol", "description") +
+					getFormattedValueAsTableRow("---", "---") +
+					getFormattedValueAsTableRow("HTTP", "") +
+					getFormattedValueAsTableRow("HTTPS", "") +
+					getFormattedValueAsTableRow("RFC", "") +
+					getFormattedValueAsTableRow("RFCS", "") +
+					getFormattedValueAsTableRow("LDAP", "") +
+					getFormattedValueAsTableRow("LDAPS", "") +
+					getFormattedValueAsTableRow("TCP", "") +
+					getFormattedValueAsTableRow("TCPS", ""),
+				Required: true,
+			},
+			"backend_type": schema.StringAttribute{
+				MarkdownDescription: "Type of the backend system. Valid values are:" +
+					getFormattedValueAsTableRow("protocol", "description") +
+					getFormattedValueAsTableRow("---", "---") +
+					getFormattedValueAsTableRow("abapSys", "") +
+					getFormattedValueAsTableRow("netweaverCE", "") +
+					getFormattedValueAsTableRow("netweaverGW", "") +
+					getFormattedValueAsTableRow("applServerJava", "") +
+					getFormattedValueAsTableRow("PI", "") +
+					getFormattedValueAsTableRow("hana", "") +
+					getFormattedValueAsTableRow("otherSAPsys", "") +
+					getFormattedValueAsTableRow("nonSAPsys", ""),
+				Required: true,
+			},
+			"authentication_mode": schema.StringAttribute{
+				MarkdownDescription: "Authentication mode to be used on the backend side, which must be one of the following:" +
+					getFormattedValueAsTableRow("protocol", "description") +
+					getFormattedValueAsTableRow("---", "---") +
+					getFormattedValueAsTableRow("NONE", "") +
+					getFormattedValueAsTableRow("NONE_RESTRICTED", "") +
+					getFormattedValueAsTableRow("X509_GENERAL", "") +
+					getFormattedValueAsTableRow("X509_RESTRICTED", "") +
+					getFormattedValueAsTableRow("KERBEROS", ""),
+				Required: true,
+			},
+			"host_in_header": schema.StringAttribute{
+				MarkdownDescription: "Policy for setting the host in the response header. This property is applicable to HTTP(S) protocols only. If set, it must be one of the following strings:" +
+					getFormattedValueAsTableRow("policy", "description") +
+					getFormattedValueAsTableRow("---", "---") +
+					getFormattedValueAsTableRow("internal/INTERNAL", "") +
+					getFormattedValueAsTableRow("virtual/VIRTUAL", "") + "The default is virtual.",
+				Required: true,
+			},
+			"sid": schema.StringAttribute{
+				MarkdownDescription: "The ID of the system.",
+				Computed:            true,
+				Optional:            true,
+			},
+			"total_resources_count": schema.Int64Attribute{
+				MarkdownDescription: "The total number of resources.",
+				Computed:            true,
+			},
+			"enabled_resources_count": schema.Int64Attribute{
+				MarkdownDescription: "The number of enabled resources.",
+				Computed:            true,
+			},
+			"description": schema.StringAttribute{
+				MarkdownDescription: "Description for the system mapping.",
+				Computed:            true,
+				Optional:            true,
+			},
+			"sap_router": schema.StringAttribute{
+				MarkdownDescription: "SAP router route, required only if an SAP router is used.",
+				Computed:            true,
+				Optional:            true,
 			},
 		},
 	}
 }
 
 func (r *SystemMappingResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
 		return
 	}
@@ -169,7 +169,7 @@ func (r *SystemMappingResource) Configure(ctx context.Context, req resource.Conf
 }
 
 func (r *SystemMappingResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var plan SystemMappingData
+	var plan SystemMappingConfig
 	var respObj apiobjects.SystemMapping
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -177,23 +177,23 @@ func (r *SystemMappingResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	region_host := plan.Credentials.RegionHost.ValueString()
-	subaccount := plan.Credentials.Subaccount.ValueString()
-	virtual_host := plan.SystemMapping.VirtualHost.ValueString()
-	virtual_port := plan.SystemMapping.VirtualPort.ValueString()
+	region_host := plan.RegionHost.ValueString()
+	subaccount := plan.Subaccount.ValueString()
+	virtual_host := plan.VirtualHost.ValueString()
+	virtual_port := plan.VirtualPort.ValueString()
 	endpoint := endpoints.GetSystemMappingBaseEndpoint(region_host, subaccount)
 
 	planBody := map[string]string{
-		"virtualHost":        plan.SystemMapping.VirtualHost.ValueString(),
-		"virtualPort":        plan.SystemMapping.VirtualPort.ValueString(),
-		"localHost":          plan.SystemMapping.LocalHost.ValueString(),
-		"localPort":          plan.SystemMapping.LocalPort.ValueString(),
-		"protocol":           plan.SystemMapping.Protocol.ValueString(),
-		"backendType":        plan.SystemMapping.BackendType.ValueString(),
-		"authenticationMode": plan.SystemMapping.AuthenticationMode.ValueString(),
-		"hostInHeader":       plan.SystemMapping.HostInHeader.ValueString(),
-		"sid":                plan.SystemMapping.Sid.ValueString(),
-		"description":        plan.SystemMapping.Description.ValueString(),
+		"virtualHost":        plan.VirtualHost.ValueString(),
+		"virtualPort":        plan.VirtualPort.ValueString(),
+		"localHost":          plan.LocalHost.ValueString(),
+		"localPort":          plan.LocalPort.ValueString(),
+		"protocol":           plan.Protocol.ValueString(),
+		"backendType":        plan.BackendType.ValueString(),
+		"authenticationMode": plan.AuthenticationMode.ValueString(),
+		"hostInHeader":       plan.HostInHeader.ValueString(),
+		"sid":                plan.Sid.ValueString(),
+		"description":        plan.Description.ValueString(),
 	}
 
 	err := requestAndUnmarshal(r.client, &respObj, "POST", endpoint, planBody, false)
@@ -223,9 +223,8 @@ func (r *SystemMappingResource) Create(ctx context.Context, req resource.CreateR
 	}
 }
 
-// Read resource information.
 func (r *SystemMappingResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var state SystemMappingData
+	var state SystemMappingConfig
 	var respObj apiobjects.SystemMapping
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -233,10 +232,10 @@ func (r *SystemMappingResource) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 
-	region_host := state.Credentials.RegionHost.ValueString()
-	subaccount := state.Credentials.Subaccount.ValueString()
-	virtual_host := state.SystemMapping.VirtualHost.ValueString()
-	virtual_port := state.SystemMapping.VirtualPort.ValueString()
+	region_host := state.RegionHost.ValueString()
+	subaccount := state.Subaccount.ValueString()
+	virtual_host := state.VirtualHost.ValueString()
+	virtual_port := state.VirtualPort.ValueString()
 	endpoint := endpoints.GetSystemMappingEndpoint(region_host, subaccount, virtual_host, virtual_port)
 
 	err := requestAndUnmarshal(r.client, &respObj, "GET", endpoint, nil, true)
@@ -259,7 +258,7 @@ func (r *SystemMappingResource) Read(ctx context.Context, req resource.ReadReque
 }
 
 func (r *SystemMappingResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var plan, state SystemMappingData
+	var plan, state SystemMappingConfig
 	var respObj apiobjects.SystemMapping
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -273,23 +272,31 @@ func (r *SystemMappingResource) Update(ctx context.Context, req resource.UpdateR
 		return
 	}
 
-	region_host := plan.Credentials.RegionHost.ValueString()
-	subaccount := plan.Credentials.Subaccount.ValueString()
-	virtual_host := state.SystemMapping.VirtualHost.ValueString()
-	virtual_port := state.SystemMapping.VirtualPort.ValueString()
+	region_host := plan.RegionHost.ValueString()
+	subaccount := plan.Subaccount.ValueString()
+	virtual_host := state.VirtualHost.ValueString()
+	virtual_port := state.VirtualPort.ValueString()
+
+	if (plan.RegionHost.ValueString() != region_host) ||
+		(plan.Subaccount.ValueString() != subaccount) ||
+		(plan.VirtualHost.ValueString() != virtual_host) ||
+		(plan.VirtualPort.ValueString() != virtual_port) {
+		resp.Diagnostics.AddError("error updating the cloud connector system mapping.", "Failed to update the cloud connector system mapping due to mismatched configuration values.")
+		return
+	}
 	endpoint := endpoints.GetSystemMappingEndpoint(region_host, subaccount, virtual_host, virtual_port)
 
 	planBody := map[string]string{
-		"virtualHost":        plan.SystemMapping.VirtualHost.ValueString(),
-		"virtualPort":        plan.SystemMapping.VirtualPort.ValueString(),
-		"localHost":          plan.SystemMapping.LocalHost.ValueString(),
-		"localPort":          plan.SystemMapping.LocalPort.ValueString(),
-		"protocol":           plan.SystemMapping.Protocol.ValueString(),
-		"backendType":        plan.SystemMapping.BackendType.ValueString(),
-		"authenticationMode": plan.SystemMapping.AuthenticationMode.ValueString(),
-		"hostInHeader":       plan.SystemMapping.HostInHeader.ValueString(),
-		"sid":                plan.SystemMapping.Sid.ValueString(),
-		"description":        plan.SystemMapping.Description.ValueString(),
+		"virtualHost":        plan.VirtualHost.ValueString(),
+		"virtualPort":        plan.VirtualPort.ValueString(),
+		"localHost":          plan.LocalHost.ValueString(),
+		"localPort":          plan.LocalPort.ValueString(),
+		"protocol":           plan.Protocol.ValueString(),
+		"backendType":        plan.BackendType.ValueString(),
+		"authenticationMode": plan.AuthenticationMode.ValueString(),
+		"hostInHeader":       plan.HostInHeader.ValueString(),
+		"sid":                plan.Sid.ValueString(),
+		"description":        plan.Description.ValueString(),
 	}
 
 	err := requestAndUnmarshal(r.client, &respObj, "PUT", endpoint, planBody, false)
@@ -318,7 +325,7 @@ func (r *SystemMappingResource) Update(ctx context.Context, req resource.UpdateR
 }
 
 func (r *SystemMappingResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state SystemMappingData
+	var state SystemMappingConfig
 	var respObj apiobjects.SystemMapping
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -326,10 +333,10 @@ func (r *SystemMappingResource) Delete(ctx context.Context, req resource.DeleteR
 		return
 	}
 
-	region_host := state.Credentials.RegionHost.ValueString()
-	subaccount := state.Credentials.Subaccount.ValueString()
-	virtual_host := state.SystemMapping.VirtualHost.ValueString()
-	virtual_port := state.SystemMapping.VirtualPort.ValueString()
+	region_host := state.RegionHost.ValueString()
+	subaccount := state.Subaccount.ValueString()
+	virtual_host := state.VirtualHost.ValueString()
+	virtual_port := state.VirtualPort.ValueString()
 	endpoint := fmt.Sprintf("/api/v1/configuration/subaccounts/%s/%s/systemMappings/%s:%s", region_host, subaccount, virtual_host, virtual_port)
 
 	err := requestAndUnmarshal(r.client, &respObj, "DELETE", endpoint, nil, false)

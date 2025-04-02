@@ -29,8 +29,8 @@ func TestDataSourceSystemMappings(t *testing.T) {
 				{
 					Config: providerConfig("", user) + DataSourceSystemMappings("test", "cf.eu12.hana.ondemand.com", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("data.cloudconnector_system_mappings.test", "credentials.region_host", "cf.eu12.hana.ondemand.com"),
-						resource.TestMatchResourceAttr("data.cloudconnector_system_mappings.test", "credentials.subaccount", regexpValidUUID),
+						resource.TestCheckResourceAttr("data.cloudconnector_system_mappings.test", "region_host", "cf.eu12.hana.ondemand.com"),
+						resource.TestMatchResourceAttr("data.cloudconnector_system_mappings.test", "subaccount", regexpValidUUID),
 
 						resource.TestCheckResourceAttr("data.cloudconnector_system_mappings.test", "system_mappings.#", "1"),
 						resource.TestCheckResourceAttr("data.cloudconnector_system_mappings.test", "system_mappings.0.virtual_host", "testterraformvirtual"),
@@ -59,10 +59,8 @@ func TestDataSourceSystemMappings(t *testing.T) {
 func DataSourceSystemMappings(datasourceName string, regionHost string, subaccount string) string {
 	return fmt.Sprintf(`
 	data "cloudconnector_system_mappings" "%s" {
-    credentials= {
-        region_host= "%s"
-        subaccount= "%s"
-    }
+	region_host= "%s"
+	subaccount= "%s"
 	}
 	`, datasourceName, regionHost, subaccount)
 }

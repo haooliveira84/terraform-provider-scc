@@ -72,18 +72,14 @@ func (c *RestApiClient) DoRequest(method string, endpoint string, body []byte) (
 
 func validateResponse(response *http.Response) error {
 	switch response.StatusCode {
-	case http.StatusCreated:
-		return nil
-	case http.StatusOK:
-		return nil
-	case http.StatusNoContent:
+	case http.StatusCreated, http.StatusOK, http.StatusNoContent:
 		return nil
 	default:
 		bodyBytes, _ := io.ReadAll(response.Body)
 		var errorResp ErrorResponse
 		err := json.Unmarshal(bodyBytes, &errorResp)
 		if err != nil {
-			return fmt.Errorf("error while unmarshaling error response")
+			return fmt.Errorf("status: %d, error while unmarshaling error response: %v", response.StatusCode, err)
 		}
 		return fmt.Errorf("status: %d, error while sending the request: %s", response.StatusCode, errorResp.Message)
 	}

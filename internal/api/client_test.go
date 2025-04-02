@@ -12,7 +12,9 @@ func TestRestApiClient(t *testing.T) {
 	handler := http.NewServeMux()
 	handler.HandleFunc("/success", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "success"}`))
+		if _, err := w.Write([]byte(`{"message": "success"}`)); err != nil {
+			t.Errorf("failed to write response: %v", err)
+		}
 	})
 
 	handler.HandleFunc("/created", func(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +27,9 @@ func TestRestApiClient(t *testing.T) {
 
 	handler.HandleFunc("/error", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"type": "bad_request", "message": "Invalid request"}`))
+		if _, err := w.Write([]byte(`{"type": "bad_request", "message": "Invalid request"}`)); err != nil {
+			t.Errorf("failed to write response: %v", err)
+		}
 	})
 
 	server := httptest.NewServer(handler)
@@ -34,7 +38,7 @@ func TestRestApiClient(t *testing.T) {
 	baseURL, _ := url.Parse(server.URL)
 	client := server.Client()
 
-	apiClient:= NewRestApiClient(client, baseURL, "testuser", "testpassword")
+	apiClient := NewRestApiClient(client, baseURL, "testuser", "testpassword")
 	t.Run("Test GET Success", func(t *testing.T) {
 		resp, err := apiClient.GetRequest("/success")
 		if err != nil {

@@ -27,7 +27,17 @@ func (d *SubaccountsDataSource) Metadata(ctx context.Context, req datasource.Met
 
 func (d *SubaccountsDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Cloud Connector Subaccounts Data Source",
+		MarkdownDescription: `Cloud Connector Subaccounts Data Source.
+				
+__Tips:__
+* You must be assigned to the following roles:
+	* Administrator
+	* Subaccount Administrator
+	* Display
+	* Support
+
+__Further documentation:__
+<https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/subaccount>`,
 		Attributes: map[string]schema.Attribute{
 			"subaccounts": schema.ListNestedAttribute{
 				MarkdownDescription: "A list of subaccounts associated with the cloud connector. Each entry in the list contains details about a specific subaccount.",

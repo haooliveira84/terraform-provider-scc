@@ -21,10 +21,8 @@ type SubaccountTunnelData struct {
 	State                   types.String `tfsdk:"state"`
 	ConnectedSinceTimeStamp types.Int64  `tfsdk:"connected_since_time_stamp"`
 	Connections             types.Int64  `tfsdk:"connections"`
-	// ApplicationConnections []interface{} `tfsdk:"application_connections"`
-	// ServiceChannels       []SubaccountServiceChannelData `tfsdk:"service_channels"`
-	SubaccountCertificate types.Object `tfsdk:"subaccount_certificate"`
-	User                  types.String `tfsdk:"user"`
+	SubaccountCertificate   types.Object `tfsdk:"subaccount_certificate"`
+	User                    types.String `tfsdk:"user"`
 }
 
 var SubaccountTunnelType = map[string]attr.Type{
@@ -36,13 +34,6 @@ var SubaccountTunnelType = map[string]attr.Type{
 		AttrTypes: SubaccountCertificateType,
 	},
 }
-
-// type SubaccountServiceChannelData struct {
-// 	Type    types.String `tfsdk:"type"`
-// 	State   types.String `tfsdk:"state"`
-// 	Details types.String `tfsdk:"details"`
-// 	Comment types.String `tfsdk:"comment"`
-// }
 
 type SubaccountCertificateData struct {
 	NotAfterTimeStamp  types.Int64  `tfsdk:"not_after_time_stamp"`
@@ -111,7 +102,6 @@ func SubaccountDataSourceValueFrom(ctx context.Context, value apiobjects.Subacco
 		ConnectedSinceTimeStamp: types.Int64Value(value.Tunnel.ConnectedSinceTimeStamp),
 		Connections:             types.Int64Value(value.Tunnel.Connections),
 		User:                    types.StringValue(value.Tunnel.User),
-		// ServiceChannels:         subaccountServiceChannels,
 	}
 
 	tunnelObj.SubaccountCertificate, _ = types.ObjectValueFrom(ctx, SubaccountCertificateType, certificateObj)
@@ -142,7 +132,6 @@ func SubaccountResourceValueFrom(ctx context.Context, plan SubaccountConfig, val
 		ConnectedSinceTimeStamp: types.Int64Value(value.Tunnel.ConnectedSinceTimeStamp),
 		Connections:             types.Int64Value(value.Tunnel.Connections),
 		User:                    types.StringValue(value.Tunnel.User),
-		// ServiceChannels:         subaccountServiceChannels,
 	}
 
 	tunnelObj.SubaccountCertificate, _ = types.ObjectValueFrom(ctx, SubaccountCertificateType, certificateObj)

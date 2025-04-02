@@ -24,12 +24,22 @@ type SubaccountDataSource struct {
 }
 
 func (d *SubaccountDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_subaccount"
+	resp.TypeName = req.ProviderTypeName + "_subaccount_configuration"
 }
 
 func (r *SubaccountDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Cloud Connector Subaccount Data Source",
+		MarkdownDescription: `Cloud Connector Subaccount Configuration Data Source.
+				
+__Tips:__
+* You must be assigned to the following roles:
+	* Administrator
+	* Subaccount Administrator
+	* Display
+	* Support
+
+__Further documentation:__
+<https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/subaccount>`,
 		Attributes: map[string]schema.Attribute{
 			"region_host": schema.StringAttribute{
 				MarkdownDescription: "Region Host Name.",

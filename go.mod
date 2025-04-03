@@ -1,7 +1,6 @@
 module github.com/SAP/terraform-provider-cloudconnector
 
 go 1.23.1
-
 toolchain go1.24.1
 
 require (
@@ -9,7 +8,7 @@ require (
 	github.com/hashicorp/terraform-plugin-framework-validators v0.17.0
 	github.com/hashicorp/terraform-plugin-go v0.26.0
 	github.com/hashicorp/terraform-plugin-testing v1.11.0
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.10.0
 	gopkg.in/dnaeon/go-vcr.v3 v3.2.0
 )
 

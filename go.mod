@@ -1,6 +1,7 @@
 module github.com/SAP/terraform-provider-cloudconnector
 
 go 1.23.1
+
 toolchain go1.24.1
 
 require (

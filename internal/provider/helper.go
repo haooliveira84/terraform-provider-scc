@@ -71,13 +71,17 @@ func requestAndUnmarshal[T any](client *api.RestApiClient, respObj *T, requestTy
 		return err
 	}
 
+	defer func() {
+		if responseBodyClose := response.Body.Close(); err != nil {
+			err = fmt.Errorf("failed to close response body: %v; original error: %v", responseBodyClose, err)
+		}
+	}()
+
 	if marshalResponse {
 		body, err := io.ReadAll(response.Body)
 		if err != nil {
 			return fmt.Errorf("failed to read API response body: %v", err)
 		}
-
-		defer response.Body.Close()
 
 		err = json.Unmarshal(body, &respObj)
 		if err != nil {

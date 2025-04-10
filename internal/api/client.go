@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -22,22 +23,35 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
-func NewRestApiClient(client *http.Client, baseURL *url.URL, username string, password string) *RestApiClient {
-	if client.Transport == nil {
-		client.Transport = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+func NewRestApiClient(client *http.Client, baseURL *url.URL, username, password string, caCertPEM []byte) (*RestApiClient, error) {
+	// Create a CA certificate pool and append the CA cert
+	var tlsConfig *tls.Config
+	if caCertPEM != nil {
+		caCertPool := x509.NewCertPool()
+		if ok := caCertPool.AppendCertsFromPEM(caCertPEM); !ok {
+			return nil, fmt.Errorf("failed to parse CA certificate: input is not valid PEM-encoded data")
 		}
-	} else {
-		if transport, ok := client.Transport.(*http.Transport); ok {
-			transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+
+		tlsConfig = &tls.Config{
+			RootCAs: caCertPool,
 		}
 	}
+
+	// Set up HTTP client and transport
+	if client == nil {
+		client = &http.Client{}
+	}
+
+	if tlsConfig != nil {
+		client.Transport = &http.Transport{TLSClientConfig: tlsConfig}
+	}
+
 	return &RestApiClient{
 		BaseURL:  baseURL,
 		Client:   client,
 		Username: username,
 		Password: password,
-	}
+	}, nil
 }
 
 func (c *RestApiClient) DoRequest(method string, endpoint string, body []byte) (*http.Response, error) {
@@ -61,7 +75,7 @@ func (c *RestApiClient) DoRequest(method string, endpoint string, body []byte) (
 	if err != nil {
 		return nil, err
 	}
-
+	// defer resp.Body.Close()
 	err = validateResponse(resp)
 	if err != nil {
 		return nil, err
@@ -71,18 +85,21 @@ func (c *RestApiClient) DoRequest(method string, endpoint string, body []byte) (
 }
 
 func validateResponse(response *http.Response) error {
-	switch response.StatusCode {
-	case http.StatusCreated, http.StatusOK, http.StatusNoContent:
+	if response.StatusCode == http.StatusOK ||
+		response.StatusCode == http.StatusCreated ||
+		response.StatusCode == http.StatusNoContent {
 		return nil
-	default:
-		bodyBytes, _ := io.ReadAll(response.Body)
-		var errorResp ErrorResponse
-		err := json.Unmarshal(bodyBytes, &errorResp)
-		if err != nil {
-			return fmt.Errorf("status: %d, error while unmarshaling error response: %v", response.StatusCode, err)
-		}
-		return fmt.Errorf("status: %d, error while sending the request: %s", response.StatusCode, errorResp.Message)
 	}
+
+	bodyBytes, _ := io.ReadAll(response.Body)
+	var errorResp ErrorResponse
+	if err := json.Unmarshal(bodyBytes, &errorResp); err != nil || errorResp.Message == "" {
+		return fmt.Errorf("HTTP %s %s failed with status %d. Raw response: %s",
+			response.Request.Method, response.Request.URL, response.StatusCode, string(bodyBytes))
+	}
+
+	return fmt.Errorf("HTTP %s %s failed with status %d: %s",
+		response.Request.Method, response.Request.URL, response.StatusCode, errorResp.Message)
 }
 
 func (c *RestApiClient) GetRequest(endpoint string) (*http.Response, error) {

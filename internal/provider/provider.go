@@ -6,13 +6,16 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 
 	"github.com/SAP/terraform-provider-cloudconnector/internal/api"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -35,9 +38,10 @@ type cloudConnectorProvider struct {
 }
 
 type cloudConnectorProviderData struct {
-	InstanceURL types.String `tfsdk:"instance_url"`
-	Username    types.String `tfsdk:"username"`
-	Password    types.String `tfsdk:"password"`
+	InstanceURL   types.String `tfsdk:"instance_url"`
+	Username      types.String `tfsdk:"username"`
+	Password      types.String `tfsdk:"password"`
+	CaCertificate types.String `tfsdk:"ca_certificate"`
 }
 
 func (c *cloudConnectorProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -51,6 +55,9 @@ func (c *cloudConnectorProvider) Schema(_ context.Context, _ provider.SchemaRequ
 			"instance_url": schema.StringAttribute{
 				MarkdownDescription: "The URL of Cloud Connector Instance.",
 				Optional:            true,
+				Validators: []validator.String{
+					stringvalidator.RegexMatches(regexp.MustCompile(`^https?://`), "must be a valid URL starting with http:// or https://"),
+				},
 			},
 			"username": schema.StringAttribute{
 				MarkdownDescription: "The username used to connect to Cloud Connector Instance.",
@@ -58,6 +65,11 @@ func (c *cloudConnectorProvider) Schema(_ context.Context, _ provider.SchemaRequ
 			},
 			"password": schema.StringAttribute{
 				MarkdownDescription: "The password used to connect to Cloud Connector Instance.",
+				Optional:            true,
+				Sensitive:           true,
+			},
+			"ca_certificate": schema.StringAttribute{
+				MarkdownDescription: "Contents of a PEM-encoded CA certificate. Use `file(\"path/to/cert.pem\")` in the provider block to read from a file.",
 				Optional:            true,
 				Sensitive:           true,
 			},
@@ -77,26 +89,34 @@ func (c *cloudConnectorProvider) Configure(ctx context.Context, req provider.Con
 		resp.Diagnostics.AddAttributeError(
 			path.Root("instance_url"),
 			"Unknown Cloud Connector Instance URL",
-			"The provider cannot create the Cloud Connector client as there is an unknown configuration value for the Cloud Connector Instance URL. "+
-				"Either target apply the source of the value first, set the value statically in the configuration, or use the CC_INSTANCE_URL environment variable.",
+			"The provider cannot create the Cloud Connector client as the Cloud Connector Instance URL is unknown. "+
+				"Set the value statically in configuration or use the CC_INSTANCE_URL environment variable.",
 		)
 	}
 
 	if config.Username.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("username"),
-			"Unknown Cloud Connector Instance Username",
-			"The provider cannot create the Cloud Connector client as there is an unknown configuration value for the Cloud Connector Instance Username. "+
-				"Either target apply the source of the value first, set the value statically in the configuration, or use the CC_USERNAME environment variable.",
+			"Unknown Username",
+			"The provider cannot create the Cloud Connector client as the username is unknown. "+
+				"Set the value statically in configuration or use the CC_USERNAME environment variable.",
 		)
 	}
 
 	if config.Password.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("password"),
-			"Unknown Cloud Connector Instance Password",
-			"The provider cannot create the Cloud Connector client as there is an unknown configuration value for the Cloud Connector Instance Password. "+
-				"Either target apply the source of the value first, set the value statically in the configuration, or use the CC_PASSWORD environment variable.",
+			"Unknown Password",
+			"The provider cannot create the Cloud Connector client as the password is unknown. "+
+				"Set the value statically in configuration or use the CC_PASSWORD environment variable.",
+		)
+	}
+	if config.CaCertificate.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("ca_certificate"),
+			"Unknown CA Certificate",
+			"The provider cannot create the Cloud Connector client as the CA certificate is unknown. "+
+				"Set the value statically in configuration or use the CC_CA_CERTIFICATE environment variable.",
 		)
 	}
 
@@ -105,9 +125,11 @@ func (c *cloudConnectorProvider) Configure(ctx context.Context, req provider.Con
 	}
 
 	// Ensure instance url is set using `export CC_INSTANCE_URL="https://example.com:port"` or pass it as a parameter.
+	// Get values from either config or environment
 	instance_url := os.Getenv("CC_INSTANCE_URL")
 	username := os.Getenv("CC_USERNAME")
 	password := os.Getenv("CC_PASSWORD")
+	ca_certificate := os.Getenv("CC_CA_CERTIFICATE")
 
 	if !config.InstanceURL.IsNull() {
 		instance_url = config.InstanceURL.ValueString()
@@ -121,33 +143,36 @@ func (c *cloudConnectorProvider) Configure(ctx context.Context, req provider.Con
 		password = config.Password.ValueString()
 	}
 
+	if !config.CaCertificate.IsNull() {
+		ca_certificate = config.CaCertificate.ValueString()
+	}
+
 	if instance_url == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("instance_url"),
 			"Missing Cloud Connector Instance URL",
-			"The provider cannot create the Cloud Connector client as there is a missing or empty value for the Cloud Connector Instance URL. "+
-				"Set the Base URL value in the configuration or use the CC_INSTANCE_URL environment variable. "+
-				"If either is already set, ensure the value is not empty.",
+			"The provider cannot create the Cloud Connector client because the Cloud Connector Instance URL is empty.",
 		)
 	}
-
 	if username == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("username"),
-			"Missing Cloud Connector Instance Username",
-			"The provider cannot create the Cloud Connector client as there is a missing or empty value for the Cloud Connector Instance Username. "+
-				"Set the username value in the configuration or use the CC_USERNAME environment variable. "+
-				"If either is already set, ensure the value is not empty.",
+			"Missing Username",
+			"The provider cannot create the Cloud Connector client because the username is empty.",
 		)
 	}
-
 	if password == "" {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("password"),
-			"Missing Cloud Connector Instance Password",
-			"The provider cannot create the Cloud Connector client as there is a missing or empty value for the Cloud Connector Instance Password. "+
-				"Set the password value in the configuration or use the CC_PASSWORD environment variable. "+
-				"If either is already set, ensure the value is not empty.",
+			"Missing Password",
+			"The provider cannot create the Cloud Connector client because the password is empty.",
+		)
+	}
+	if ca_certificate == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("ca_certificate"),
+			"Missing CA Certificate",
+			"The provider cannot create the Cloud Connector client because the CA certificate is empty.",
 		)
 	}
 
@@ -155,7 +180,7 @@ func (c *cloudConnectorProvider) Configure(ctx context.Context, req provider.Con
 		return
 	}
 
-	u, err := url.Parse(instance_url)
+	parsedURL, err := url.Parse(instance_url)
 	if err != nil {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("instance_url"),
@@ -163,7 +188,16 @@ func (c *cloudConnectorProvider) Configure(ctx context.Context, req provider.Con
 			fmt.Sprintf("The provider cannot create the Cloud Connector client as there is an error while parsing the provided Cloud Connector Instance URL: %s. Error: %v", instance_url, err),
 		)
 	}
-	client := api.NewRestApiClient(c.httpClient, u, username, password)
+
+	caCertPEM := []byte(ca_certificate)
+	client, err := api.NewRestApiClient(c.httpClient, parsedURL, username, password, caCertPEM)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client Creation Failed",
+			fmt.Sprintf("Failed to create Cloud Connector client: %s", err),
+		)
+		return
+	}
 	resp.DataSourceData = client
 	resp.ResourceData = client
 }

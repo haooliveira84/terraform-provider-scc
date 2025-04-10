@@ -28,7 +28,7 @@ func TestDataSourceSubaccountK8SServiceChannel(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + DataSourceSubaccountK8SServiceChannel("cc_sc", "cf.eu12.hana.ondemand.com", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8", 183),
+					Config: providerConfig("", user) + DataSourceSubaccountK8SServiceChannel("cc_sc", "cf.eu12.hana.ondemand.com", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8", 1),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttr("data.cloudconnector_subaccount_k8s_service_channel.cc_sc", "region_host", "cf.eu12.hana.ondemand.com"),
 						resource.TestMatchResourceAttr("data.cloudconnector_subaccount_k8s_service_channel.cc_sc", "subaccount", regexpValidUUID),

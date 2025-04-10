@@ -38,7 +38,10 @@ func TestRestApiClient(t *testing.T) {
 	baseURL, _ := url.Parse(server.URL)
 	client := server.Client()
 
-	apiClient := NewRestApiClient(client, baseURL, "testuser", "testpassword")
+	apiClient, err := NewRestApiClient(client, baseURL, "testuser", "testpassword", nil)
+	if err != nil {
+		t.Fatalf("failed to create api client: %v", err)
+	}
 	t.Run("Test GET Success", func(t *testing.T) {
 		resp, err := apiClient.GetRequest("/success")
 		if err != nil {

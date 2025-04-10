@@ -28,13 +28,15 @@ var (
 )
 
 type User struct {
-	Username string
-	Password string
+	Username      string
+	Password      string
+	CACertificate string
 }
 
 var redactedTestUser = User{
-	Username: "Administrator",
-	Password: "Terraform",
+	Username:      "Administrator",
+	Password:      "Terraform",
+	CACertificate: "/workspaces/terraform-provider-for-sap-cloud-connector/rootCA.pem",
 }
 
 func providerConfig(_ string, testUser User) string {
@@ -44,8 +46,9 @@ func providerConfig(_ string, testUser User) string {
 	instance_url= "%s"
 	username= "%s"
 	password= "%s"
+	ca_certificate= file("%s")
 	}
-	`, instance_url, testUser.Username, testUser.Password)
+	`, instance_url, testUser.Username, testUser.Password, testUser.CACertificate)
 }
 
 func getTestProviders(httpClient *http.Client) map[string]func() (tfprotov6.ProviderServer, error) {
@@ -64,6 +67,8 @@ func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 		mode = recorder.ModeRecordOnly
 	}
 
+	user := redactedTestUser
+
 	rec, err := recorder.NewWithOptions(&recorder.Options{
 		CassetteName:       cassetteName,
 		Mode:               mode,
@@ -71,12 +76,12 @@ func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 		RealTransport:      http.DefaultTransport,
 	})
 
-	user := redactedTestUser
 	if rec.IsRecording() {
 		t.Logf("ATTENTION: Recording '%s'", cassetteName)
 		user.Username = os.Getenv("CC_USERNAME")
 		user.Password = os.Getenv("CC_PASSWORD")
-		if len(user.Username) == 0 || len(user.Password) == 0 {
+		user.CACertificate = os.Getenv("CC_CA_CERTIFICATE")
+		if len(user.Username) == 0 || len(user.Password) == 0 || len(user.CACertificate) == 0 {
 			t.Fatal("Env vars CC_USERNAME and CC_PASSWORD are required when recording test fixtures")
 		}
 	} else {

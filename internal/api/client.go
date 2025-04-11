@@ -24,26 +24,24 @@ type ErrorResponse struct {
 }
 
 func NewRestApiClient(client *http.Client, baseURL *url.URL, username, password string, caCertPEM []byte) (*RestApiClient, error) {
-	// Create a CA certificate pool and append the CA cert
-	var tlsConfig *tls.Config
+	// Create TLS config only if caCertPEM is provided
 	if caCertPEM != nil {
 		caCertPool := x509.NewCertPool()
 		if ok := caCertPool.AppendCertsFromPEM(caCertPEM); !ok {
 			return nil, fmt.Errorf("failed to parse CA certificate: input is not valid PEM-encoded data")
 		}
 
-		tlsConfig = &tls.Config{
-			RootCAs: caCertPool,
+		// Initialize transport with custom TLS config
+		if client == nil {
+			client = &http.Client{}
 		}
-	}
-
-	// Set up HTTP client and transport
-	if client == nil {
+		client.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs: caCertPool,
+			},
+		}
+	} else if client == nil {
 		client = &http.Client{}
-	}
-
-	if tlsConfig != nil {
-		client.Transport = &http.Transport{TLSClientConfig: tlsConfig}
 	}
 
 	return &RestApiClient{

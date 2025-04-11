@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"net/http"
@@ -28,27 +29,24 @@ var (
 )
 
 type User struct {
-	Username      string
-	Password      string
-	CACertificate string
+	Username string
+	Password string
 }
 
 var redactedTestUser = User{
-	Username:      "Administrator",
-	Password:      "Terraform",
-	CACertificate: "/workspaces/terraform-provider-for-sap-cloud-connector/rootCA.pem",
+	Username: "Administrator",
+	Password: "Terraform",
 }
 
 func providerConfig(_ string, testUser User) string {
-	instance_url := "https://10.52.101.149:8443"
+	instance_url := "https://10.60.178.218:8443"
 	return fmt.Sprintf(`
 	provider "cloudconnector" {
 	instance_url= "%s"
 	username= "%s"
 	password= "%s"
-	ca_certificate= file("%s")
 	}
-	`, instance_url, testUser.Username, testUser.Password, testUser.CACertificate)
+	`, instance_url, testUser.Username, testUser.Password)
 }
 
 func getTestProviders(httpClient *http.Client) map[string]func() (tfprotov6.ProviderServer, error) {
@@ -73,15 +71,18 @@ func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 		CassetteName:       cassetteName,
 		Mode:               mode,
 		SkipRequestLatency: true,
-		RealTransport:      http.DefaultTransport,
+		RealTransport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
 	})
 
 	if rec.IsRecording() {
 		t.Logf("ATTENTION: Recording '%s'", cassetteName)
 		user.Username = os.Getenv("CC_USERNAME")
 		user.Password = os.Getenv("CC_PASSWORD")
-		user.CACertificate = os.Getenv("CC_CA_CERTIFICATE")
-		if len(user.Username) == 0 || len(user.Password) == 0 || len(user.CACertificate) == 0 {
+		if len(user.Username) == 0 || len(user.Password) == 0 {
 			t.Fatal("Env vars CC_USERNAME and CC_PASSWORD are required when recording test fixtures")
 		}
 	} else {

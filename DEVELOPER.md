@@ -28,10 +28,10 @@ Then open the cloned repository in [Visual Studio Code](https://code.visualstudi
 
 This will trigger the start of the dev container. You can choose to open a dev container with two configurations:
 
-* "Terraform Provider for SAP Cloud Connector" - the configuration in [.devcontainer/default/devcontainer.json](.devcontainer/default/devcontainer.json) contains the development override for the Terraform provider so that the local build is used. You must set the environment variables `CC_USERNAME` and `CC_PASSWORD` yourself.
+* "Terraform Provider for SAP Cloud Connector" - the configuration in [.devcontainer/default/devcontainer.json](.devcontainer/default/devcontainer.json) contains the development override for the Terraform provider so that the local build is used. You must set the environment variables `CC_USERNAME`, `CC_PASSWORD` and `CC_INSTANCE_URL` yourself.
 * Terraform Provider for SAP Cloud Connector - the configuration in [.devcontainer/withenvfile/devcontainer.json](.devcontainer/withenvfile/devcontainer.json) enhances the "Terraform provider for SAP Cloud Connector" to load environment variables (like username and password) when the container is started. This configuration expects a file called `devcontainer.env` in the folder `.devcontainer`.
 
-> **Note**: `.env` files are excluded from git via `.gitignore`. You can use the file to store the environment variables `CC_USERNAME` and `CC_PASSWORD` that are needed when developing tests.
+> **Note**: `.env` files are excluded from git via `.gitignore`. You can use the file to store the environment variables `CC_USERNAME`, `CC_PASSWORD` and `CC_INSTANCE_URL` that are needed when developing tests.
 
 > **Note**: In the first run, the download of the container might take a while, so maybe time to grab a cup of coffee ☕.
 

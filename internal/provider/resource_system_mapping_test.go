@@ -27,7 +27,7 @@ func TestResourceSystemMapping(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + ResourceSystemMapping("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtual", "900", "testtfinternal", "900", "HTTP", "abapSys", "VIRTUAL", "KERBEROS"),
+					Config: providerConfig(user) + ResourceSystemMapping("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtual", "900", "testtfinternal", "900", "HTTP", "abapSys", "VIRTUAL", "KERBEROS"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttr("cloudconnector_system_mapping.test", "region_host", "cf.eu12.hana.ondemand.com"),
 						resource.TestMatchResourceAttr("cloudconnector_system_mapping.test", "subaccount", regexpValidUUID),

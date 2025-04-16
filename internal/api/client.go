@@ -73,7 +73,6 @@ func (c *RestApiClient) DoRequest(method string, endpoint string, body []byte) (
 	if err != nil {
 		return nil, err
 	}
-	// defer resp.Body.Close()
 	err = validateResponse(resp)
 	if err != nil {
 		return nil, err

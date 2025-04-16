@@ -28,7 +28,7 @@ func TestDataSourceSubaccounts(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + DataSourceSubaccounts("test"),
+					Config: providerConfig(user) + DataSourceSubaccounts("test"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.ComposeTestCheckFunc(
 							func(s *terraform.State) error {

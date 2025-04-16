@@ -27,7 +27,7 @@ func TestDataSourceDomainMapping(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + DataSourceDomainMapping("mappings", "cf.eu12.hana.ondemand.com", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8", "testterraforminternaldomain"),
+					Config: providerConfig(user) + DataSourceDomainMapping("mappings", "cf.eu12.hana.ondemand.com", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8", "testterraforminternaldomain"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttr("data.cloudconnector_domain_mapping.mappings", "region_host", "cf.eu12.hana.ondemand.com"),
 						resource.TestMatchResourceAttr("data.cloudconnector_domain_mapping.mappings", "subaccount", regexpValidUUID),

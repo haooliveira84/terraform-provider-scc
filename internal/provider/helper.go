@@ -28,14 +28,14 @@ func sendPostOrPutRequest(client *api.RestApiClient, planBody map[string]string,
 	if action == "Create" {
 		response, err = client.PostRequest(endpoint, requestByteBody)
 		if err != nil {
-			return nil, fmt.Errorf("failed to send PUT request to %s: %v", endpoint, err)
+			return nil, fmt.Errorf("failed to send POST request to %s: %v", endpoint, err)
 		}
 	}
 
 	if action == "Update" {
 		response, err = client.PutRequest(endpoint, requestByteBody)
 		if err != nil {
-			return nil, fmt.Errorf("failed to send POST request to %s: %v", endpoint, err)
+			return nil, fmt.Errorf("failed to send PUT request to %s: %v", endpoint, err)
 		}
 	}
 

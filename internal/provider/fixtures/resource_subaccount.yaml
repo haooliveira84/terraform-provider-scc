@@ -9,10 +9,10 @@ interactions:
         content_length: 271
         transfer_encoding: []
         trailer: {}
-        host: 10.60.178.218:8443
+        host: https://127.0.0.1:8443
         remote_addr: ""
         request_uri: ""
-        body: '{"cloudPassword":"redacted","cloudUser":"redacted","description":"subaccount added via terraform tests","displayName":"","locationID":"","regionHost":"cf.eu12.hana.ondemand.com","subaccount":"7480ee65-e039-41cf-ba72-6aaf56c312df"}'
+        body: '{"cloudPassword":"testpassword","cloudUser":"testuser@sap.com","description":"subaccount added via terraform tests","displayName":"","locationID":"","regionHost":"cf.eu12.hana.ondemand.com","subaccount":"7480ee65-e039-41cf-ba72-6aaf56c312df"}'
         form: {}
         headers:
             Accept:
@@ -21,7 +21,7 @@ interactions:
                 - redacted
             Content-Type:
                 - application/json
-        url: https://10.60.178.218:8443/api/v1/configuration/subaccounts
+        url: https://127.0.0.1:8443/api/v1/configuration/subaccounts
         method: POST
       response:
         proto: HTTP/1.1
@@ -32,16 +32,16 @@ interactions:
         trailer: {}
         content_length: -1
         uncompressed: true
-        body: '{"description":"subaccount added via terraform tests","displayName":"7480ee65-e039-41cf-ba72-6aaf56c312df","tunnel":{"state":"Connected","connectedSinceTimeStamp":1744362505068,"connections":0,"applicationConnections":[],"serviceChannels":[],"subaccountCertificate":"redacted","user":"redacted"},"_links":"redacted","Kyma-channels":"redacted","HANA-channels":"redacted","systemMappings":"redacted","self":"redacted","validity":"redacted","state":"redacted","VirtualMachine-channels":"redacted","domainMappings":"redacted"},"regionHost":"cf.eu12.hana.ondemand.com","subaccount":"7480ee65-e039-41cf-ba72-6aaf56c312df","locationID":""}'
+        body: '{"description":"subaccount added via terraform tests","displayName":"7480ee65-e039-41cf-ba72-6aaf56c312df","tunnel":{"state":"Connected","connectedSinceTimeStamp":1744791358024,"connections":0,"applicationConnections":[],"serviceChannels":[],"subaccountCertificate":{"notAfterTimeStamp": 1111111111111,"notBeforeTimeStamp": 1111111111111,"subjectDN": "CN=redacted,L=redacted,OU=redacted,OU=redacted,O=redacted,C=redacted","issuer": "CN=redacted,OU=SAP Cloud Platform Clients,O=redacted,L=redacted,C=redacted","serialNumber": "aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa"},"user":"testuser@sap.com"},"_links":{"ABAPCloud-channels":{"href": "https://redacted.url/path"},"Kyma-channels":{"href": "https://redacted.url/path"},"HANA-channels":{"href": "https://redacted.url/path"},"systemMappings":{"href": "https://redacted.url/path"},"self":{"href": "https://redacted.url/path"},"validity":{"href": "https://redacted.url/path"},"state":{"href": "https://redacted.url/path"},"VirtualMachine-channels":{"href": "https://redacted.url/path"},"domainMappings":{"href": "https://redacted.url/path"}},"regionHost":"cf.eu12.hana.ondemand.com","subaccount":"7480ee65-e039-41cf-ba72-6aaf56c312df","locationID":""}'
         headers:
             Cache-Control:
                 - no-store
             Content-Type:
                 - application/json
             Date:
-                - Fri, 11 Apr 2025 09:08:25 GMT
+                - Wed, 16 Apr 2025 08:15:58 GMT
             Location:
-                - https://10.60.178.218:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/7480ee65-e039-41cf-ba72-6aaf56c312df
+                - https://10.52.101.149:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/7480ee65-e039-41cf-ba72-6aaf56c312df
             Server:
                 - Cloud Connector
             Set-Cookie:
@@ -52,7 +52,7 @@ interactions:
                 - redacted
         status: '201 '
         code: 201
-        duration: 5.16071242s
+        duration: 4.594484669s
     - id: 1
       request:
         proto: HTTP/1.1
@@ -61,7 +61,7 @@ interactions:
         content_length: 0
         transfer_encoding: []
         trailer: {}
-        host: 10.60.178.218:8443
+        host: https://127.0.0.1:8443
         remote_addr: ""
         request_uri: ""
         body: ""
@@ -73,7 +73,7 @@ interactions:
                 - redacted
             Content-Type:
                 - application/json
-        url: https://10.60.178.218:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/7480ee65-e039-41cf-ba72-6aaf56c312df
+        url: https://127.0.0.1:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/7480ee65-e039-41cf-ba72-6aaf56c312df
         method: GET
       response:
         proto: HTTP/1.1
@@ -84,14 +84,14 @@ interactions:
         trailer: {}
         content_length: -1
         uncompressed: true
-        body: '{"description":"subaccount added via terraform tests","displayName":"7480ee65-e039-41cf-ba72-6aaf56c312df","tunnel":{"state":"Connected","connectedSinceTimeStamp":1744362505068,"connections":0,"applicationConnections":[],"serviceChannels":[],"subaccountCertificate":"redacted","user":"redacted"},"_links":"redacted","Kyma-channels":"redacted","HANA-channels":"redacted","systemMappings":"redacted","self":"redacted","validity":"redacted","state":"redacted","VirtualMachine-channels":"redacted","domainMappings":"redacted"},"regionHost":"cf.eu12.hana.ondemand.com","subaccount":"7480ee65-e039-41cf-ba72-6aaf56c312df","locationID":""}'
+        body: '{"description":"subaccount added via terraform tests","displayName":"7480ee65-e039-41cf-ba72-6aaf56c312df","tunnel":{"state":"Connected","connectedSinceTimeStamp":1744791358024,"connections":0,"applicationConnections":[],"serviceChannels":[],"subaccountCertificate":{"notAfterTimeStamp": 1111111111111,"notBeforeTimeStamp": 1111111111111,"subjectDN": "CN=redacted,L=redacted,OU=redacted,OU=redacted,O=redacted,C=redacted","issuer": "CN=redacted,OU=SAP Cloud Platform Clients,O=redacted,L=redacted,C=redacted","serialNumber": "aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa:aa"},"user":"testuser@sap.com"},"_links":{"ABAPCloud-channels":{"href": "https://redacted.url/path"},"Kyma-channels":{"href": "https://redacted.url/path"},"HANA-channels":{"href": "https://redacted.url/path"},"systemMappings":{"href": "https://redacted.url/path"},"self":{"href": "https://redacted.url/path"},"validity":{"href": "https://redacted.url/path"},"state":{"href": "https://redacted.url/path"},"VirtualMachine-channels":{"href": "https://redacted.url/path"},"domainMappings":{"href": "https://redacted.url/path"}},"regionHost":"cf.eu12.hana.ondemand.com","subaccount":"7480ee65-e039-41cf-ba72-6aaf56c312df","locationID":""}'
         headers:
             Cache-Control:
                 - no-store
             Content-Type:
                 - application/json
             Date:
-                - Fri, 11 Apr 2025 09:08:25 GMT
+                - Wed, 16 Apr 2025 08:15:58 GMT
             Server:
                 - Cloud Connector
             Set-Cookie:
@@ -102,7 +102,7 @@ interactions:
                 - redacted
         status: '200 '
         code: 200
-        duration: 13.844375ms
+        duration: 13.630041ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -111,7 +111,7 @@ interactions:
         content_length: 0
         transfer_encoding: []
         trailer: {}
-        host: 10.60.178.218:8443
+        host: https://127.0.0.1:8443
         remote_addr: ""
         request_uri: ""
         body: ""
@@ -123,7 +123,7 @@ interactions:
                 - redacted
             Content-Type:
                 - application/json
-        url: https://10.60.178.218:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/7480ee65-e039-41cf-ba72-6aaf56c312df
+        url: https://127.0.0.1:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/7480ee65-e039-41cf-ba72-6aaf56c312df
         method: DELETE
       response:
         proto: HTTP/1.1
@@ -138,7 +138,7 @@ interactions:
             Cache-Control:
                 - no-store
             Date:
-                - Fri, 11 Apr 2025 09:08:25 GMT
+                - Wed, 16 Apr 2025 08:15:58 GMT
             Server:
                 - Cloud Connector
             Set-Cookie:
@@ -147,4 +147,4 @@ interactions:
                 - redacted
         status: '204 '
         code: 204
-        duration: 51.634ms
+        duration: 49.450083ms

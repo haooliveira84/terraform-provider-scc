@@ -28,13 +28,13 @@ func TestResourceSubaccountK8SServiceChannel(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + ResourceSubaccountK8SServiceChannel("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "cp.ace9fb5.stage.kyma.ondemand.com:443", "29d4e6f6-8e7f-4882-b434-21a52bb75e0f", 6000, 1, true),
+					Config: providerConfig(user) + ResourceSubaccountK8SServiceChannel("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "cp.ace9fb5.stage.kyma.ondemand.com:443", "29d4e6f6-8e7f-4882-b434-21a52bb75e0f", 3000, 1, true),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "region_host", "cf.eu12.hana.ondemand.com"),
 						resource.TestMatchResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "subaccount", regexpValidUUID),
 						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "k8s_cluster", "cp.ace9fb5.stage.kyma.ondemand.com:443"),
 						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "k8s_service", "29d4e6f6-8e7f-4882-b434-21a52bb75e0f"),
-						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "port", "6000"),
+						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "port", "3000"),
 						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "connections", "1"),
 						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "type", "K8S"),
 						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "enabled", "true"),

@@ -27,7 +27,7 @@ func TestResourceDomainMapping(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig("", user) + ResourceDomainMapping("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtualdomain", "testtfinternaldomain"),
+					Config: providerConfig(user) + ResourceDomainMapping("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtualdomain", "testtfinternaldomain"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttr("cloudconnector_domain_mapping.test", "region_host", "cf.eu12.hana.ondemand.com"),
 						resource.TestMatchResourceAttr("cloudconnector_domain_mapping.test", "subaccount", regexpValidUUID),

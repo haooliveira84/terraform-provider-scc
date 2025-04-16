@@ -9,7 +9,7 @@ interactions:
         content_length: 0
         transfer_encoding: []
         trailer: {}
-        host: 10.60.178.218:8443
+        host: https://127.0.0.1:8443
         remote_addr: ""
         request_uri: ""
         body: ""
@@ -21,7 +21,7 @@ interactions:
                 - redacted
             Content-Type:
                 - application/json
-        url: https://10.60.178.218:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/0bcb0012-a982-42f9-bda4-0a5cb15f88c8/systemMappings/testterraformvirtual:900
+        url: https://127.0.0.1:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/0bcb0012-a982-42f9-bda4-0a5cb15f88c8/systemMappings/testterraformvirtual:900
         method: GET
       response:
         proto: HTTP/1.1
@@ -31,7 +31,7 @@ interactions:
         trailer: {}
         content_length: 748
         uncompressed: false
-        body: '{"virtualHost":"testterraformvirtual","virtualPort":"900","localHost":"testterraforminternal","localPort":"900","creationDate":"1744354256543","protocol":"HTTP","backendType":"abapSys","hostInHeader":"VIRTUAL","sid":"","totalResourcesCount":1,"enabledResourcesCount":1,"authenticationMode":"KERBEROS","description":"","allowedClients":[],"blacklistedUsers":[],"_links":"redacted","resources":{"href":"https://10.60.178.218:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/0bcb0012-a982-42f9-bda4-0a5cb15f88c8/systemMappings/testterraformvirtual:900/resources"}}}'
+        body: '{"virtualHost":"testterraformvirtual","virtualPort":"900","localHost":"testterraforminternal","localPort":"900","creationDate":"1744354256543","protocol":"HTTP","backendType":"abapSys","hostInHeader":"VIRTUAL","sid":"","totalResourcesCount":1,"enabledResourcesCount":1,"authenticationMode":"KERBEROS","description":"","allowedClients":[],"blacklistedUsers":[],"_links":{"self":{"href": "https://redacted.url/path"},"resources":{"href": "https://redacted.url/path"}}}'
         headers:
             Cache-Control:
                 - no-store
@@ -40,7 +40,7 @@ interactions:
             Content-Type:
                 - application/json
             Date:
-                - Fri, 11 Apr 2025 09:08:19 GMT
+                - Wed, 16 Apr 2025 08:13:27 GMT
             Server:
                 - Cloud Connector
             Set-Cookie:
@@ -49,7 +49,7 @@ interactions:
                 - redacted
         status: '200 '
         code: 200
-        duration: 47.393667ms
+        duration: 27.996042ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -58,7 +58,7 @@ interactions:
         content_length: 0
         transfer_encoding: []
         trailer: {}
-        host: 10.60.178.218:8443
+        host: https://127.0.0.1:8443
         remote_addr: ""
         request_uri: ""
         body: ""
@@ -70,7 +70,7 @@ interactions:
                 - redacted
             Content-Type:
                 - application/json
-        url: https://10.60.178.218:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/0bcb0012-a982-42f9-bda4-0a5cb15f88c8/systemMappings/testterraformvirtual:900
+        url: https://127.0.0.1:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/0bcb0012-a982-42f9-bda4-0a5cb15f88c8/systemMappings/testterraformvirtual:900
         method: GET
       response:
         proto: HTTP/1.1
@@ -80,7 +80,7 @@ interactions:
         trailer: {}
         content_length: 748
         uncompressed: false
-        body: '{"virtualHost":"testterraformvirtual","virtualPort":"900","localHost":"testterraforminternal","localPort":"900","creationDate":"1744354256543","protocol":"HTTP","backendType":"abapSys","hostInHeader":"VIRTUAL","sid":"","totalResourcesCount":1,"enabledResourcesCount":1,"authenticationMode":"KERBEROS","description":"","allowedClients":[],"blacklistedUsers":[],"_links":"redacted","resources":{"href":"https://10.60.178.218:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/0bcb0012-a982-42f9-bda4-0a5cb15f88c8/systemMappings/testterraformvirtual:900/resources"}}}'
+        body: '{"virtualHost":"testterraformvirtual","virtualPort":"900","localHost":"testterraforminternal","localPort":"900","creationDate":"1744354256543","protocol":"HTTP","backendType":"abapSys","hostInHeader":"VIRTUAL","sid":"","totalResourcesCount":1,"enabledResourcesCount":1,"authenticationMode":"KERBEROS","description":"","allowedClients":[],"blacklistedUsers":[],"_links":{"self":{"href": "https://redacted.url/path"},"resources":{"href": "https://redacted.url/path"}}}'
         headers:
             Cache-Control:
                 - no-store
@@ -89,7 +89,7 @@ interactions:
             Content-Type:
                 - application/json
             Date:
-                - Fri, 11 Apr 2025 09:08:19 GMT
+                - Wed, 16 Apr 2025 08:13:27 GMT
             Server:
                 - Cloud Connector
             Set-Cookie:
@@ -98,7 +98,7 @@ interactions:
                 - redacted
         status: '200 '
         code: 200
-        duration: 1.5725ms
+        duration: 4.58425ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -107,7 +107,7 @@ interactions:
         content_length: 0
         transfer_encoding: []
         trailer: {}
-        host: 10.60.178.218:8443
+        host: https://127.0.0.1:8443
         remote_addr: ""
         request_uri: ""
         body: ""
@@ -119,7 +119,7 @@ interactions:
                 - redacted
             Content-Type:
                 - application/json
-        url: https://10.60.178.218:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/0bcb0012-a982-42f9-bda4-0a5cb15f88c8/systemMappings/testterraformvirtual:900
+        url: https://127.0.0.1:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/0bcb0012-a982-42f9-bda4-0a5cb15f88c8/systemMappings/testterraformvirtual:900
         method: GET
       response:
         proto: HTTP/1.1
@@ -129,7 +129,7 @@ interactions:
         trailer: {}
         content_length: 748
         uncompressed: false
-        body: '{"virtualHost":"testterraformvirtual","virtualPort":"900","localHost":"testterraforminternal","localPort":"900","creationDate":"1744354256543","protocol":"HTTP","backendType":"abapSys","hostInHeader":"VIRTUAL","sid":"","totalResourcesCount":1,"enabledResourcesCount":1,"authenticationMode":"KERBEROS","description":"","allowedClients":[],"blacklistedUsers":[],"_links":"redacted","resources":{"href":"https://10.60.178.218:8443/api/v1/configuration/subaccounts/cf.eu12.hana.ondemand.com/0bcb0012-a982-42f9-bda4-0a5cb15f88c8/systemMappings/testterraformvirtual:900/resources"}}}'
+        body: '{"virtualHost":"testterraformvirtual","virtualPort":"900","localHost":"testterraforminternal","localPort":"900","creationDate":"1744354256543","protocol":"HTTP","backendType":"abapSys","hostInHeader":"VIRTUAL","sid":"","totalResourcesCount":1,"enabledResourcesCount":1,"authenticationMode":"KERBEROS","description":"","allowedClients":[],"blacklistedUsers":[],"_links":{"self":{"href": "https://redacted.url/path"},"resources":{"href": "https://redacted.url/path"}}}'
         headers:
             Cache-Control:
                 - no-store
@@ -138,7 +138,7 @@ interactions:
             Content-Type:
                 - application/json
             Date:
-                - Fri, 11 Apr 2025 09:08:19 GMT
+                - Wed, 16 Apr 2025 08:13:27 GMT
             Server:
                 - Cloud Connector
             Set-Cookie:
@@ -147,4 +147,4 @@ interactions:
                 - redacted
         status: '200 '
         code: 200
-        duration: 4.212875ms
+        duration: 3.41875ms

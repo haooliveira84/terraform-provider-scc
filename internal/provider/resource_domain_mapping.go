@@ -3,9 +3,11 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/SAP/terraform-provider-cloudconnector/internal/api"
 	apiobjects "github.com/SAP/terraform-provider-cloudconnector/internal/api/apiObjects"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
@@ -263,11 +265,18 @@ func (r *DomainMappingResource) Delete(ctx context.Context, req resource.DeleteR
 	}
 }
 
-// func GetDomainMapping(domainMappings apiobjects.DomainMappings, targetInternalDomain string) (*apiobjects.DomainMapping, error) {
-// 	for _, mapping := range domainMappings.DomainMappings {
-// 		if mapping.InternalDomain == targetInternalDomain {
-// 			return &mapping, nil
-// 		}
-// 	}
-// 	return nil, fmt.Errorf("%s", "mapping doesn't exist")
-// }
+func (rs *DomainMappingResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	idParts := strings.Split(req.ID, ",")
+
+	if len(idParts) != 3 || idParts[0] == "" || idParts[1] == "" || idParts[2] == "" {
+		resp.Diagnostics.AddError(
+			"Unexpected Import Identifier",
+			fmt.Sprintf("Expected import identifier with format: region_host, subaccount, internal_domain. Got: %q", req.ID),
+		)
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("region_host"), idParts[0])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("subaccount"), idParts[1])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("internal_domain"), idParts[2])...)
+}

@@ -67,3 +67,13 @@ Read-Only:
 - `connected` (Boolean) A Boolean flag indicating whether the channel is connected.
 - `connected_since_time_stamp` (Number) The time stamp, a UTC long number, for the first time the channel was opened/connected.
 - `opened_connections` (Number) The number of open, possibly idle connections.
+
+## Import
+
+Import is supported using the following syntax:
+
+```terraform
+# terraform import cloudconnector_subaccount_k8s_service_channel.<resource_name> '<region_host>,<subaccount>,<id>`
+
+terraform import cloudconnector_subaccount_k8s_service_channel.cc_sc 'cf.eu12.hana.ondemand.com,12345678-90ab-cdef-1234-567890abcdef,1'
+```

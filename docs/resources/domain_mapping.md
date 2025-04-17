@@ -42,3 +42,13 @@ resource "cloudconnector_domain_mapping" "cc_dm" {
 - `region_host` (String) Region Host Name.
 - `subaccount` (String) The ID of the subaccount.
 - `virtual_domain` (String) Domain used on the cloud side.
+
+## Import
+
+Import is supported using the following syntax:
+
+```terraform
+# terraform import cloudconnector_domain_mapping.<resource_name> '<region_host>,<subaccount>,<internal_domain>`
+
+terraform import cloudconnector_domain_mapping.cc_dm 'cf.eu12.hana.ondemand.com,12345678-90ab-cdef-1234-567890abcdef,my.internal.domain.com'
+```

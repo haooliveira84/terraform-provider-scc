@@ -50,5 +50,3 @@ Read-Only:
 
 - `internal_domain` (String) Domain used on the on-premise side.
 - `virtual_domain` (String) Domain used on the cloud side.
-
-

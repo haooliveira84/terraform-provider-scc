@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/SAP/terraform-provider-cloudconnector/internal/api"
 	apiobjects "github.com/SAP/terraform-provider-cloudconnector/internal/api/apiObjects"
@@ -15,7 +16,6 @@ import (
 )
 
 var _ resource.Resource = &SystemMappingResource{}
-var _ resource.ResourceWithImportState = &SystemMappingResource{}
 
 func NewSystemMappingResource() resource.Resource {
 	return &SystemMappingResource{}
@@ -359,6 +359,19 @@ func (r *SystemMappingResource) Delete(ctx context.Context, req resource.DeleteR
 	}
 }
 
-func (r *SystemMappingResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+func (rs *SystemMappingResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	idParts := strings.Split(req.ID, ",")
+
+	if len(idParts) != 4 || idParts[0] == "" || idParts[1] == "" || idParts[2] == "" || idParts[3] == "" {
+		resp.Diagnostics.AddError(
+			"Unexpected Import Identifier",
+			fmt.Sprintf("Expected import identifier with format: region_host, subaccount, virtual_host, virtual_port. Got: %q", req.ID),
+		)
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("region_host"), idParts[0])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("subaccount"), idParts[1])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("virtual_host"), idParts[2])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("virtual_port"), idParts[3])...)
 }

@@ -53,3 +53,13 @@ resource "cloudconnector_system_mapping_resource" "cc_smr" {
 - `enabled` (Boolean) Boolean flag indicating whether the resource is enabled.
 - `exact_match_only` (Boolean) Boolean flag determining whether access is granted only if the requested resource is an exact match.
 - `websocket_upgrade_allowed` (Boolean) Boolean flag indicating whether websocket upgrade is allowed. This property is of relevance only if the owning system mapping employs protocol HTTP or HTTPS.
+
+## Import
+
+Import is supported using the following syntax:
+
+```terraform
+# terraform import cloudconnector_system_mapping_resource.<resource_name> '<region_host>,<subaccount>,<virtual_host>,<virtual_port>`
+
+terraform import cloudconnector_system_mapping_resource.cc_smr 'cf.eu12.hana.ondemand.com,12345678-90ab-cdef-1234-567890abcdef,virtual.example.com,443,/'
+```

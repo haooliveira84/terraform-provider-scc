@@ -62,5 +62,3 @@ Read-Only:
 - `connected` (Boolean) A Boolean flag indicating whether the channel is connected.
 - `connected_since_time_stamp` (Number) The time stamp, a UTC long number, for the first time the channel was opened/connected.
 - `opened_connections` (Number) The number of open, possibly idle connections.
-
-

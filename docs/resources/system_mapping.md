@@ -97,3 +97,13 @@ resource "cloudconnector_system_mapping" "cc_sm" {
 - `creation_date` (String) Date of creation of system mapping.
 - `enabled_resources_count` (Number) The number of enabled resources.
 - `total_resources_count` (Number) The total number of resources.
+
+## Import
+
+Import is supported using the following syntax:
+
+```terraform
+# terraform import cloudconnector_system_mapping.<resource_name> '<region_host>,<subaccount>,<virtual_host>,<virtual_port>`
+
+terraform import cloudconnector_system_mapping.cc_sm 'cf.eu12.hana.ondemand.com,12345678-90ab-cdef-1234-567890abcdef,virtual.example.com,443'
+```

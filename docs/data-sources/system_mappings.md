@@ -98,5 +98,3 @@ Read-Only:
 - `sap_router` (String) SAP router route, required only if an SAP router is used.
 - `sid` (String) The ID of the system.
 - `total_resources_count` (Number) The total number of resources.
-
-

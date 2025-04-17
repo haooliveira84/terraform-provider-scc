@@ -63,5 +63,3 @@ Read-Only:
 - `enabled` (Boolean) Boolean flag indicating whether the resource is enabled.
 - `exact_match_only` (Boolean) Boolean flag determining whether access is granted only if the requested resource is an exact match.
 - `websocket_upgrade_allowed` (Boolean) Boolean flag indicating whether websocket upgrade is allowed. This property is of relevance only if the owning system mapping employs protocol HTTP or HTTPS.
-
-

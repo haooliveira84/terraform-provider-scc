@@ -45,5 +45,3 @@ Read-Only:
 - `location_id` (String) Location identifier for the Cloud Connector instance. This property is not available if the default location ID is in use.
 - `region_host` (String) Region Host Name.
 - `subaccount` (String) The ID of the subaccount.
-
-

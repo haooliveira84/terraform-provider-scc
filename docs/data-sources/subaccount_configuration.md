@@ -75,5 +75,3 @@ Read-Only:
 - `not_before_time_stamp` (Number) Timestamp of the beginning of the validity period.
 - `serial_number` (String) Unique identifier for the certificate, typically assigned by the CA.
 - `subject_dn` (String) The subject distinguished name.
-
-

@@ -44,5 +44,3 @@ data "cloudconnector_domain_mapping" "cc_dm" {
 ### Read-Only
 
 - `virtual_domain` (String) Domain used on the cloud side.
-
-

@@ -82,3 +82,13 @@ Read-Only:
 - `not_before_time_stamp` (Number) Timestamp of the beginning of the validity period.
 - `serial_number` (String) Unique identifier for the certificate, typically assigned by the CA.
 - `subject_dn` (String) The subject distinguished name.
+
+## Import
+
+Import is supported using the following syntax:
+
+```terraform
+# terraform import cloudconnector_subaccount.<resource_name> '<region_host>,<subaccount>`
+
+terraform import cloudconnector_subaccount.cc_subaccount 'cf.eu12.hana.ondemand.com,12345678-90ab-cdef-1234-567890abcdef'
+```

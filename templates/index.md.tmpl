@@ -1,0 +1,16 @@
+---
+page_title: "{{.RenderedProviderName}} Provider"
+description: |-
+{{ .Description }}
+---
+# Terraform Provider for {{.RenderedProviderName}}
+
+{{ .Description }}
+
+{{ if .HasExample -}}
+## Example Usage
+
+{{tffile .ExampleFile}}
+{{- end }}
+
+{{ .SchemaMarkdown }}

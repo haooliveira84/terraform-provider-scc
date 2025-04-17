@@ -1,0 +1,1 @@
+data "cloudconnector_subaccounts" "all" {}

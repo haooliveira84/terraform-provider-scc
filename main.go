@@ -1,3 +1,5 @@
+//go:generate go install github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@latest
+//go:generate tfplugindocs generate --provider-name "cloudconnector" --rendered-provider-name "SAP Cloud Connector"
 package main
 
 import (

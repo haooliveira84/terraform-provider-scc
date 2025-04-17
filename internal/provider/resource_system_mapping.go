@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/SAP/terraform-provider-cloudconnector/internal/api"
 	apiobjects "github.com/SAP/terraform-provider-cloudconnector/internal/api/apiObjects"
@@ -15,7 +16,6 @@ import (
 )
 
 var _ resource.Resource = &SystemMappingResource{}
-var _ resource.ResourceWithImportState = &SystemMappingResource{}
 
 func NewSystemMappingResource() resource.Resource {
 	return &SystemMappingResource{}
@@ -79,47 +79,48 @@ __Further documentation:__
 				MarkdownDescription: "Protocol used when sending requests and receiving responses, which must be one of the following values:" +
 					getFormattedValueAsTableRow("protocol", "description") +
 					getFormattedValueAsTableRow("---", "---") +
-					getFormattedValueAsTableRow("HTTP", "") +
-					getFormattedValueAsTableRow("HTTPS", "") +
-					getFormattedValueAsTableRow("RFC", "") +
-					getFormattedValueAsTableRow("RFCS", "") +
-					getFormattedValueAsTableRow("LDAP", "") +
-					getFormattedValueAsTableRow("LDAPS", "") +
-					getFormattedValueAsTableRow("TCP", "") +
-					getFormattedValueAsTableRow("TCPS", ""),
+					getFormattedValueAsTableRow("HTTP", "HTTP protocol") +
+					getFormattedValueAsTableRow("HTTPS", "Secure HTTP protocol") +
+					getFormattedValueAsTableRow("RFC", "Remote Function Call protocol") +
+					getFormattedValueAsTableRow("RFCS", "Secure RFC protocol") +
+					getFormattedValueAsTableRow("LDAP", "Lightweight Directory Access Protocol") +
+					getFormattedValueAsTableRow("LDAPS", "Secure LDAP") +
+					getFormattedValueAsTableRow("TCP", "Transmission Control Protocol") +
+					getFormattedValueAsTableRow("TCPS", "Secure TCP"),
 				Required: true,
 			},
 			"backend_type": schema.StringAttribute{
 				MarkdownDescription: "Type of the backend system. Valid values are:" +
-					getFormattedValueAsTableRow("protocol", "description") +
+					getFormattedValueAsTableRow("backend", "description") +
 					getFormattedValueAsTableRow("---", "---") +
-					getFormattedValueAsTableRow("abapSys", "") +
-					getFormattedValueAsTableRow("netweaverCE", "") +
-					getFormattedValueAsTableRow("netweaverGW", "") +
-					getFormattedValueAsTableRow("applServerJava", "") +
-					getFormattedValueAsTableRow("PI", "") +
-					getFormattedValueAsTableRow("hana", "") +
-					getFormattedValueAsTableRow("otherSAPsys", "") +
-					getFormattedValueAsTableRow("nonSAPsys", ""),
+					getFormattedValueAsTableRow("abapSys", "ABAP-based SAP system") +
+					getFormattedValueAsTableRow("netweaverCE", "SAP NetWeaver Composition Environment") +
+					getFormattedValueAsTableRow("netweaverGW", "SAP NetWeaver Gateway") +
+					getFormattedValueAsTableRow("applServerJava", "Java-based application server") +
+					getFormattedValueAsTableRow("PI", "SAP Process Integration system") +
+					getFormattedValueAsTableRow("hana", "SAP HANA system") +
+					getFormattedValueAsTableRow("otherSAPsys", "Other SAP system") +
+					getFormattedValueAsTableRow("nonSAPsys", "Non-SAP system"),
 				Required: true,
 			},
 			"authentication_mode": schema.StringAttribute{
 				MarkdownDescription: "Authentication mode to be used on the backend side, which must be one of the following:" +
-					getFormattedValueAsTableRow("protocol", "description") +
+					getFormattedValueAsTableRow("authentication mode", "description") +
 					getFormattedValueAsTableRow("---", "---") +
-					getFormattedValueAsTableRow("NONE", "") +
-					getFormattedValueAsTableRow("NONE_RESTRICTED", "") +
-					getFormattedValueAsTableRow("X509_GENERAL", "") +
-					getFormattedValueAsTableRow("X509_RESTRICTED", "") +
-					getFormattedValueAsTableRow("KERBEROS", ""),
+					getFormattedValueAsTableRow("NONE", "No authentication") +
+					getFormattedValueAsTableRow("NONE_RESTRICTED", "No authentication; system certificate will never be sent") +
+					getFormattedValueAsTableRow("X509_GENERAL", "X.509 certificate-based authentication, system certificate may be sent") +
+					getFormattedValueAsTableRow("X509_RESTRICTED", "X.509 certificate-based authentication, system certificate never sent") +
+					getFormattedValueAsTableRow("KERBEROS", "Kerberos-based authentication") +
+					"The authentication modes NONE_RESTRICTED and X509_RESTRICTED prevent the Cloud Connector from sending the system certificate in any case, whereas NONE and X509_GENERAL will send the system certificate if the circumstances allow it.",
 				Required: true,
 			},
 			"host_in_header": schema.StringAttribute{
 				MarkdownDescription: "Policy for setting the host in the response header. This property is applicable to HTTP(S) protocols only. If set, it must be one of the following strings:" +
 					getFormattedValueAsTableRow("policy", "description") +
 					getFormattedValueAsTableRow("---", "---") +
-					getFormattedValueAsTableRow("internal/INTERNAL", "") +
-					getFormattedValueAsTableRow("virtual/VIRTUAL", "") + "The default is virtual.",
+					getFormattedValueAsTableRow("internal/INTERNAL", "Use internal (local) host for HTTP headers") +
+					getFormattedValueAsTableRow("virtual/VIRTUAL", "Use virtual host (default) for HTTP headers") + "The default is virtual.",
 				Required: true,
 			},
 			"sid": schema.StringAttribute{
@@ -358,6 +359,19 @@ func (r *SystemMappingResource) Delete(ctx context.Context, req resource.DeleteR
 	}
 }
 
-func (r *SystemMappingResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+func (rs *SystemMappingResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	idParts := strings.Split(req.ID, ",")
+
+	if len(idParts) != 4 || idParts[0] == "" || idParts[1] == "" || idParts[2] == "" || idParts[3] == "" {
+		resp.Diagnostics.AddError(
+			"Unexpected Import Identifier",
+			fmt.Sprintf("Expected import identifier with format: region_host, subaccount, virtual_host, virtual_port. Got: %q", req.ID),
+		)
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("region_host"), idParts[0])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("subaccount"), idParts[1])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("virtual_host"), idParts[2])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("virtual_port"), idParts[3])...)
 }

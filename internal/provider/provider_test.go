@@ -144,7 +144,6 @@ func hookRedactSensitiveCredentials() func(i *cassette.Interaction) error {
 		i.Request.URL = ipPattern.ReplaceAllString(i.Request.URL, redactedTestUser.InstanceURL)
 		i.Request.Host = hostPattern.ReplaceAllString(i.Request.Host, redactedTestUser.InstanceURL)
 
-
 		redact(i.Request.Headers)
 		redact(i.Response.Headers)
 

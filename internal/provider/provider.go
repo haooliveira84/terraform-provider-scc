@@ -54,18 +54,18 @@ func (c *cloudConnectorProvider) Schema(_ context.Context, _ provider.SchemaRequ
 		Attributes: map[string]schema.Attribute{
 			"instance_url": schema.StringAttribute{
 				MarkdownDescription: "The URL of Cloud Connector Instance.",
-				Optional:            true,
+				Required:            true,
 				Validators: []validator.String{
 					stringvalidator.RegexMatches(regexp.MustCompile(`^https?://`), "must be a valid URL starting with http:// or https://"),
 				},
 			},
 			"username": schema.StringAttribute{
 				MarkdownDescription: "The username used to connect to Cloud Connector Instance.",
-				Optional:            true,
+				Required:            true,
 			},
 			"password": schema.StringAttribute{
 				MarkdownDescription: "The password used to connect to Cloud Connector Instance.",
-				Optional:            true,
+				Required:            true,
 				Sensitive:           true,
 			},
 			"ca_certificate": schema.StringAttribute{

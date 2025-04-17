@@ -3,10 +3,13 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/SAP/terraform-provider-cloudconnector/internal/api"
 	apiobjects "github.com/SAP/terraform-provider-cloudconnector/internal/api/apiObjects"
 	"github.com/SAP/terraform-provider-cloudconnector/internal/api/endpoints"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
@@ -345,4 +348,30 @@ func (r *SubaccountServiceChannelK8SResource) updateSubaccountServiceChannel(pla
 		resp.Diagnostics.AddError("error updating the cloud connector subaccount service channel", err.Error())
 		return
 	}
+}
+
+func (rs *SubaccountServiceChannelK8SResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	idParts := strings.Split(req.ID, ",")
+
+	if len(idParts) != 3 || idParts[0] == "" || idParts[1] == "" || idParts[2] == "" {
+		resp.Diagnostics.AddError(
+			"Unexpected Import Identifier",
+			fmt.Sprintf("Expected import identifier with format: region_host, subaccount, id. Got: %q", req.ID),
+		)
+		return
+	}
+
+	intID, err := strconv.Atoi(idParts[2])
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Invalid ID Format",
+			fmt.Sprintf("The 'id' part must be an integer. Got: %q", idParts[2]),
+		)
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("region_host"), idParts[0])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("subaccount"), idParts[1])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), intID)...)
+
 }

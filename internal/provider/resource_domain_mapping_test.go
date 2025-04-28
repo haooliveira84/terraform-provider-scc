@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -48,6 +49,58 @@ func TestResourceDomainMapping(t *testing.T) {
 
 	})
 
+	t.Run("error path - region host mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceDomainMappingWoRegionHost("test", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtualdomain", "testtfinternaldomain"),
+					ExpectError: regexp.MustCompile(`The argument "region_host" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - subaccount id mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceDomainMappingWoSubaccount("test", "cf.eu12.hana.ondemand.com", "testtfvirtualdomain", "testtfinternaldomain"),
+					ExpectError: regexp.MustCompile(`The argument "subaccount" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - internal domain mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceDomainMappingWoInternalDomain("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtualdomain"),
+					ExpectError: regexp.MustCompile(`The argument "internal_domain" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - virtual domain mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceDomainMappingWoVirtualDomain("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfinternaldomain"),
+					ExpectError: regexp.MustCompile(`The argument "virtual_domain" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
 }
 
 func ResourceDomainMapping(datasourceName string, regionHost string, subaccount string, virtualDomain string, internalDomain string) string {
@@ -74,3 +127,44 @@ func getImportStateForSubaccountEntitlement(resourceName string) resource.Import
 		), nil
 	}
 }
+
+func ResourceDomainMappingWoRegionHost(datasourceName string, subaccount string, virtualDomain string, internalDomain string) string {
+	return fmt.Sprintf(`
+	resource "cloudconnector_domain_mapping" "%s" {
+    subaccount = "%s"
+    virtual_domain = "%s"
+    internal_domain = "%s"
+	}
+	`, datasourceName, subaccount, virtualDomain, internalDomain)
+}
+
+func ResourceDomainMappingWoSubaccount(datasourceName string, regionHost string, virtualDomain string, internalDomain string) string {
+	return fmt.Sprintf(`
+	resource "cloudconnector_domain_mapping" "%s" {
+    region_host = "%s"
+    virtual_domain = "%s"
+    internal_domain = "%s"
+	}
+	`, datasourceName, regionHost, virtualDomain, internalDomain)
+}
+
+func ResourceDomainMappingWoInternalDomain(datasourceName string, regionHost string, subaccount string, virtualDomain string) string {
+	return fmt.Sprintf(`
+	resource "cloudconnector_domain_mapping" "%s" {
+    region_host = "%s"
+    subaccount = "%s"
+    virtual_domain = "%s"
+	}
+	`, datasourceName, regionHost, subaccount, virtualDomain)
+}
+
+func ResourceDomainMappingWoVirtualDomain(datasourceName string, regionHost string, subaccount string, internalDomain string) string {
+	return fmt.Sprintf(`
+	resource "cloudconnector_domain_mapping" "%s" {
+    region_host = "%s"
+    subaccount = "%s"
+    internal_domain = "%s"
+	}
+	`, datasourceName, regionHost, subaccount, internalDomain)
+}
+

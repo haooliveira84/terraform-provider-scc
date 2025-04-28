@@ -56,6 +56,84 @@ func TestResourceSubaccountK8SServiceChannel(t *testing.T) {
 
 	})
 
+	t.Run("error path - region host mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceSubaccountK8SServiceChannelWoRegionHost("test", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "cp.ace9fb5.stage.kyma.ondemand.com:443", "29d4e6f6-8e7f-4882-b434-21a52bb75e0f", 3000, 1, true),
+					ExpectError: regexp.MustCompile(`The argument "region_host" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - subaccount id mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceSubaccountK8SServiceChannelWoSubaccount("test", "cf.eu12.hana.ondemand.com", "cp.ace9fb5.stage.kyma.ondemand.com:443", "29d4e6f6-8e7f-4882-b434-21a52bb75e0f", 3000, 1, true),
+					ExpectError: regexp.MustCompile(`The argument "subaccount" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - k8s cluster mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceSubaccountK8SServiceChannelWoCluster("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "29d4e6f6-8e7f-4882-b434-21a52bb75e0f", 3000, 1, true),
+					ExpectError: regexp.MustCompile(`The argument "k8s_cluster" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - k8s service mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceSubaccountK8SServiceChannelWoService("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "cp.ace9fb5.stage.kyma.ondemand.com:443", 3000, 1, true),
+					ExpectError: regexp.MustCompile(`The argument "k8s_service" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - port mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceSubaccountK8SServiceChannelWoPort("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "cp.ace9fb5.stage.kyma.ondemand.com:443", "29d4e6f6-8e7f-4882-b434-21a52bb75e0f", 1, true),
+					ExpectError: regexp.MustCompile(`The argument "port" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - connections mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceSubaccountK8SServiceChannelWoConnections("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "cp.ace9fb5.stage.kyma.ondemand.com:443", "29d4e6f6-8e7f-4882-b434-21a52bb75e0f", 3000, true),
+					ExpectError: regexp.MustCompile(`The argument "connections" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
 }
 
 func ResourceSubaccountK8SServiceChannel(datasourceName string, regionHost string, subaccount string, k8sCluster string, k8sService string, port int64, connections int64, enabled bool) string {
@@ -70,6 +148,84 @@ func ResourceSubaccountK8SServiceChannel(datasourceName string, regionHost strin
 	enabled= "%t"
 	}
 	`, datasourceName, regionHost, subaccount, k8sCluster, k8sService, port, connections, enabled)
+}
+
+func ResourceSubaccountK8SServiceChannelWoRegionHost(datasourceName string, subaccount string, k8sCluster string, k8sService string, port int64, connections int64, enabled bool) string {
+	return fmt.Sprintf(`
+	resource "cloudconnector_subaccount_k8s_service_channel" "%s" {
+	subaccount = "%s"
+	k8s_cluster =  "%s"
+	k8s_service =  "%s"
+	port = "%d"
+	connections = "%d"
+	enabled= "%t"
+	}
+	`, datasourceName, subaccount, k8sCluster, k8sService, port, connections, enabled)
+}
+
+func ResourceSubaccountK8SServiceChannelWoSubaccount(datasourceName string, regionHost string, k8sCluster string, k8sService string, port int64, connections int64, enabled bool) string {
+	return fmt.Sprintf(`
+	resource "cloudconnector_subaccount_k8s_service_channel" "%s" {
+	region_host = "%s"
+	k8s_cluster =  "%s"
+	k8s_service =  "%s"
+	port = "%d"
+	connections = "%d"
+	enabled= "%t"
+	}
+	`, datasourceName, regionHost, k8sCluster, k8sService, port, connections, enabled)
+}
+
+func ResourceSubaccountK8SServiceChannelWoCluster(datasourceName string, regionHost string, subaccount string, k8sService string, port int64, connections int64, enabled bool) string {
+	return fmt.Sprintf(`
+	resource "cloudconnector_subaccount_k8s_service_channel" "%s" {
+	region_host = "%s"
+	subaccount = "%s"
+	k8s_service =  "%s"
+	port = "%d"
+	connections = "%d"
+	enabled= "%t"
+	}
+	`, datasourceName, regionHost, subaccount, k8sService, port, connections, enabled)
+}
+
+func ResourceSubaccountK8SServiceChannelWoService(datasourceName string, regionHost string, subaccount string, k8sCluster string, port int64, connections int64, enabled bool) string {
+	return fmt.Sprintf(`
+	resource "cloudconnector_subaccount_k8s_service_channel" "%s" {
+	region_host = "%s"
+	subaccount = "%s"
+	k8s_cluster =  "%s"
+	port = "%d"
+	connections = "%d"
+	enabled= "%t"
+	}
+	`, datasourceName, regionHost, subaccount, k8sCluster, port, connections, enabled)
+}
+
+func ResourceSubaccountK8SServiceChannelWoPort(datasourceName string, regionHost string, subaccount string, k8sCluster string, k8sService string, connections int64, enabled bool) string {
+	return fmt.Sprintf(`
+	resource "cloudconnector_subaccount_k8s_service_channel" "%s" {
+	region_host = "%s"
+	subaccount = "%s"
+	k8s_cluster =  "%s"
+	k8s_service =  "%s"
+	connections = "%d"
+	enabled= "%t"
+	}
+	`, datasourceName, regionHost, subaccount, k8sCluster, k8sService, connections, enabled)
+}
+
+func ResourceSubaccountK8SServiceChannelWoConnections(datasourceName string, regionHost string, subaccount string, k8sCluster string, k8sService string, port int64, enabled bool) string {
+	return fmt.Sprintf(`
+	resource "cloudconnector_subaccount_k8s_service_channel" "%s" {
+	region_host = "%s"
+	subaccount = "%s"
+	k8s_cluster =  "%s"
+	k8s_service =  "%s"
+	port = "%d"
+	enabled= "%t"
+	}
+	`, datasourceName, regionHost, subaccount, k8sCluster, k8sService, port, enabled)
 }
 
 func getImportStateForSubaccountK8SServiceChannel(resourceName string) resource.ImportStateIdFunc {

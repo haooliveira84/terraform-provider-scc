@@ -69,6 +69,102 @@ func TestResourceSubaccount(t *testing.T) {
 
 	})
 
+	t.Run("error path - region host mandatory", func(t *testing.T) {
+		rec, user := setupVCR(t, "fixtures/resource_subaccount_err_wo_region_host")
+		rec.SetRealTransport(&http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		})
+
+		if len(user.CloudUsername) == 0 || len(user.CloudPassword) == 0 {
+			t.Fatalf("Missing TF_CLOUD_USER or TF_CLOUD_PASSWORD for recording test fixtures")
+		}
+		defer stopQuietly(rec)
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceSubaccountWoRegionHost("test", "7480ee65-e039-41cf-ba72-6aaf56c312df", user.CloudUsername, user.CloudPassword, "subaccount added via terraform tests"),
+					ExpectError: regexp.MustCompile(`The argument "region_host" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - subaccount id mandatory", func(t *testing.T) {
+		rec, user := setupVCR(t, "fixtures/resource_subaccount_err_wo_subaccount_id")
+		rec.SetRealTransport(&http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		})
+
+		if len(user.CloudUsername) == 0 || len(user.CloudPassword) == 0 {
+			t.Fatalf("Missing TF_CLOUD_USER or TF_CLOUD_PASSWORD for recording test fixtures")
+		}
+		defer stopQuietly(rec)
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceSubaccountWoID("test", "cf.eu12.hana.ondemand.com", user.CloudUsername, user.CloudPassword, "subaccount added via terraform tests"),
+					ExpectError: regexp.MustCompile(`The argument "subaccount" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - cloud user mandatory", func(t *testing.T) {
+		rec, user := setupVCR(t, "fixtures/resource_subaccount_err_wo_cloud_user")
+		rec.SetRealTransport(&http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		})
+
+		if len(user.CloudUsername) == 0 || len(user.CloudPassword) == 0 {
+			t.Fatalf("Missing TF_CLOUD_USER or TF_CLOUD_PASSWORD for recording test fixtures")
+		}
+		defer stopQuietly(rec)
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceSubaccountWoUsername("test", "cf.eu12.hana.ondemand.com", "7480ee65-e039-41cf-ba72-6aaf56c312df", user.CloudPassword, "subaccount added via terraform tests"),
+					ExpectError: regexp.MustCompile(`The argument "cloud_user" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - cloud password mandatory", func(t *testing.T) {
+		rec, user := setupVCR(t, "fixtures/resource_subaccount_err_wo_password")
+		rec.SetRealTransport(&http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		})
+
+		if len(user.CloudUsername) == 0 || len(user.CloudPassword) == 0 {
+			t.Fatalf("Missing TF_CLOUD_USER or TF_CLOUD_PASSWORD for recording test fixtures")
+		}
+		defer stopQuietly(rec)
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      ResourceSubaccountWoPassword("test", "cf.eu12.hana.ondemand.com", "7480ee65-e039-41cf-ba72-6aaf56c312df", user.CloudUsername, "subaccount added via terraform tests"),
+					ExpectError: regexp.MustCompile(`The argument "cloud_password" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
 }
 
 func ResourceSubaccount(datasourceName string, regionHost string, subaccount string, cloudUser string, cloudPassword string, description string) string {
@@ -81,6 +177,50 @@ func ResourceSubaccount(datasourceName string, regionHost string, subaccount str
     description= "%s"
 	}
 	`, datasourceName, regionHost, subaccount, cloudUser, cloudPassword, description)
+}
+
+func ResourceSubaccountWoRegionHost(datasourceName string, subaccount string, cloudUser string, cloudPassword string, description string) string {
+	return fmt.Sprintf(`
+	resource "cloudconnector_subaccount" "%s" {
+    subaccount= "%s"
+    cloud_user= "%s"
+    cloud_password= "%s" 
+    description= "%s"
+	}
+	`, datasourceName, subaccount, cloudUser, cloudPassword, description)
+}
+
+func ResourceSubaccountWoID(datasourceName string, regionHost string, cloudUser string, cloudPassword string, description string) string {
+	return fmt.Sprintf(`
+	resource "cloudconnector_subaccount" "%s" {
+    region_host= "%s"
+    cloud_user= "%s"
+    cloud_password= "%s" 
+    description= "%s"
+	}
+	`, datasourceName, regionHost, cloudUser, cloudPassword, description)
+}
+
+func ResourceSubaccountWoUsername(datasourceName string, regionHost string, subaccount string, cloudPassword string, description string) string {
+	return fmt.Sprintf(`
+	resource "cloudconnector_subaccount" "%s" {
+    region_host= "%s"
+    subaccount= "%s"
+    cloud_password= "%s" 
+    description= "%s"
+	}
+	`, datasourceName, regionHost, subaccount, cloudPassword, description)
+}
+
+func ResourceSubaccountWoPassword(datasourceName string, regionHost string, subaccount string, cloudUser string, description string) string {
+	return fmt.Sprintf(`
+	resource "cloudconnector_subaccount" "%s" {
+    region_host= "%s"
+    subaccount= "%s"
+    cloud_user= "%s"
+    description= "%s"
+	}
+	`, datasourceName, regionHost, subaccount, cloudUser, description)
 }
 
 func getImportStateForSubaccount(resourceName string) resource.ImportStateIdFunc {

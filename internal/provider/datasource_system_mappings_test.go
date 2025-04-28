@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -54,6 +55,32 @@ func TestDataSourceSystemMappings(t *testing.T) {
 
 	})
 
+	t.Run("error path - region host mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      DataSourceSystemMappingsWoRegionHost("test", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8"),
+					ExpectError: regexp.MustCompile(`The argument "region_host" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - subaccount id mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      DataSourceSystemMappingsWoSubaccount("test", "cf.eu12.hana.ondemand.com"),
+					ExpectError: regexp.MustCompile(`The argument "subaccount" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
 }
 
 func DataSourceSystemMappings(datasourceName string, regionHost string, subaccount string) string {
@@ -63,4 +90,20 @@ func DataSourceSystemMappings(datasourceName string, regionHost string, subaccou
 	subaccount= "%s"
 	}
 	`, datasourceName, regionHost, subaccount)
+}
+
+func DataSourceSystemMappingsWoRegionHost(datasourceName string, subaccount string) string {
+	return fmt.Sprintf(`
+	data "cloudconnector_system_mapping" "%s" {
+	subaccount= "%s"
+	}
+	`, datasourceName, subaccount)
+}
+
+func DataSourceSystemMappingsWoSubaccount(datasourceName string, regionHost string) string {
+	return fmt.Sprintf(`
+	data "cloudconnector_system_mapping" "%s" {
+	region_host= "%s"
+	}
+	`, datasourceName, regionHost)
 }

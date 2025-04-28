@@ -51,6 +51,32 @@ func TestDataSourceSubaccount(t *testing.T) {
 
 	})
 
+	t.Run("error path - region host mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      DataSourceSubaccountConfigurationWoRegionHost("test", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8"),
+					ExpectError: regexp.MustCompile(`The argument "region_host" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - subaccount id mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      DataSourceSubaccountConfigurationWoSubaccount("test", "cf.eu12.hana.ondemand.com"),
+					ExpectError: regexp.MustCompile(`The argument "subaccount" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
 }
 
 func DataSourceSubaccountConfiguration(datasourceName string, regionHost string, subaccountID string) string {
@@ -60,4 +86,20 @@ func DataSourceSubaccountConfiguration(datasourceName string, regionHost string,
     subaccount= "%s"	
 	}
 	`, datasourceName, regionHost, subaccountID)
+}
+
+func DataSourceSubaccountConfigurationWoRegionHost(datasourceName string, subaccountID string) string {
+	return fmt.Sprintf(`
+	data "cloudconnector_subaccount_configuration" "%s" {
+    subaccount= "%s"
+	}
+	`, datasourceName, subaccountID)
+}
+
+func DataSourceSubaccountConfigurationWoSubaccount(datasourceName string, regionHost string) string {
+	return fmt.Sprintf(`
+	data "cloudconnector_subaccount_configuration" "%s" {
+	region_host= "%s"
+	}
+	`, datasourceName, regionHost)
 }

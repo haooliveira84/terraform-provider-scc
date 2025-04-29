@@ -51,6 +51,32 @@ func TestDataSourceSubaccountK8SServiceChannels(t *testing.T) {
 
 	})
 
+	t.Run("error path - region host mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      DataSourceSubaccountK8SServiceChannelsWoRegionHost("cc_sc", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8"),
+					ExpectError: regexp.MustCompile(`The argument "region_host" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
+	t.Run("error path - subaccount id mandatory", func(t *testing.T) {
+		resource.Test(t, resource.TestCase{
+			IsUnitTest:               true,
+			ProtoV6ProviderFactories: getTestProviders(nil),
+			Steps: []resource.TestStep{
+				{
+					Config:      DataSourceSubaccountK8SServiceChannelsWoSubaccount("cc_sc", "cf.eu12.hana.ondemand.com"),
+					ExpectError: regexp.MustCompile(`The argument "subaccount" is required, but no definition was found.`),
+				},
+			},
+		})
+	})
+
 }
 
 func DataSourceSubaccountK8SServiceChannels(datasourceName string, regionHost string, subaccountID string) string {
@@ -60,4 +86,20 @@ func DataSourceSubaccountK8SServiceChannels(datasourceName string, regionHost st
 	subaccount = "%s"
 	}
 	`, datasourceName, regionHost, subaccountID)
+}
+
+func DataSourceSubaccountK8SServiceChannelsWoSubaccount(datasourceName string, regionHost string) string {
+	return fmt.Sprintf(`
+	data "cloudconnector_subaccount_k8s_service_channels" "%s" {
+	region_host = "%s"
+	}
+	`, datasourceName, regionHost)
+}
+
+func DataSourceSubaccountK8SServiceChannelsWoRegionHost(datasourceName string, subaccountID string) string {
+	return fmt.Sprintf(`
+	data "cloudconnector_subaccount_k8s_service_channels" "%s" {
+	subaccount = "%s"
+	}
+	`, datasourceName, subaccountID)
 }

@@ -23,6 +23,8 @@ type SubaccountTunnelData struct {
 	Connections             types.Int64  `tfsdk:"connections"`
 	SubaccountCertificate   types.Object `tfsdk:"subaccount_certificate"`
 	User                    types.String `tfsdk:"user"`
+	ApplicationConnections  types.List   `tfsdk:"application_connections"`
+	ServiceChannels         types.List   `tfsdk:"service_channels"`
 }
 
 var SubaccountTunnelType = map[string]attr.Type{
@@ -32,6 +34,12 @@ var SubaccountTunnelType = map[string]attr.Type{
 	"user":                       types.StringType,
 	"subaccount_certificate": types.ObjectType{
 		AttrTypes: SubaccountCertificateType,
+	},
+	"application_connections": types.ListType{
+		ElemType: SubaccountApplicationConnectionsType,
+	},
+	"service_channels": types.ListType{
+		ElemType: SubaccountServiceChannelsType,
 	},
 }
 
@@ -49,6 +57,36 @@ var SubaccountCertificateType = map[string]attr.Type{
 	"subject_dn":            types.StringType,
 	"issuer":                types.StringType,
 	"serial_number":         types.StringType,
+}
+
+type SubaccountApplicationConnectionsData struct {
+	ConnectionCount types.Int64  `tfsdk:"connection_count"`
+	Name            types.String `tfsdk:"name"`
+	Type            types.String `tfsdk:"type"`
+}
+
+var SubaccountApplicationConnectionsType = types.ObjectType{
+	AttrTypes: map[string]attr.Type{
+		"connection_count": types.Int64Type,
+		"name":             types.StringType,
+		"type":             types.StringType,
+	},
+}
+
+type SubaccountServiceChannelsData struct {
+	Type    types.String `tfsdk:"type"`
+	State   types.String `tfsdk:"state"`
+	Details types.String `tfsdk:"details"`
+	Comment types.String `tfsdk:"comment"`
+}
+
+var SubaccountServiceChannelsType = types.ObjectType{
+	AttrTypes: map[string]attr.Type{
+		"type":    types.StringType,
+		"state":   types.StringType,
+		"details": types.StringType,
+		"comment": types.StringType,
+	},
 }
 
 type SubaccountsData struct {
@@ -97,15 +135,58 @@ func SubaccountDataSourceValueFrom(ctx context.Context, value apiobjects.Subacco
 		SerialNumber:       types.StringValue(value.Tunnel.SubaccountCertificate.SerialNumber),
 	}
 
+	certificate, err := types.ObjectValueFrom(ctx, SubaccountCertificateType, certificateObj)
+	if err != nil {
+		return SubaccountData{}, ctx.Err()
+	}
+
+	applicationConnectionsValues := []SubaccountApplicationConnectionsData{}
+	for _, connection := range value.Tunnel.ApplicationConnections {
+		ac := SubaccountApplicationConnectionsData{
+			ConnectionCount: types.Int64Value(connection.ConnectionCount),
+			Name:            types.StringValue(connection.Name),
+			Type:            types.StringValue(connection.Type),
+		}
+
+		applicationConnectionsValues = append(applicationConnectionsValues, ac)
+	}
+
+	applicationConnections, err := types.ListValueFrom(ctx, SubaccountApplicationConnectionsType, applicationConnectionsValues)
+	if err != nil {
+		return SubaccountData{}, ctx.Err()
+	}
+
+	serviceChannelsValues := []SubaccountServiceChannelsData{}
+	for _, channel := range value.Tunnel.ServiceChannels {
+		sc := SubaccountServiceChannelsData{
+			Type:    types.StringValue(channel.Type),
+			State:   types.StringValue(channel.State),
+			Details: types.StringValue(channel.Details),
+			Comment: types.StringValue(channel.Comment),
+		}
+
+		serviceChannelsValues = append(serviceChannelsValues, sc)
+	}
+
+	serviceChannels, err := types.ListValueFrom(ctx, SubaccountServiceChannelsType, serviceChannelsValues)
+	if err != nil {
+		return SubaccountData{}, ctx.Err()
+	}
+
 	tunnelObj := SubaccountTunnelData{
 		State:                   types.StringValue(value.Tunnel.State),
 		ConnectedSinceTimeStamp: types.Int64Value(value.Tunnel.ConnectedSinceTimeStamp),
 		Connections:             types.Int64Value(value.Tunnel.Connections),
 		User:                    types.StringValue(value.Tunnel.User),
+		SubaccountCertificate:   certificate,
+		ApplicationConnections:  applicationConnections,
+		ServiceChannels:         serviceChannels,
 	}
 
-	tunnelObj.SubaccountCertificate, _ = types.ObjectValueFrom(ctx, SubaccountCertificateType, certificateObj)
-	tunnel, _ := types.ObjectValueFrom(ctx, SubaccountTunnelType, tunnelObj)
+	tunnel, err := types.ObjectValueFrom(ctx, SubaccountTunnelType, tunnelObj)
+	if err != nil {
+		return SubaccountData{}, ctx.Err()
+	}
 
 	model := &SubaccountData{
 		RegionHost:  types.StringValue(value.RegionHost),
@@ -127,15 +208,58 @@ func SubaccountResourceValueFrom(ctx context.Context, plan SubaccountConfig, val
 		SerialNumber:       types.StringValue(value.Tunnel.SubaccountCertificate.SerialNumber),
 	}
 
+	certificate, err := types.ObjectValueFrom(ctx, SubaccountCertificateType, certificateObj)
+	if err != nil {
+		return SubaccountConfig{}, ctx.Err()
+	}
+
+	applicationConnectionsValues := []SubaccountApplicationConnectionsData{}
+	for _, connection := range value.Tunnel.ApplicationConnections {
+		ac := SubaccountApplicationConnectionsData{
+			ConnectionCount: types.Int64Value(connection.ConnectionCount),
+			Name:            types.StringValue(connection.Name),
+			Type:            types.StringValue(connection.Type),
+		}
+
+		applicationConnectionsValues = append(applicationConnectionsValues, ac)
+	}
+
+	applicationConnections, err := types.ListValueFrom(ctx, SubaccountApplicationConnectionsType, applicationConnectionsValues)
+	if err != nil {
+		return SubaccountConfig{}, ctx.Err()
+	}
+
+	serviceChannelsValues := []SubaccountServiceChannelsData{}
+	for _, channel := range value.Tunnel.ServiceChannels {
+		sc := SubaccountServiceChannelsData{
+			Type:    types.StringValue(channel.Type),
+			State:   types.StringValue(channel.State),
+			Details: types.StringValue(channel.Details),
+			Comment: types.StringValue(channel.Comment),
+		}
+
+		serviceChannelsValues = append(serviceChannelsValues, sc)
+	}
+
+	serviceChannels, err := types.ListValueFrom(ctx, SubaccountServiceChannelsType, serviceChannelsValues)
+	if err != nil {
+		return SubaccountConfig{}, ctx.Err()
+	}
+
 	tunnelObj := SubaccountTunnelData{
 		State:                   types.StringValue(value.Tunnel.State),
 		ConnectedSinceTimeStamp: types.Int64Value(value.Tunnel.ConnectedSinceTimeStamp),
 		Connections:             types.Int64Value(value.Tunnel.Connections),
 		User:                    types.StringValue(value.Tunnel.User),
+		SubaccountCertificate:   certificate,
+		ApplicationConnections:  applicationConnections,
+		ServiceChannels:         serviceChannels,
 	}
 
-	tunnelObj.SubaccountCertificate, _ = types.ObjectValueFrom(ctx, SubaccountCertificateType, certificateObj)
-	tunnel, _ := types.ObjectValueFrom(ctx, SubaccountTunnelType, tunnelObj)
+	tunnel, err := types.ObjectValueFrom(ctx, SubaccountTunnelType, tunnelObj)
+	if err != nil {
+		return SubaccountConfig{}, ctx.Err()
+	}
 
 	model := &SubaccountConfig{
 		RegionHost:    types.StringValue(value.RegionHost),

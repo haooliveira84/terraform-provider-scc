@@ -28,11 +28,26 @@ type SubaccountCertificate struct {
 }
 
 type SubaccountTunnel struct {
-	State                   string                `json:"state"`
-	ConnectedSinceTimeStamp int64                 `json:"connectedSinceTimeStamp"`
-	Connections             int64                 `json:"connections"`
-	SubaccountCertificate   SubaccountCertificate `json:"subaccountCertificate"`
-	User                    string                `json:"user"`
+	State                   string                             `json:"state"`
+	ConnectedSinceTimeStamp int64                              `json:"connectedSinceTimeStamp"`
+	Connections             int64                              `json:"connections"`
+	SubaccountCertificate   SubaccountCertificate              `json:"subaccountCertificate"`
+	User                    string                             `json:"user"`
+	ApplicationConnections  []SubaccountApplicationConnections `json:"applicationConnections"`
+	ServiceChannels         []SubaccountServiceChannels        `json:"serviceChannels"`
+}
+
+type SubaccountApplicationConnections struct {
+	ConnectionCount int64  `json:"connectionCount"`
+	Name            string `json:"name"`
+	Type            string `json:"type"`
+}
+
+type SubaccountServiceChannels struct {
+	Type    string `json:"type"`
+	State   string `json:"state"`
+	Details string `json:"details"`
+	Comment string `json:"comment"`
 }
 
 type SubaccountResource struct {

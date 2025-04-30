@@ -73,7 +73,7 @@ __Further documentation:__
 				Optional:            true,
 			},
 			"tunnel": schema.SingleNestedAttribute{
-				MarkdownDescription: "Array of connection tunnels used by the subaccount.",
+				MarkdownDescription: "Details of connection tunnel used by the subaccount.",
 				Optional:            true,
 				Computed:            true,
 				Attributes: map[string]schema.Attribute{
@@ -118,6 +118,50 @@ __Further documentation:__
 							"serial_number": schema.StringAttribute{
 								MarkdownDescription: "Unique identifier for the certificate, typically assigned by the CA.",
 								Computed:            true,
+							},
+						},
+					},
+					"application_connections": schema.ListNestedAttribute{
+						MarkdownDescription: "Array of connections to application instances. Each connection provides information about a specific application instance accessible through the cloud connector.",
+						Computed: true,
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"connection_count": schema.Int64Attribute{
+									MarkdownDescription: "Number of active connections to the specified application instance.",
+									Computed:            true,
+								},
+								"name": schema.StringAttribute{
+									MarkdownDescription: "Name of the connected application instance.",
+									Computed:            true,
+								},
+								"type": schema.StringAttribute{
+									MarkdownDescription: "Type of the connected application instance.",
+									Computed:            true,
+								},
+							},
+						},
+					},
+					"service_channels": schema.ListNestedAttribute{
+						MarkdownDescription: "Type and state of the service channels used (types: HANA database, Virtual Machine or RFC)",
+						Computed: true,
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"type": schema.StringAttribute{
+									MarkdownDescription: "Type of the service channel (e.g., HANA, VM, or RFC).",
+									Computed:            true,
+								},
+								"state": schema.StringAttribute{
+									MarkdownDescription: "Current operational state of the service channel.",
+									Computed:            true,
+								},
+								"details": schema.StringAttribute{
+									MarkdownDescription: "Technical details about the service channel.",
+									Computed:            true,
+								},
+								"comment": schema.StringAttribute{
+									MarkdownDescription: "Optional user-provided comment or annotation regarding the service channel.",
+									Computed:            true,
+								},
 							},
 						},
 					},

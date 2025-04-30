@@ -111,6 +111,48 @@ __Further documentation:__
 							},
 						},
 					},
+					"application_connections": schema.ListNestedAttribute{
+						Computed: true,
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"connection_count": schema.Int64Attribute{
+									MarkdownDescription: "Number of active connections to the specified application instance.",
+									Computed:            true,
+								},
+								"name": schema.StringAttribute{
+									MarkdownDescription: "Name of the connected application instance.",
+									Computed:            true,
+								},
+								"type": schema.StringAttribute{
+									MarkdownDescription: "Type of the connected application instance.",
+									Computed:            true,
+								},
+							},
+						},
+					},
+					"service_channels": schema.ListNestedAttribute{
+						Computed: true,
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"type": schema.StringAttribute{
+									MarkdownDescription: "Type of the service channel (e.g., HANA, VM, or RFC).",
+									Computed:            true,
+								},
+								"state": schema.StringAttribute{
+									MarkdownDescription: "Current operational state of the service channel.",
+									Computed:            true,
+								},
+								"details": schema.StringAttribute{
+									MarkdownDescription: "Technical details about the service channel.",
+									Computed:            true,
+								},
+								"comment": schema.StringAttribute{
+									MarkdownDescription: "Optional user-provided comment or annotation regarding the service channel.",
+									Computed:            true,
+								},
+							},
+						},
+					},
 					"user": schema.StringAttribute{
 						MarkdownDescription: "User for the specified region host and subaccount.",
 						Computed:            true,

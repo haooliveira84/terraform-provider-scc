@@ -46,6 +46,9 @@ func TestResourceSubaccount(t *testing.T) {
 						resource.TestCheckResourceAttr("cloudconnector_subaccount.test", "tunnel.state", "Connected"),
 						resource.TestCheckResourceAttr("cloudconnector_subaccount.test", "tunnel.user", user.CloudUsername),
 
+						resource.TestCheckResourceAttr("cloudconnector_subaccount.test", "tunnel.application_connections.#", "0"),
+						resource.TestCheckResourceAttr("cloudconnector_subaccount.test", "tunnel.service_channels.#", "0"),
+
 						resource.TestMatchResourceAttr("cloudconnector_subaccount.test", "tunnel.subaccount_certificate.issuer", regexp.MustCompile(`CN=.*?,OU=S.*?,O=.*?,L=.*?,C=.*?`)),
 						resource.TestMatchResourceAttr("cloudconnector_subaccount.test", "tunnel.subaccount_certificate.not_after_time_stamp", regexValidTimeStamp),
 						resource.TestMatchResourceAttr("cloudconnector_subaccount.test", "tunnel.subaccount_certificate.not_before_time_stamp", regexValidTimeStamp),

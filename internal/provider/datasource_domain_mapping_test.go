@@ -30,10 +30,10 @@ func TestDataSourceDomainMapping(t *testing.T) {
 				{
 					Config: providerConfig(user) + DataSourceDomainMapping("mapping", "cf.eu12.hana.ondemand.com", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8", "testterraforminternaldomain"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("data.cloudconnector_domain_mapping.mapping", "region_host", "cf.eu12.hana.ondemand.com"),
-						resource.TestMatchResourceAttr("data.cloudconnector_domain_mapping.mapping", "subaccount", regexpValidUUID),
-						resource.TestCheckResourceAttr("data.cloudconnector_domain_mapping.mapping", "virtual_domain", "testterraformvirtualdomain"),
-						resource.TestCheckResourceAttr("data.cloudconnector_domain_mapping.mapping", "internal_domain", "testterraforminternaldomain"),
+						resource.TestCheckResourceAttr("data.scc_domain_mapping.mapping", "region_host", "cf.eu12.hana.ondemand.com"),
+						resource.TestMatchResourceAttr("data.scc_domain_mapping.mapping", "subaccount", regexpValidUUID),
+						resource.TestCheckResourceAttr("data.scc_domain_mapping.mapping", "virtual_domain", "testterraformvirtualdomain"),
+						resource.TestCheckResourceAttr("data.scc_domain_mapping.mapping", "internal_domain", "testterraforminternaldomain"),
 					),
 				},
 			},
@@ -84,7 +84,7 @@ func TestDataSourceDomainMapping(t *testing.T) {
 
 func DataSourceDomainMapping(datasourceName string, regionHost string, subaccountID string, internalDomain string) string {
 	return fmt.Sprintf(`
-	data "cloudconnector_domain_mapping" "%s" {
+	data "scc_domain_mapping" "%s" {
 	region_host= "%s"
     subaccount= "%s"
 	internal_domain= "%s"
@@ -94,7 +94,7 @@ func DataSourceDomainMapping(datasourceName string, regionHost string, subaccoun
 
 func DataSourceDomainMappingWoRegionHost(datasourceName string, subaccountID string, internalDomain string) string {
 	return fmt.Sprintf(`
-	data "cloudconnector_domain_mapping" "%s" {
+	data "scc_domain_mapping" "%s" {
     subaccount= "%s"
 	internal_domain= "%s"
 	}
@@ -103,7 +103,7 @@ func DataSourceDomainMappingWoRegionHost(datasourceName string, subaccountID str
 
 func DataSourceDomainMappingWoSubaccount(datasourceName string, regionHost string, internalDomain string) string {
 	return fmt.Sprintf(`
-	data "cloudconnector_domain_mapping" "%s" {
+	data "scc_domain_mapping" "%s" {
 	region_host= "%s"
 	internal_domain= "%s"
 	}
@@ -112,7 +112,7 @@ func DataSourceDomainMappingWoSubaccount(datasourceName string, regionHost strin
 
 func DataSourceDomainMappingWoInternalDomain(datasourceName string, regionHost string, subaccountID string) string {
 	return fmt.Sprintf(`
-	data "cloudconnector_domain_mapping" "%s" {
+	data "scc_domain_mapping" "%s" {
 	region_host= "%s"
     subaccount= "%s"
 	}

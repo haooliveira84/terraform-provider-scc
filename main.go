@@ -1,5 +1,5 @@
 //go:generate go install github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@latest
-//go:generate tfplugindocs generate --provider-name "cloudconnector" --rendered-provider-name "SAP Cloud Connector"
+//go:generate tfplugindocs generate --provider-name "scc" --rendered-provider-name "SAP Cloud Connector"
 package main
 
 import (
@@ -7,7 +7,7 @@ import (
 	"flag"
 	"log"
 
-	"github.com/SAP/terraform-provider-cloudconnector/internal/provider"
+	"github.com/SAP/terraform-provider-scc/internal/provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 )
 

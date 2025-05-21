@@ -1,4 +1,4 @@
-module github.com/SAP/terraform-provider-cloudconnector
+module github.com/SAP/terraform-provider-scc
 
 go 1.23.1
 

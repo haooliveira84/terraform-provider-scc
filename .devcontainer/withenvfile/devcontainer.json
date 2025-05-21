@@ -19,15 +19,15 @@
 		},
 		"codespaces": {}
 	},
-	"postCreateCommand": "cp ./config/provider-config.txt ~/.terraformrc",
+	"postCreateCommand": "cp ./config/provider-config-local.txt ~/.terraformrc",
 	"hostRequirements": {
 		"memory": "4gb"
 	},
 	"remoteUser": "vscode",
 	// This devcontainer expects a file named .devcontainer/devcontainer.env to exist.
 	// you should place the following environment variables in that file:
-	// - CC_USERNAME
-	// - CC_PASSWORD
+	// - SCC_USERNAME
+	// - SCC_PASSWORD
 	"runArgs": [
 		"--env-file",
 		".devcontainer/devcontainer.env"

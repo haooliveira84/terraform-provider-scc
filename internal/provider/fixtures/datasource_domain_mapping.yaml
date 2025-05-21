@@ -29,18 +29,18 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 289
+        content_length: 291
         uncompressed: false
         body: '[{"virtualDomain":"testterraformvirtualdomain","internalDomain":"testterraforminternaldomain","_links":{"self":{"href": "https://redacted.url/path"}}}]'
         headers:
             Cache-Control:
                 - no-store
             Content-Length:
-                - "289"
+                - "291"
             Content-Type:
                 - application/json
             Date:
-                - Mon, 28 Apr 2025 08:31:30 GMT
+                - Wed, 21 May 2025 11:52:50 GMT
             Server:
                 - Cloud Connector
             Set-Cookie:
@@ -49,7 +49,7 @@ interactions:
                 - redacted
         status: '200 '
         code: 200
-        duration: 24.76625ms
+        duration: 690.249167ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -78,18 +78,18 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 289
+        content_length: 291
         uncompressed: false
         body: '[{"virtualDomain":"testterraformvirtualdomain","internalDomain":"testterraforminternaldomain","_links":{"self":{"href": "https://redacted.url/path"}}}]'
         headers:
             Cache-Control:
                 - no-store
             Content-Length:
-                - "289"
+                - "291"
             Content-Type:
                 - application/json
             Date:
-                - Mon, 28 Apr 2025 08:31:30 GMT
+                - Wed, 21 May 2025 11:52:50 GMT
             Server:
                 - Cloud Connector
             Set-Cookie:
@@ -98,7 +98,7 @@ interactions:
                 - redacted
         status: '200 '
         code: 200
-        duration: 1.638958ms
+        duration: 231.202958ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -127,18 +127,18 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 289
+        content_length: 291
         uncompressed: false
         body: '[{"virtualDomain":"testterraformvirtualdomain","internalDomain":"testterraforminternaldomain","_links":{"self":{"href": "https://redacted.url/path"}}}]'
         headers:
             Cache-Control:
                 - no-store
             Content-Length:
-                - "289"
+                - "291"
             Content-Type:
                 - application/json
             Date:
-                - Mon, 28 Apr 2025 08:31:30 GMT
+                - Wed, 21 May 2025 11:52:50 GMT
             Server:
                 - Cloud Connector
             Set-Cookie:
@@ -147,4 +147,4 @@ interactions:
                 - redacted
         status: '200 '
         code: 200
-        duration: 1.386416ms
+        duration: 333.718167ms

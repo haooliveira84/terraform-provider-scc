@@ -32,9 +32,9 @@ func TestDataSourceSubaccounts(t *testing.T) {
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.ComposeTestCheckFunc(
 							func(s *terraform.State) error {
-								rs, ok := s.RootModule().Resources["data.cloudconnector_subaccounts.test"]
+								rs, ok := s.RootModule().Resources["data.scc_subaccounts.test"]
 								if !ok {
-									return fmt.Errorf("Not found: %s", "data.cloudconnector_subaccounts.test")
+									return fmt.Errorf("Not found: %s", "data.scc_subaccounts.test")
 								}
 
 								subaccounts := rs.Primary.Attributes["subaccounts.#"]
@@ -44,9 +44,9 @@ func TestDataSourceSubaccounts(t *testing.T) {
 								return nil
 							},
 						),
-						resource.TestMatchResourceAttr("data.cloudconnector_subaccounts.test", "subaccounts.0.subaccount", regexpValidUUID),
-						resource.TestCheckResourceAttr("data.cloudconnector_subaccounts.test", "subaccounts.0.region_host", "cf.eu12.hana.ondemand.com"),
-						resource.TestCheckResourceAttr("data.cloudconnector_subaccounts.test", "subaccounts.0.location_id", ""),
+						resource.TestMatchResourceAttr("data.scc_subaccounts.test", "subaccounts.0.subaccount", regexpValidUUID),
+						resource.TestCheckResourceAttr("data.scc_subaccounts.test", "subaccounts.0.region_host", "cf.eu12.hana.ondemand.com"),
+						resource.TestCheckResourceAttr("data.scc_subaccounts.test", "subaccounts.0.location_id", ""),
 					),
 				},
 			},
@@ -58,6 +58,6 @@ func TestDataSourceSubaccounts(t *testing.T) {
 
 func DataSourceSubaccounts(datasourceName string) string {
 	return fmt.Sprintf(`
-	data "cloudconnector_subaccounts" "%s"{}
+	data "scc_subaccounts" "%s"{}
 	`, datasourceName)
 }

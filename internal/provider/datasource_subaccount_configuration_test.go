@@ -30,27 +30,26 @@ func TestDataSourceSubaccount(t *testing.T) {
 				{
 					Config: providerConfig(user) + DataSourceSubaccountConfiguration("test", "cf.eu12.hana.ondemand.com", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("data.cloudconnector_subaccount_configuration.test", "region_host", "cf.eu12.hana.ondemand.com"),
-						resource.TestMatchResourceAttr("data.cloudconnector_subaccount_configuration.test", "subaccount", regexpValidUUID),
-						resource.TestCheckResourceAttr("data.cloudconnector_subaccount_configuration.test", "display_name", "Terraform Subaccount Datasource"),
-						resource.TestCheckResourceAttr("data.cloudconnector_subaccount_configuration.test", "description", "This subaccount has all the configurations for data source."),
+						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "region_host", "cf.eu12.hana.ondemand.com"),
+						resource.TestMatchResourceAttr("data.scc_subaccount_configuration.test", "subaccount", regexpValidUUID),
+						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "display_name", "Terraform Subaccount Datasource"),
+						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "description", "This subaccount has all the configurations for data source."),
 
-						resource.TestCheckResourceAttr("data.cloudconnector_subaccount_configuration.test", "tunnel.user", user.CloudUsername),
-						resource.TestCheckResourceAttr("data.cloudconnector_subaccount_configuration.test", "tunnel.state", "Connected"),
-						resource.TestMatchResourceAttr("data.cloudconnector_subaccount_configuration.test", "tunnel.connected_since_time_stamp", regexValidTimeStamp),
-						resource.TestCheckResourceAttr("data.cloudconnector_subaccount_configuration.test", "tunnel.connections", "0"),
-						resource.TestCheckResourceAttr("data.cloudconnector_subaccount_configuration.test", "tunnel.application_connections.#", "0"),
-						resource.TestCheckResourceAttr("data.cloudconnector_subaccount_configuration.test", "tunnel.application_connections.#", "0"),
-						resource.TestCheckResourceAttr("data.cloudconnector_subaccount_configuration.test", "tunnel.service_channels.#", "1"),
-						resource.TestCheckResourceAttr("data.cloudconnector_subaccount_configuration.test", "tunnel.service_channels.0.type", "K8S"),
-						resource.TestCheckResourceAttr("data.cloudconnector_subaccount_configuration.test", "tunnel.service_channels.0.state", "Connected"),
-						resource.TestCheckResourceAttr("data.cloudconnector_subaccount_configuration.test", "tunnel.service_channels.0.details", "cp.da2b3e1.stage.kyma.ondemand.com:443/bd64665f-060a-47b6-8aba-f406703f0acf"),
-						resource.TestCheckResourceAttr("data.cloudconnector_subaccount_configuration.test", "tunnel.service_channels.0.comment", ""),
-						resource.TestMatchResourceAttr("data.cloudconnector_subaccount_configuration.test", "tunnel.subaccount_certificate.not_after_time_stamp", regexValidTimeStamp),
-						resource.TestMatchResourceAttr("data.cloudconnector_subaccount_configuration.test", "tunnel.subaccount_certificate.not_before_time_stamp", regexValidTimeStamp),
-						resource.TestMatchResourceAttr("data.cloudconnector_subaccount_configuration.test", "tunnel.subaccount_certificate.subject_dn", regexp.MustCompile(`CN=.*?,L=.*?,OU=.*?,OU=.*?,O=.*?,C=.*?`)),
-						resource.TestMatchResourceAttr("data.cloudconnector_subaccount_configuration.test", "tunnel.subaccount_certificate.issuer", regexp.MustCompile(`CN=.*?,OU=S.*?,O=.*?,L=.*?,C=.*?`)),
-						resource.TestMatchResourceAttr("data.cloudconnector_subaccount_configuration.test", "tunnel.subaccount_certificate.serial_number", regexValidSerialNumber),
+						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.user", user.CloudUsername),
+						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.state", "Connected"),
+						resource.TestMatchResourceAttr("data.scc_subaccount_configuration.test", "tunnel.connected_since_time_stamp", regexValidTimeStamp),
+						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.connections", "0"),
+						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.application_connections.#", "0"),
+						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.service_channels.#", "1"),
+						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.service_channels.0.type", "K8S"),
+						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.service_channels.0.state", "Connected"),
+						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.service_channels.0.details", "cp.da2b3e1.stage.kyma.ondemand.com:443/bd64665f-060a-47b6-8aba-f406703f0acf"),
+						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.service_channels.0.comment", ""),
+						resource.TestMatchResourceAttr("data.scc_subaccount_configuration.test", "tunnel.subaccount_certificate.not_after_time_stamp", regexValidTimeStamp),
+						resource.TestMatchResourceAttr("data.scc_subaccount_configuration.test", "tunnel.subaccount_certificate.not_before_time_stamp", regexValidTimeStamp),
+						resource.TestMatchResourceAttr("data.scc_subaccount_configuration.test", "tunnel.subaccount_certificate.subject_dn", regexp.MustCompile(`CN=.*?,L=.*?,OU=.*?,OU=.*?,O=.*?,C=.*?`)),
+						resource.TestMatchResourceAttr("data.scc_subaccount_configuration.test", "tunnel.subaccount_certificate.issuer", regexp.MustCompile(`CN=.*?,OU=S.*?,O=.*?,L=.*?,C=.*?`)),
+						resource.TestMatchResourceAttr("data.scc_subaccount_configuration.test", "tunnel.subaccount_certificate.serial_number", regexValidSerialNumber),
 					),
 				},
 			},
@@ -88,7 +87,7 @@ func TestDataSourceSubaccount(t *testing.T) {
 
 func DataSourceSubaccountConfiguration(datasourceName string, regionHost string, subaccountID string) string {
 	return fmt.Sprintf(`
-	data "cloudconnector_subaccount_configuration" "%s"{
+	data "scc_subaccount_configuration" "%s"{
     region_host= "%s"
     subaccount= "%s"	
 	}
@@ -97,7 +96,7 @@ func DataSourceSubaccountConfiguration(datasourceName string, regionHost string,
 
 func DataSourceSubaccountConfigurationWoRegionHost(datasourceName string, subaccountID string) string {
 	return fmt.Sprintf(`
-	data "cloudconnector_subaccount_configuration" "%s" {
+	data "scc_subaccount_configuration" "%s" {
     subaccount= "%s"
 	}
 	`, datasourceName, subaccountID)
@@ -105,7 +104,7 @@ func DataSourceSubaccountConfigurationWoRegionHost(datasourceName string, subacc
 
 func DataSourceSubaccountConfigurationWoSubaccount(datasourceName string, regionHost string) string {
 	return fmt.Sprintf(`
-	data "cloudconnector_subaccount_configuration" "%s" {
+	data "scc_subaccount_configuration" "%s" {
 	region_host= "%s"
 	}
 	`, datasourceName, regionHost)

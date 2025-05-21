@@ -29,18 +29,18 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 600
+        content_length: 604
         uncompressed: false
-        body: '{"k8sCluster":"cp.da2b3e1.stage.kyma.ondemand.com:443","k8sService":"bd64665f-060a-47b6-8aba-f406703f0acf","id":2,"type":"K8S","port":8080,"enabled":true,"connections":1,"comment":"","state":{"connected":true,"openedConnections":1,"connectedSinceTimeStamp":1745827798435},"_links":{"self":{"href": "https://redacted.url/path"},"state":{"href": "https://redacted.url/path"}}}'
+        body: '{"k8sCluster":"cp.da2b3e1.stage.kyma.ondemand.com:443","k8sService":"bd64665f-060a-47b6-8aba-f406703f0acf","id":2,"type":"K8S","port":8080,"enabled":true,"connections":1,"comment":"","state":{"connected":true,"openedConnections":1,"connectedSinceTimeStamp":1747729905246},"_links":{"self":{"href": "https://redacted.url/path"},"state":{"href": "https://redacted.url/path"}}}'
         headers:
             Cache-Control:
                 - no-store
             Content-Length:
-                - "600"
+                - "604"
             Content-Type:
                 - application/json
             Date:
-                - Mon, 28 Apr 2025 08:31:39 GMT
+                - Wed, 21 May 2025 11:53:04 GMT
             Server:
                 - Cloud Connector
             Set-Cookie:
@@ -49,7 +49,7 @@ interactions:
                 - redacted
         status: '200 '
         code: 200
-        duration: 33.249291ms
+        duration: 693.142084ms
     - id: 1
       request:
         proto: HTTP/1.1
@@ -78,18 +78,18 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 600
+        content_length: 604
         uncompressed: false
-        body: '{"k8sCluster":"cp.da2b3e1.stage.kyma.ondemand.com:443","k8sService":"bd64665f-060a-47b6-8aba-f406703f0acf","id":2,"type":"K8S","port":8080,"enabled":true,"connections":1,"comment":"","state":{"connected":true,"openedConnections":1,"connectedSinceTimeStamp":1745827798435},"_links":{"self":{"href": "https://redacted.url/path"},"state":{"href": "https://redacted.url/path"}}}'
+        body: '{"k8sCluster":"cp.da2b3e1.stage.kyma.ondemand.com:443","k8sService":"bd64665f-060a-47b6-8aba-f406703f0acf","id":2,"type":"K8S","port":8080,"enabled":true,"connections":1,"comment":"","state":{"connected":true,"openedConnections":1,"connectedSinceTimeStamp":1747729905246},"_links":{"self":{"href": "https://redacted.url/path"},"state":{"href": "https://redacted.url/path"}}}'
         headers:
             Cache-Control:
                 - no-store
             Content-Length:
-                - "600"
+                - "604"
             Content-Type:
                 - application/json
             Date:
-                - Mon, 28 Apr 2025 08:31:39 GMT
+                - Wed, 21 May 2025 11:53:04 GMT
             Server:
                 - Cloud Connector
             Set-Cookie:
@@ -98,7 +98,7 @@ interactions:
                 - redacted
         status: '200 '
         code: 200
-        duration: 3.438416ms
+        duration: 216.771001ms
     - id: 2
       request:
         proto: HTTP/1.1
@@ -127,18 +127,18 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 600
+        content_length: 604
         uncompressed: false
-        body: '{"k8sCluster":"cp.da2b3e1.stage.kyma.ondemand.com:443","k8sService":"bd64665f-060a-47b6-8aba-f406703f0acf","id":2,"type":"K8S","port":8080,"enabled":true,"connections":1,"comment":"","state":{"connected":true,"openedConnections":1,"connectedSinceTimeStamp":1745827798435},"_links":{"self":{"href": "https://redacted.url/path"},"state":{"href": "https://redacted.url/path"}}}'
+        body: '{"k8sCluster":"cp.da2b3e1.stage.kyma.ondemand.com:443","k8sService":"bd64665f-060a-47b6-8aba-f406703f0acf","id":2,"type":"K8S","port":8080,"enabled":true,"connections":1,"comment":"","state":{"connected":true,"openedConnections":1,"connectedSinceTimeStamp":1747729905246},"_links":{"self":{"href": "https://redacted.url/path"},"state":{"href": "https://redacted.url/path"}}}'
         headers:
             Cache-Control:
                 - no-store
             Content-Length:
-                - "600"
+                - "604"
             Content-Type:
                 - application/json
             Date:
-                - Mon, 28 Apr 2025 08:31:39 GMT
+                - Wed, 21 May 2025 11:53:05 GMT
             Server:
                 - Cloud Connector
             Set-Cookie:
@@ -147,4 +147,4 @@ interactions:
                 - redacted
         status: '200 '
         code: 200
-        duration: 2.967958ms
+        duration: 219.639417ms

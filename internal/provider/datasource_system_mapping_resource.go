@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/SAP/terraform-provider-cloudconnector/internal/api"
-	apiobjects "github.com/SAP/terraform-provider-cloudconnector/internal/api/apiObjects"
-	"github.com/SAP/terraform-provider-cloudconnector/internal/api/endpoints"
+	"github.com/SAP/terraform-provider-scc/internal/api"
+	apiobjects "github.com/SAP/terraform-provider-scc/internal/api/apiObjects"
+	"github.com/SAP/terraform-provider-scc/internal/api/endpoints"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 )

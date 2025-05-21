@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	apiobjects "github.com/SAP/terraform-provider-cloudconnector/internal/api/apiObjects"
+	apiobjects "github.com/SAP/terraform-provider-scc/internal/api/apiObjects"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 

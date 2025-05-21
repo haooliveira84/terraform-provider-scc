@@ -1,5 +1,5 @@
 ---
-page_title: "cloudconnector_domain_mapping Resource - cloudconnector"
+page_title: "scc_domain_mapping Resource - scc"
 subcategory: ""
 description: |-
   Cloud Connector Domain Mapping Resource.
@@ -10,7 +10,7 @@ description: |-
   https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/domain-mappings
 ---
 
-# cloudconnector_domain_mapping (Resource)
+# scc_domain_mapping (Resource)
 
 Cloud Connector Domain Mapping Resource.
 
@@ -25,7 +25,7 @@ __Further documentation:__
 ## Example Usage
 
 ```terraform
-resource "cloudconnector_domain_mapping" "cc_dm" {
+resource "scc_domain_mapping" "scc_dm" {
     region_host = "cf.eu12.hana.ondemand.com"
     subaccount = "12345678-90ab-cdef-1234-567890abcdef"
     virtual_domain = "my.virtual.domain.com"
@@ -48,7 +48,7 @@ resource "cloudconnector_domain_mapping" "cc_dm" {
 Import is supported using the following syntax:
 
 ```terraform
-# terraform import cloudconnector_domain_mapping.<resource_name> '<region_host>,<subaccount>,<internal_domain>`
+# terraform import scc_domain_mapping.<resource_name> '<region_host>,<subaccount>,<internal_domain>`
 
-terraform import cloudconnector_domain_mapping.cc_dm 'cf.eu12.hana.ondemand.com,12345678-90ab-cdef-1234-567890abcdef,my.internal.domain.com'
+terraform import scc_domain_mapping.scc_dm 'cf.eu12.hana.ondemand.com,12345678-90ab-cdef-1234-567890abcdef,my.internal.domain.com'
 ```

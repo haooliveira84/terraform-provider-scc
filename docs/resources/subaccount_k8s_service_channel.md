@@ -1,5 +1,5 @@
 ---
-page_title: "cloudconnector_subaccount_k8s_service_channel Resource - cloudconnector"
+page_title: "scc_subaccount_k8s_service_channel Resource - scc"
 subcategory: ""
 description: |-
   Cloud Connector Subaccount K8S Service Channel Resource.
@@ -10,7 +10,7 @@ description: |-
   https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/subaccount-service-channels
 ---
 
-# cloudconnector_subaccount_k8s_service_channel (Resource)
+# scc_subaccount_k8s_service_channel (Resource)
 
 Cloud Connector Subaccount K8S Service Channel Resource.
 
@@ -25,7 +25,7 @@ __Further documentation:__
 ## Example Usage
 
 ```terraform
-resource "cloudconnector_subaccount_k8s_service_channel" "cc_sc" {
+resource "scc_subaccount_k8s_service_channel" "scc_sc" {
   region_host = "cf.eu12.hana.ondemand.com"
   subaccount = "12345678-90ab-cdef-1234-567890abcdef"
   k8s_cluster =  "cp.app.cluster.kyma.ondemand.com"
@@ -73,7 +73,7 @@ Read-Only:
 Import is supported using the following syntax:
 
 ```terraform
-# terraform import cloudconnector_subaccount_k8s_service_channel.<resource_name> '<region_host>,<subaccount>,<id>`
+# terraform import scc_subaccount_k8s_service_channel.<resource_name> '<region_host>,<subaccount>,<id>`
 
-terraform import cloudconnector_subaccount_k8s_service_channel.cc_sc 'cf.eu12.hana.ondemand.com,12345678-90ab-cdef-1234-567890abcdef,1'
+terraform import scc_subaccount_k8s_service_channel.scc_sc 'cf.eu12.hana.ondemand.com,12345678-90ab-cdef-1234-567890abcdef,1'
 ```

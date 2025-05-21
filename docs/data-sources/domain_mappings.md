@@ -1,5 +1,5 @@
 ---
-page_title: "cloudconnector_domain_mappings Data Source - cloudconnector"
+page_title: "scc_domain_mappings Data Source - scc"
 subcategory: ""
 description: |-
   Cloud Connector Domain Mapping Data Source.
@@ -10,7 +10,7 @@ description: |-
   https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/domain-mappings
 ---
 
-# cloudconnector_domain_mappings (Data Source)
+# scc_domain_mappings (Data Source)
 
 Cloud Connector Domain Mapping Data Source.
 
@@ -25,7 +25,7 @@ __Further documentation:__
 ## Example Usage
 
 ```terraform
-data "cloudconnector_domain_mappings" "all" {
+data "scc_domain_mappings" "all" {
   region_host = "cf.eu12.hana.ondemand.com"
   subaccount = "12345678-90ab-cdef-1234-567890abcdef"
 }

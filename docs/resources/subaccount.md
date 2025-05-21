@@ -1,5 +1,5 @@
 ---
-page_title: "cloudconnector_subaccount Resource - cloudconnector"
+page_title: "scc_subaccount Resource - scc"
 subcategory: ""
 description: |-
   Cloud Connector Subaccount resource.
@@ -10,7 +10,7 @@ description: |-
   https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/subaccount
 ---
 
-# cloudconnector_subaccount (Resource)
+# scc_subaccount (Resource)
 
 Cloud Connector Subaccount resource.
 		
@@ -25,7 +25,7 @@ __Further documentation:__
 ## Example Usage
 
 ```terraform
-resource "cloudconnector_subaccount" "cc_subaccount" {
+resource "scc_subaccount" "scc_subaccount" {
   region_host = "cf.eu12.hana.ondemand.com"
   subaccount = "12345678-90ab-cdef-1234-567890abcdef"
   cloud_user = "Cloud Username"
@@ -111,7 +111,7 @@ Read-Only:
 Import is supported using the following syntax:
 
 ```terraform
-# terraform import cloudconnector_subaccount.<resource_name> '<region_host>,<subaccount>`
+# terraform import scc_subaccount.<resource_name> '<region_host>,<subaccount>`
 
-terraform import cloudconnector_subaccount.cc_subaccount 'cf.eu12.hana.ondemand.com,12345678-90ab-cdef-1234-567890abcdef'
+terraform import scc_subaccount.scc_subaccount 'cf.eu12.hana.ondemand.com,12345678-90ab-cdef-1234-567890abcdef'
 ```

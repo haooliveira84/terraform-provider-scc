@@ -1,6 +1,6 @@
 provider_installation {
   dev_overrides {
-    "sap/cloudconnector" = "/home/runner/go/bin"
+    "sap/scc" = "/home/runner/go/bin"
   }
 
   direct {}

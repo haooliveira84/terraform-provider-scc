@@ -18,7 +18,7 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		Address:         "registry.terraform.io/sap/cloudconnector",
+		Address:         "registry.terraform.io/sap/scc",
 		Debug:           debug,
 		ProtocolVersion: 6,
 	}

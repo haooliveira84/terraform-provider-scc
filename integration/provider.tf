@@ -1,11 +1,7 @@
 terraform {
   required_providers {
     scc = {
-        source = "sap/cloudconnector"
+        source = "sap/scc"
     }
   }
-}
-
-provider "scc" {
-  ca_certificate = file("rootCA.pem")
 }

@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/SAP/terraform-provider-cloudconnector/validation/uuidvalidator"
+	"github.com/SAP/terraform-provider-scc/validation/uuidvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -47,7 +47,7 @@ var redactedTestUser = User{
 
 func providerConfig(testUser User) string {
 	return fmt.Sprintf(`
-	provider "cloudconnector" {
+	provider "scc" {
 	instance_url= "%s"
 	username= "%s"
 	password= "%s"
@@ -59,7 +59,7 @@ func getTestProviders(httpClient *http.Client) map[string]func() (tfprotov6.Prov
 	cloudconnectorProvider := NewWithClient(httpClient).(*cloudConnectorProvider)
 
 	return map[string]func() (tfprotov6.ProviderServer, error){
-		"cloudconnector": providerserver.NewProtocol6WithError(cloudconnectorProvider),
+		"scc": providerserver.NewProtocol6WithError(cloudconnectorProvider),
 	}
 }
 
@@ -86,14 +86,14 @@ func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 
 	if rec.IsRecording() {
 		t.Logf("ATTENTION: Recording '%s'", cassetteName)
-		user.InstanceUsername = os.Getenv("CC_USERNAME")
-		user.InstancePassword = os.Getenv("CC_PASSWORD")
-		user.InstanceURL = os.Getenv("CC_INSTANCE_URL")
+		user.InstanceUsername = os.Getenv("SCC_USERNAME")
+		user.InstancePassword = os.Getenv("SCC_PASSWORD")
+		user.InstanceURL = os.Getenv("SCC_INSTANCE_URL")
 
-		user.CloudUsername = os.Getenv("TF_CLOUD_USER")
-		user.CloudPassword = os.Getenv("TF_CLOUD_PASSWORD")
+		user.CloudUsername = os.Getenv("TF_VAR_cloud_user")
+		user.CloudPassword = os.Getenv("TF_VAR_cloud_password")
 		if len(user.InstanceUsername) == 0 || len(user.InstancePassword) == 0 || len(user.InstanceURL) == 0 {
-			t.Fatal("Env vars CC_USERNAME, CC_PASSWORD and CC_INSTANCE_URL are required when recording test fixtures")
+			t.Fatal("Env vars SCC_USERNAME, SCC_PASSWORD and SCC_INSTANCE_URL are required when recording test fixtures")
 		}
 	} else {
 		t.Logf("Replaying '%s'", cassetteName)
@@ -211,11 +211,11 @@ func stopQuietly(rec *recorder.Recorder) {
 func TestCCProvider_AllResources(t *testing.T) {
 
 	expectedResources := []string{
-		"cloudconnector_domain_mapping",
-		"cloudconnector_subaccount",
-		"cloudconnector_system_mapping_resource",
-		"cloudconnector_system_mapping",
-		"cloudconnector_subaccount_k8s_service_channel",
+		"scc_domain_mapping",
+		"scc_subaccount",
+		"scc_system_mapping_resource",
+		"scc_system_mapping",
+		"scc_subaccount_k8s_service_channel",
 	}
 
 	ctx := context.Background()
@@ -224,7 +224,7 @@ func TestCCProvider_AllResources(t *testing.T) {
 	for _, resourceFunc := range New().Resources(ctx) {
 		var resp resource.MetadataResponse
 
-		resourceFunc().Metadata(ctx, resource.MetadataRequest{ProviderTypeName: "cloudconnector"}, &resp)
+		resourceFunc().Metadata(ctx, resource.MetadataRequest{ProviderTypeName: "scc"}, &resp)
 
 		registeredResources = append(registeredResources, resp.TypeName)
 	}
@@ -235,16 +235,16 @@ func TestCCProvider_AllResources(t *testing.T) {
 func TestCCProvider_AllDataSources(t *testing.T) {
 
 	expectedDataSources := []string{
-		"cloudconnector_domain_mapping",
-		"cloudconnector_domain_mappings",
-		"cloudconnector_subaccount_configuration",
-		"cloudconnector_subaccounts",
-		"cloudconnector_system_mapping_resource",
-		"cloudconnector_system_mapping_resources",
-		"cloudconnector_system_mapping",
-		"cloudconnector_system_mappings",
-		"cloudconnector_subaccount_k8s_service_channel",
-		"cloudconnector_subaccount_k8s_service_channels",
+		"scc_domain_mapping",
+		"scc_domain_mappings",
+		"scc_subaccount_configuration",
+		"scc_subaccounts",
+		"scc_system_mapping_resource",
+		"scc_system_mapping_resources",
+		"scc_system_mapping",
+		"scc_system_mappings",
+		"scc_subaccount_k8s_service_channel",
+		"scc_subaccount_k8s_service_channels",
 	}
 
 	ctx := context.Background()
@@ -253,7 +253,7 @@ func TestCCProvider_AllDataSources(t *testing.T) {
 	for _, datasourceFunc := range New().DataSources(ctx) {
 		var resp datasource.MetadataResponse
 
-		datasourceFunc().Metadata(ctx, datasource.MetadataRequest{ProviderTypeName: "cloudconnector"}, &resp)
+		datasourceFunc().Metadata(ctx, datasource.MetadataRequest{ProviderTypeName: "scc"}, &resp)
 
 		registeredDataSources = append(registeredDataSources, resp.TypeName)
 	}

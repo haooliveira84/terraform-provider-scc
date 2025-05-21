@@ -8,7 +8,7 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/SAP/terraform-provider-cloudconnector/internal/api"
+	"github.com/SAP/terraform-provider-scc/internal/api"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -45,7 +45,7 @@ type cloudConnectorProviderData struct {
 }
 
 func (c *cloudConnectorProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
-	resp.TypeName = "cloudconnector"
+	resp.TypeName = "scc"
 }
 
 func (c *cloudConnectorProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
@@ -53,23 +53,23 @@ func (c *cloudConnectorProvider) Schema(_ context.Context, _ provider.SchemaRequ
 		MarkdownDescription: "The Terraform Provider for SAP Cloud Connector allows users to manage and configure SAP Cloud Connector instances within SAP BTP (Business Technology Platform). It enables automation of connectivity between SAP BTP subaccounts and on-premise systems using Terraform.",
 		Attributes: map[string]schema.Attribute{
 			"instance_url": schema.StringAttribute{
-				MarkdownDescription: "The URL of Cloud Connector Instance.",
-				Required:            true,
+				MarkdownDescription: "The URL of Cloud Connector Instance. This can also be sourced from the `SCC_INSTANCE_URL` environment variable.",
+				Optional:            true,
 				Validators: []validator.String{
 					stringvalidator.RegexMatches(regexp.MustCompile(`^https?://`), "must be a valid URL starting with http:// or https://"),
 				},
 			},
 			"username": schema.StringAttribute{
-				MarkdownDescription: "The username used to connect to Cloud Connector Instance.",
-				Required:            true,
+				MarkdownDescription: "The username used to connect to Cloud Connector Instance. This can also be sourced from the `SCC_USERNAME` environment variable.",
+				Optional:            true,
 			},
 			"password": schema.StringAttribute{
-				MarkdownDescription: "The password used to connect to Cloud Connector Instance.",
-				Required:            true,
+				MarkdownDescription: "The password used to connect to Cloud Connector Instance. This can also be sourced from the `SCC_PASSWORD` environment variable.",
+				Optional:            true,
 				Sensitive:           true,
 			},
 			"ca_certificate": schema.StringAttribute{
-				MarkdownDescription: "Contents of a PEM-encoded CA certificate. Use `file(\"path/to/cert.pem\")` in the provider block to read from a file.",
+				MarkdownDescription: "Contents of a PEM-encoded CA certificate. Use `file(\"path/to/cert.pem\")` in the provider block to read from a file. This can also be sourced from the `SCC_CA_CERTIFICATE` environment variable.",
 				Optional:            true,
 				Sensitive:           true,
 			},
@@ -113,10 +113,10 @@ func (c *cloudConnectorProvider) Configure(ctx context.Context, req provider.Con
 	}
 
 	// Load values from config or fallback to environment
-	instance_url := os.Getenv("CC_INSTANCE_URL")
-	username := os.Getenv("CC_USERNAME")
-	password := os.Getenv("CC_PASSWORD")
-	ca_certificate := os.Getenv("CC_CA_CERTIFICATE")
+	instance_url := os.Getenv("SCC_INSTANCE_URL")
+	username := os.Getenv("SCC_USERNAME")
+	password := os.Getenv("SCC_PASSWORD")
+	ca_certificate := os.Getenv("SCC_CA_CERTIFICATE")
 
 	if !config.InstanceURL.IsNull() {
 		instance_url = config.InstanceURL.ValueString()

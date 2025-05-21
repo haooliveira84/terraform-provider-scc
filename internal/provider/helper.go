@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/SAP/terraform-provider-cloudconnector/internal/api"
+	"github.com/SAP/terraform-provider-scc/internal/api"
 )
 
 func sendGetRequest(client *api.RestApiClient, endpoint string) (*http.Response, error) {

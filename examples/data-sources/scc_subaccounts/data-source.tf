@@ -1,0 +1,1 @@
+data "scc_subaccounts" "all" {}

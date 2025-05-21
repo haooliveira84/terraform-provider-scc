@@ -1,5 +1,5 @@
 ---
-page_title: "cloudconnector_subaccount_k8s_service_channel Data Source - cloudconnector"
+page_title: "scc_subaccount_k8s_service_channel Data Source - scc"
 subcategory: ""
 description: |-
   Cloud Connector Subaccount K8S Service Channel Data Source.
@@ -10,7 +10,7 @@ description: |-
   https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/subaccount-service-channels
 ---
 
-# cloudconnector_subaccount_k8s_service_channel (Data Source)
+# scc_subaccount_k8s_service_channel (Data Source)
 
 Cloud Connector Subaccount K8S Service Channel Data Source.
 				
@@ -27,7 +27,7 @@ __Further documentation:__
 ## Example Usage
 
 ```terraform
-data "cloudconnector_subaccount_k8s_service_channel" "by_id" {
+data "scc_subaccount_k8s_service_channel" "by_id" {
   region_host = "cf.eu12.hana.ondemand.com"
   subaccount = "12345678-90ab-cdef-1234-567890abcdef"
   id = 1

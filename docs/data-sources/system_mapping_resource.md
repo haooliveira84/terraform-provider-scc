@@ -1,5 +1,5 @@
 ---
-page_title: "cloudconnector_system_mapping_resource Data Source - cloudconnector"
+page_title: "scc_system_mapping_resource Data Source - scc"
 subcategory: ""
 description: |-
   Cloud Connector System Mapping Resource Data Source.
@@ -10,7 +10,7 @@ description: |-
   https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/system-mapping-resources
 ---
 
-# cloudconnector_system_mapping_resource (Data Source)
+# scc_system_mapping_resource (Data Source)
 
 Cloud Connector System Mapping Resource Data Source.
 				
@@ -27,7 +27,7 @@ __Further documentation:__
 ## Example Usage
 
 ```terraform
-data "cloudconnector_system_mapping_resource" "by_resource_id" {
+data "scc_system_mapping_resource" "by_resource_id" {
   region_host   = "cf.eu12.hana.ondemand.com"
   subaccount    = "12345678-90ab-cdef-1234-567890abcdef"
   virtual_host  = "virtual.example.com"

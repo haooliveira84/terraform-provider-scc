@@ -1,5 +1,5 @@
 ---
-page_title: "cloudconnector_system_mapping_resource Resource - cloudconnector"
+page_title: "scc_system_mapping_resource Resource - scc"
 subcategory: ""
 description: |-
   Cloud Connector System Mapping Resource Resource.
@@ -10,7 +10,7 @@ description: |-
   https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/system-mapping-resources
 ---
 
-# cloudconnector_system_mapping_resource (Resource)
+# scc_system_mapping_resource (Resource)
 
 Cloud Connector System Mapping Resource Resource.
 				
@@ -25,7 +25,7 @@ __Further documentation:__
 ## Example Usage
 
 ```terraform
-resource "cloudconnector_system_mapping_resource" "cc_smr" {
+resource "scc_system_mapping_resource" "scc_smr" {
     region_host = "cf.eu12.hana.ondemand.com"
     subaccount = "12345678-90ab-cdef-1234-567890abcdef"
     virtual_host  = "virtual.example.com"
@@ -59,7 +59,7 @@ resource "cloudconnector_system_mapping_resource" "cc_smr" {
 Import is supported using the following syntax:
 
 ```terraform
-# terraform import cloudconnector_system_mapping_resource.<resource_name> '<region_host>,<subaccount>,<virtual_host>,<virtual_port>,<id>`
+# terraform import scc_system_mapping_resource.<resource_name> '<region_host>,<subaccount>,<virtual_host>,<virtual_port>,<id>`
 
-terraform import cloudconnector_system_mapping_resource.cc_smr 'cf.eu12.hana.ondemand.com,12345678-90ab-cdef-1234-567890abcdef,virtual.example.com,443,/'
+terraform import scc_system_mapping_resource.scc_smr 'cf.eu12.hana.ondemand.com,12345678-90ab-cdef-1234-567890abcdef,virtual.example.com,443,/'
 ```

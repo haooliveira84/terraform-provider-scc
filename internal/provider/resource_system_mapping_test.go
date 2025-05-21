@@ -31,24 +31,24 @@ func TestResourceSystemMapping(t *testing.T) {
 				{
 					Config: providerConfig(user) + ResourceSystemMapping("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtual", "900", "testtfinternal", "900", "HTTP", "abapSys", "VIRTUAL", "KERBEROS"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("cloudconnector_system_mapping.test", "region_host", "cf.eu12.hana.ondemand.com"),
-						resource.TestMatchResourceAttr("cloudconnector_system_mapping.test", "subaccount", regexpValidUUID),
+						resource.TestCheckResourceAttr("scc_system_mapping.test", "region_host", "cf.eu12.hana.ondemand.com"),
+						resource.TestMatchResourceAttr("scc_system_mapping.test", "subaccount", regexpValidUUID),
 
-						resource.TestCheckResourceAttr("cloudconnector_system_mapping.test", "virtual_host", "testtfvirtual"),
-						resource.TestCheckResourceAttr("cloudconnector_system_mapping.test", "virtual_port", "900"),
-						resource.TestCheckResourceAttr("cloudconnector_system_mapping.test", "local_host", "testtfinternal"),
-						resource.TestCheckResourceAttr("cloudconnector_system_mapping.test", "local_port", "900"),
-						resource.TestCheckResourceAttr("cloudconnector_system_mapping.test", "protocol", "HTTP"),
-						resource.TestCheckResourceAttr("cloudconnector_system_mapping.test", "backend_type", "abapSys"),
-						resource.TestCheckResourceAttr("cloudconnector_system_mapping.test", "host_in_header", "VIRTUAL"),
-						resource.TestCheckResourceAttr("cloudconnector_system_mapping.test", "authentication_mode", "KERBEROS"),
+						resource.TestCheckResourceAttr("scc_system_mapping.test", "virtual_host", "testtfvirtual"),
+						resource.TestCheckResourceAttr("scc_system_mapping.test", "virtual_port", "900"),
+						resource.TestCheckResourceAttr("scc_system_mapping.test", "local_host", "testtfinternal"),
+						resource.TestCheckResourceAttr("scc_system_mapping.test", "local_port", "900"),
+						resource.TestCheckResourceAttr("scc_system_mapping.test", "protocol", "HTTP"),
+						resource.TestCheckResourceAttr("scc_system_mapping.test", "backend_type", "abapSys"),
+						resource.TestCheckResourceAttr("scc_system_mapping.test", "host_in_header", "VIRTUAL"),
+						resource.TestCheckResourceAttr("scc_system_mapping.test", "authentication_mode", "KERBEROS"),
 					),
 				},
 				{
-					ResourceName:                         "cloudconnector_system_mapping.test",
+					ResourceName:                         "scc_system_mapping.test",
 					ImportState:                          true,
 					ImportStateVerify:                    true,
-					ImportStateIdFunc:                    getImportStateForSystemMapping("cloudconnector_system_mapping.test"),
+					ImportStateIdFunc:                    getImportStateForSystemMapping("scc_system_mapping.test"),
 					ImportStateVerifyIdentifierAttribute: "virtual_host",
 				},
 			},
@@ -191,7 +191,7 @@ func TestResourceSystemMapping(t *testing.T) {
 func ResourceSystemMapping(datasourceName string, regionHost string, subaccount string, virtualHost string, virtualPort string,
 	localHost string, localPort string, protocol string, backendType string, hostInHeader string, authenticationMode string) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping" "%s" {
+	resource "scc_system_mapping" "%s" {
 	region_host= "%s"
 	subaccount= "%s"
 	virtual_host= "%s"
@@ -209,7 +209,7 @@ func ResourceSystemMapping(datasourceName string, regionHost string, subaccount 
 func ResourceSystemMappingWoRegionHost(datasourceName string, subaccount string, virtualHost string, virtualPort string,
 	localHost string, localPort string, protocol string, backendType string, hostInHeader string, authenticationMode string) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping" "%s" {
+	resource "scc_system_mapping" "%s" {
 	subaccount= "%s"
 	virtual_host= "%s"
 	virtual_port= "%s"
@@ -226,7 +226,7 @@ func ResourceSystemMappingWoRegionHost(datasourceName string, subaccount string,
 func ResourceSystemMappingWoSubaccount(datasourceName string, regionHost string, virtualHost string, virtualPort string,
 	localHost string, localPort string, protocol string, backendType string, hostInHeader string, authenticationMode string) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping" "%s" {
+	resource "scc_system_mapping" "%s" {
 	region_host= "%s"
 	virtual_host= "%s"
 	virtual_port= "%s"
@@ -243,7 +243,7 @@ func ResourceSystemMappingWoSubaccount(datasourceName string, regionHost string,
 func ResourceSystemMappingWoVirtualHost(datasourceName string, regionHost string, subaccount string, virtualPort string,
 	localHost string, localPort string, protocol string, backendType string, hostInHeader string, authenticationMode string) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping" "%s" {
+	resource "scc_system_mapping" "%s" {
 	region_host= "%s"
 	subaccount= "%s"
 	virtual_port= "%s"
@@ -260,7 +260,7 @@ func ResourceSystemMappingWoVirtualHost(datasourceName string, regionHost string
 func ResourceSystemMappingWoVirtualPort(datasourceName string, regionHost string, subaccount string, virtualHost string,
 	localHost string, localPort string, protocol string, backendType string, hostInHeader string, authenticationMode string) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping" "%s" {
+	resource "scc_system_mapping" "%s" {
 	region_host= "%s"
 	subaccount= "%s"
 	virtual_host= "%s"
@@ -276,7 +276,7 @@ func ResourceSystemMappingWoVirtualPort(datasourceName string, regionHost string
 
 func ResourceSystemMappingWoLocalHost(datasourceName string, regionHost string, subaccount string, virtualHost string, virtualPort string, localPort string, protocol string, backendType string, hostInHeader string, authenticationMode string) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping" "%s" {
+	resource "scc_system_mapping" "%s" {
 	region_host= "%s"
 	subaccount= "%s"
 	virtual_host= "%s"
@@ -293,7 +293,7 @@ func ResourceSystemMappingWoLocalHost(datasourceName string, regionHost string, 
 func ResourceSystemMappingWoLocalPort(datasourceName string, regionHost string, subaccount string, virtualHost string, virtualPort string,
 	localHost string, protocol string, backendType string, hostInHeader string, authenticationMode string) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping" "%s" {
+	resource "scc_system_mapping" "%s" {
 	region_host= "%s"
 	subaccount= "%s"
 	virtual_host= "%s"
@@ -310,7 +310,7 @@ func ResourceSystemMappingWoLocalPort(datasourceName string, regionHost string, 
 func ResourceSystemMappingWoProtocol(datasourceName string, regionHost string, subaccount string, virtualHost string, virtualPort string,
 	localHost string, localPort string, backendType string, hostInHeader string, authenticationMode string) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping" "%s" {
+	resource "scc_system_mapping" "%s" {
 	region_host= "%s"
 	subaccount= "%s"
 	virtual_host= "%s"
@@ -327,7 +327,7 @@ func ResourceSystemMappingWoProtocol(datasourceName string, regionHost string, s
 func ResourceSystemMappingWoBackendType(datasourceName string, regionHost string, subaccount string, virtualHost string, virtualPort string,
 	localHost string, localPort string, protocol string, hostInHeader string, authenticationMode string) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping" "%s" {
+	resource "scc_system_mapping" "%s" {
 	region_host= "%s"
 	subaccount= "%s"
 	virtual_host= "%s"
@@ -344,7 +344,7 @@ func ResourceSystemMappingWoBackendType(datasourceName string, regionHost string
 func ResourceSystemMappingWoHostInHeader(datasourceName string, regionHost string, subaccount string, virtualHost string, virtualPort string,
 	localHost string, localPort string, protocol string, backendType string, authenticationMode string) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping" "%s" {
+	resource "scc_system_mapping" "%s" {
 	region_host= "%s"
 	subaccount= "%s"
 	virtual_host= "%s"
@@ -361,7 +361,7 @@ func ResourceSystemMappingWoHostInHeader(datasourceName string, regionHost strin
 func ResourceSystemMappingWoAuthMode(datasourceName string, regionHost string, subaccount string, virtualHost string, virtualPort string,
 	localHost string, localPort string, protocol string, backendType string, hostInHeader string) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping" "%s" {
+	resource "scc_system_mapping" "%s" {
 	region_host= "%s"
 	subaccount= "%s"
 	virtual_host= "%s"

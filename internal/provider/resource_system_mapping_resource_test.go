@@ -31,21 +31,21 @@ func TestResourceSystemMappingResource(t *testing.T) {
 				{
 					Config: providerConfig(user) + ResourceSystemMappingResource("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtualtesting", "90", "/", "create resource", true),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("cloudconnector_system_mapping_resource.test", "region_host", "cf.eu12.hana.ondemand.com"),
-						resource.TestMatchResourceAttr("cloudconnector_system_mapping_resource.test", "subaccount", regexpValidUUID),
-						resource.TestCheckResourceAttr("cloudconnector_system_mapping_resource.test", "virtual_host", "testtfvirtualtesting"),
-						resource.TestCheckResourceAttr("cloudconnector_system_mapping_resource.test", "virtual_port", "90"),
+						resource.TestCheckResourceAttr("scc_system_mapping_resource.test", "region_host", "cf.eu12.hana.ondemand.com"),
+						resource.TestMatchResourceAttr("scc_system_mapping_resource.test", "subaccount", regexpValidUUID),
+						resource.TestCheckResourceAttr("scc_system_mapping_resource.test", "virtual_host", "testtfvirtualtesting"),
+						resource.TestCheckResourceAttr("scc_system_mapping_resource.test", "virtual_port", "90"),
 
-						resource.TestCheckResourceAttr("cloudconnector_system_mapping_resource.test", "id", "/"),
-						resource.TestCheckResourceAttr("cloudconnector_system_mapping_resource.test", "description", "create resource"),
-						resource.TestCheckResourceAttr("cloudconnector_system_mapping_resource.test", "enabled", "true"),
+						resource.TestCheckResourceAttr("scc_system_mapping_resource.test", "id", "/"),
+						resource.TestCheckResourceAttr("scc_system_mapping_resource.test", "description", "create resource"),
+						resource.TestCheckResourceAttr("scc_system_mapping_resource.test", "enabled", "true"),
 					),
 				},
 				{
-					ResourceName:      "cloudconnector_system_mapping_resource.test",
+					ResourceName:      "scc_system_mapping_resource.test",
 					ImportState:       true,
 					ImportStateVerify: true,
-					ImportStateIdFunc: getImportStateForSystemMappingResource("cloudconnector_system_mapping_resource.test"),
+					ImportStateIdFunc: getImportStateForSystemMappingResource("scc_system_mapping_resource.test"),
 				},
 			},
 		})
@@ -122,7 +122,7 @@ func TestResourceSystemMappingResource(t *testing.T) {
 func ResourceSystemMappingResource(datasourceName string, regionHost string, subaccount string, virtualHost string, virtualPort string,
 	id string, description string, enabled bool) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping_resource" "%s" {
+	resource "scc_system_mapping_resource" "%s" {
 	region_host = "%s"
 	subaccount = "%s"
 	virtual_host = "%s"
@@ -137,7 +137,7 @@ func ResourceSystemMappingResource(datasourceName string, regionHost string, sub
 func ResourceSystemMappingResourceWoRegionHost(datasourceName string, subaccount string, virtualHost string, virtualPort string,
 	id string, description string, enabled bool) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping_resource" "%s" {
+	resource "scc_system_mapping_resource" "%s" {
 	subaccount = "%s"
 	virtual_host = "%s"
 	virtual_port = "%s"
@@ -151,7 +151,7 @@ func ResourceSystemMappingResourceWoRegionHost(datasourceName string, subaccount
 func ResourceSystemMappingResourceWoSubaccount(datasourceName string, regionHost string, virtualHost string, virtualPort string,
 	id string, description string, enabled bool) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping_resource" "%s" {
+	resource "scc_system_mapping_resource" "%s" {
 	region_host = "%s"
 	virtual_host = "%s"
 	virtual_port = "%s"
@@ -165,7 +165,7 @@ func ResourceSystemMappingResourceWoSubaccount(datasourceName string, regionHost
 func ResourceSystemMappingResourceWoVirtualHost(datasourceName string, regionHost string, subaccount string, virtualPort string,
 	id string, description string, enabled bool) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping_resource" "%s" {
+	resource "scc_system_mapping_resource" "%s" {
 	region_host = "%s"
 	subaccount = "%s"
 	virtual_port = "%s"
@@ -179,7 +179,7 @@ func ResourceSystemMappingResourceWoVirtualHost(datasourceName string, regionHos
 func ResourceSystemMappingResourceWoVirtualPort(datasourceName string, regionHost string, subaccount string, virtualHost string,
 	id string, description string, enabled bool) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping_resource" "%s" {
+	resource "scc_system_mapping_resource" "%s" {
 	region_host = "%s"
 	subaccount = "%s"
 	virtual_host = "%s"
@@ -193,7 +193,7 @@ func ResourceSystemMappingResourceWoVirtualPort(datasourceName string, regionHos
 func ResourceSystemMappingResourceWoID(datasourceName string, regionHost string, subaccount string, virtualHost string, virtualPort string,
 	description string, enabled bool) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_system_mapping_resource" "%s" {
+	resource "scc_system_mapping_resource" "%s" {
 	region_host = "%s"
 	subaccount = "%s"
 	virtual_host = "%s"

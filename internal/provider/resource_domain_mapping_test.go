@@ -31,17 +31,17 @@ func TestResourceDomainMapping(t *testing.T) {
 				{
 					Config: providerConfig(user) + ResourceDomainMapping("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtualdomain", "testtfinternaldomain"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("cloudconnector_domain_mapping.test", "region_host", "cf.eu12.hana.ondemand.com"),
-						resource.TestMatchResourceAttr("cloudconnector_domain_mapping.test", "subaccount", regexpValidUUID),
-						resource.TestCheckResourceAttr("cloudconnector_domain_mapping.test", "virtual_domain", "testtfvirtualdomain"),
-						resource.TestCheckResourceAttr("cloudconnector_domain_mapping.test", "internal_domain", "testtfinternaldomain"),
+						resource.TestCheckResourceAttr("scc_domain_mapping.test", "region_host", "cf.eu12.hana.ondemand.com"),
+						resource.TestMatchResourceAttr("scc_domain_mapping.test", "subaccount", regexpValidUUID),
+						resource.TestCheckResourceAttr("scc_domain_mapping.test", "virtual_domain", "testtfvirtualdomain"),
+						resource.TestCheckResourceAttr("scc_domain_mapping.test", "internal_domain", "testtfinternaldomain"),
 					),
 				},
 				{
-					ResourceName:                         "cloudconnector_domain_mapping.test",
+					ResourceName:                         "scc_domain_mapping.test",
 					ImportState:                          true,
 					ImportStateVerify:                    true,
-					ImportStateIdFunc:                    getImportStateForSubaccountEntitlement("cloudconnector_domain_mapping.test"),
+					ImportStateIdFunc:                    getImportStateForSubaccountEntitlement("scc_domain_mapping.test"),
 					ImportStateVerifyIdentifierAttribute: "internal_domain",
 				},
 			},
@@ -105,7 +105,7 @@ func TestResourceDomainMapping(t *testing.T) {
 
 func ResourceDomainMapping(datasourceName string, regionHost string, subaccount string, virtualDomain string, internalDomain string) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_domain_mapping" "%s" {
+	resource "scc_domain_mapping" "%s" {
     region_host = "%s"
     subaccount = "%s"
     virtual_domain = "%s"
@@ -130,7 +130,7 @@ func getImportStateForSubaccountEntitlement(resourceName string) resource.Import
 
 func ResourceDomainMappingWoRegionHost(datasourceName string, subaccount string, virtualDomain string, internalDomain string) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_domain_mapping" "%s" {
+	resource "scc_domain_mapping" "%s" {
     subaccount = "%s"
     virtual_domain = "%s"
     internal_domain = "%s"
@@ -140,7 +140,7 @@ func ResourceDomainMappingWoRegionHost(datasourceName string, subaccount string,
 
 func ResourceDomainMappingWoSubaccount(datasourceName string, regionHost string, virtualDomain string, internalDomain string) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_domain_mapping" "%s" {
+	resource "scc_domain_mapping" "%s" {
     region_host = "%s"
     virtual_domain = "%s"
     internal_domain = "%s"
@@ -150,7 +150,7 @@ func ResourceDomainMappingWoSubaccount(datasourceName string, regionHost string,
 
 func ResourceDomainMappingWoInternalDomain(datasourceName string, regionHost string, subaccount string, virtualDomain string) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_domain_mapping" "%s" {
+	resource "scc_domain_mapping" "%s" {
     region_host = "%s"
     subaccount = "%s"
     virtual_domain = "%s"
@@ -160,11 +160,10 @@ func ResourceDomainMappingWoInternalDomain(datasourceName string, regionHost str
 
 func ResourceDomainMappingWoVirtualDomain(datasourceName string, regionHost string, subaccount string, internalDomain string) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_domain_mapping" "%s" {
+	resource "scc_domain_mapping" "%s" {
     region_host = "%s"
     subaccount = "%s"
     internal_domain = "%s"
 	}
 	`, datasourceName, regionHost, subaccount, internalDomain)
 }
-

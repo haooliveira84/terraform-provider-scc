@@ -31,25 +31,25 @@ func TestResourceSubaccountK8SServiceChannel(t *testing.T) {
 				{
 					Config: providerConfig(user) + ResourceSubaccountK8SServiceChannel("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "cp.ace9fb5.stage.kyma.ondemand.com:443", "29d4e6f6-8e7f-4882-b434-21a52bb75e0f", 3000, 1, true),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "region_host", "cf.eu12.hana.ondemand.com"),
-						resource.TestMatchResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "subaccount", regexpValidUUID),
-						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "k8s_cluster", "cp.ace9fb5.stage.kyma.ondemand.com:443"),
-						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "k8s_service", "29d4e6f6-8e7f-4882-b434-21a52bb75e0f"),
-						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "port", "3000"),
-						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "connections", "1"),
-						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "type", "K8S"),
-						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "enabled", "true"),
-						resource.TestCheckResourceAttrSet("cloudconnector_subaccount_k8s_service_channel.test", "id"),
-						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "state.connected", "true"),
-						resource.TestMatchResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "state.connected_since_time_stamp", regexp.MustCompile(`^(0|\d{13})$`)),
-						resource.TestCheckResourceAttr("cloudconnector_subaccount_k8s_service_channel.test", "state.opened_connections", "1"),
+						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "region_host", "cf.eu12.hana.ondemand.com"),
+						resource.TestMatchResourceAttr("scc_subaccount_k8s_service_channel.test", "subaccount", regexpValidUUID),
+						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "k8s_cluster", "cp.ace9fb5.stage.kyma.ondemand.com:443"),
+						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "k8s_service", "29d4e6f6-8e7f-4882-b434-21a52bb75e0f"),
+						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "port", "3000"),
+						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "connections", "1"),
+						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "type", "K8S"),
+						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "enabled", "true"),
+						resource.TestCheckResourceAttrSet("scc_subaccount_k8s_service_channel.test", "id"),
+						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "state.connected", "true"),
+						resource.TestMatchResourceAttr("scc_subaccount_k8s_service_channel.test", "state.connected_since_time_stamp", regexp.MustCompile(`^(0|\d{13})$`)),
+						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "state.opened_connections", "1"),
 					),
 				},
 				{
-					ResourceName:      "cloudconnector_subaccount_k8s_service_channel.test",
+					ResourceName:      "scc_subaccount_k8s_service_channel.test",
 					ImportState:       true,
 					ImportStateVerify: true,
-					ImportStateIdFunc: getImportStateForSubaccountK8SServiceChannel("cloudconnector_subaccount_k8s_service_channel.test"),
+					ImportStateIdFunc: getImportStateForSubaccountK8SServiceChannel("scc_subaccount_k8s_service_channel.test"),
 				},
 			},
 		})
@@ -138,7 +138,7 @@ func TestResourceSubaccountK8SServiceChannel(t *testing.T) {
 
 func ResourceSubaccountK8SServiceChannel(datasourceName string, regionHost string, subaccount string, k8sCluster string, k8sService string, port int64, connections int64, enabled bool) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_subaccount_k8s_service_channel" "%s" {
+	resource "scc_subaccount_k8s_service_channel" "%s" {
 	region_host = "%s"
 	subaccount = "%s"
 	k8s_cluster =  "%s"
@@ -152,7 +152,7 @@ func ResourceSubaccountK8SServiceChannel(datasourceName string, regionHost strin
 
 func ResourceSubaccountK8SServiceChannelWoRegionHost(datasourceName string, subaccount string, k8sCluster string, k8sService string, port int64, connections int64, enabled bool) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_subaccount_k8s_service_channel" "%s" {
+	resource "scc_subaccount_k8s_service_channel" "%s" {
 	subaccount = "%s"
 	k8s_cluster =  "%s"
 	k8s_service =  "%s"
@@ -165,7 +165,7 @@ func ResourceSubaccountK8SServiceChannelWoRegionHost(datasourceName string, suba
 
 func ResourceSubaccountK8SServiceChannelWoSubaccount(datasourceName string, regionHost string, k8sCluster string, k8sService string, port int64, connections int64, enabled bool) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_subaccount_k8s_service_channel" "%s" {
+	resource "scc_subaccount_k8s_service_channel" "%s" {
 	region_host = "%s"
 	k8s_cluster =  "%s"
 	k8s_service =  "%s"
@@ -178,7 +178,7 @@ func ResourceSubaccountK8SServiceChannelWoSubaccount(datasourceName string, regi
 
 func ResourceSubaccountK8SServiceChannelWoCluster(datasourceName string, regionHost string, subaccount string, k8sService string, port int64, connections int64, enabled bool) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_subaccount_k8s_service_channel" "%s" {
+	resource "scc_subaccount_k8s_service_channel" "%s" {
 	region_host = "%s"
 	subaccount = "%s"
 	k8s_service =  "%s"
@@ -191,7 +191,7 @@ func ResourceSubaccountK8SServiceChannelWoCluster(datasourceName string, regionH
 
 func ResourceSubaccountK8SServiceChannelWoService(datasourceName string, regionHost string, subaccount string, k8sCluster string, port int64, connections int64, enabled bool) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_subaccount_k8s_service_channel" "%s" {
+	resource "scc_subaccount_k8s_service_channel" "%s" {
 	region_host = "%s"
 	subaccount = "%s"
 	k8s_cluster =  "%s"
@@ -204,7 +204,7 @@ func ResourceSubaccountK8SServiceChannelWoService(datasourceName string, regionH
 
 func ResourceSubaccountK8SServiceChannelWoPort(datasourceName string, regionHost string, subaccount string, k8sCluster string, k8sService string, connections int64, enabled bool) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_subaccount_k8s_service_channel" "%s" {
+	resource "scc_subaccount_k8s_service_channel" "%s" {
 	region_host = "%s"
 	subaccount = "%s"
 	k8s_cluster =  "%s"
@@ -217,7 +217,7 @@ func ResourceSubaccountK8SServiceChannelWoPort(datasourceName string, regionHost
 
 func ResourceSubaccountK8SServiceChannelWoConnections(datasourceName string, regionHost string, subaccount string, k8sCluster string, k8sService string, port int64, enabled bool) string {
 	return fmt.Sprintf(`
-	resource "cloudconnector_subaccount_k8s_service_channel" "%s" {
+	resource "scc_subaccount_k8s_service_channel" "%s" {
 	region_host = "%s"
 	subaccount = "%s"
 	k8s_cluster =  "%s"

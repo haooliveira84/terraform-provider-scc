@@ -13,7 +13,7 @@ The Terraform Provider for SAP Cloud Connector allows users to manage and config
 terraform {
   required_providers {
     scc = {
-        source = "SAP/cloudconnector"
+        source = "sap/scc"
         version = "0.1.0-beta1"
     }
   }

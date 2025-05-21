@@ -1,0 +1,98 @@
+name: Integration Test - Terraform Provider
+
+# Idea: 
+# 1. Build the provider from the latest pull
+# 2. Setup Terraform
+# 3. Execute the integration test script
+# 4. All changes must apply
+# 5. Destroy the infrastructure
+
+
+on:
+  workflow_dispatch:
+
+env:
+  PATH_TO_TFSCRIPT: 'integration'
+  DEV_OVERRIDE: 'config/provider-config-ghaction.txt'
+  TEMP_PLAN_OUTPUT : 'plan-output.txt'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out Git repository
+        id: checkout_repo
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: false
+      - run: go mod download
+      - run: go mod tidy
+      - run: go build -v .
+      - name: Run linters
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: latest
+          skip-cache: true
+
+  test:
+    name: Integration Test for Terraform Provider
+    needs: build
+    runs-on: ubuntu-latest
+
+    env:
+      SCC_USERNAME: ${{ secrets.SCC_USERNAME }}
+      SCC_PASSWORD: ${{ secrets.SCC_PASSWORD }}
+      SCC_INSTANCE_URL: ${{ secrets.SCC_INSTANCE_URL }}
+      TF_VAR_subaccount: ${{ secrets.SUBACCOUNT_ID }}
+      TF_VAR_cloud_user: ${{ secrets.CLOUD_USER }}
+      TF_VAR_cloud_password: ${{ secrets.CLOUD_PASSWORD }}
+      
+
+    steps:
+    - name: Check out Git repository
+      id: checkout_repo
+      uses: actions/checkout@v4
+
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: 'go.mod'
+        cache: false
+
+    - name: Setup Terraform
+      id : setup_terraform
+      uses: hashicorp/setup-terraform@v3.1.2
+      with:
+        terraform_wrapper: false
+        terraform_version: latest
+
+    - name: Install local Terraform provider
+      id: build_provider
+      shell: bash
+      run: |
+        go mod tidy && make install
+    - name: Remove init data and place override
+      id: set_to_override
+      shell: bash
+      run: |
+        rm -rf .terraform && rm -rf .terraform.lock.hcl && cp ${{ env.DEV_OVERRIDE }} ~/.terraformrc
+    - name: Terraform Apply with local provider
+      id: terraform_apply_local
+      shell: bash
+      run: |
+        terraform -chdir=${{ env.PATH_TO_TFSCRIPT }} apply -auto-approve -no-color
+    
+    - name: Terraform Destroy with local provider
+      if: always()
+      id: terraform_destory
+      shell: bash
+      run: |
+        terraform -chdir=${{ env.PATH_TO_TFSCRIPT }} destroy -auto-approve -no-color

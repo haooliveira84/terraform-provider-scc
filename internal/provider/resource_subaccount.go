@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SAP/terraform-provider-cloudconnector/internal/api"
-	apiobjects "github.com/SAP/terraform-provider-cloudconnector/internal/api/apiObjects"
-	"github.com/SAP/terraform-provider-cloudconnector/internal/api/endpoints"
+	"github.com/SAP/terraform-provider-scc/internal/api"
+	apiobjects "github.com/SAP/terraform-provider-scc/internal/api/apiObjects"
+	"github.com/SAP/terraform-provider-scc/internal/api/endpoints"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -123,7 +123,7 @@ __Further documentation:__
 					},
 					"application_connections": schema.ListNestedAttribute{
 						MarkdownDescription: "Array of connections to application instances. Each connection provides information about a specific application instance accessible through the cloud connector.",
-						Computed: true,
+						Computed:            true,
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"connection_count": schema.Int64Attribute{
@@ -143,7 +143,7 @@ __Further documentation:__
 					},
 					"service_channels": schema.ListNestedAttribute{
 						MarkdownDescription: "Type and state of the service channels used (types: HANA database, Virtual Machine or RFC)",
-						Computed: true,
+						Computed:            true,
 						NestedObject: schema.NestedAttributeObject{
 							Attributes: map[string]schema.Attribute{
 								"type": schema.StringAttribute{

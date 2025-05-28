@@ -15,7 +15,7 @@ First, you need to setup your development environment. The following sections de
 First, you must clone the repository:
 
 ```bash
-git clone https://github.com/SAP/terraform-provider-for-sap-cloud-connector.git
+git clone https://github.com/SAP/terraform-provider-scc.git
 ```
 
 Then open the cloned repository in [Visual Studio Code](https://code.visualstudio.com/). Within Visual Studio Code, press the "Open a remote Window" button in the lower left corner:
@@ -87,7 +87,7 @@ provider_installation {
 The last step is then to clone the repository on your machine via:
 
 ```bash
-git clone https://github.com/SAP/terraform-provider-for-sap-cloud-connector.git
+git clone https://github.com/SAP/terraform-provider-scc.git
 ```
 
 Navigate into the directory of the cloned repository.
@@ -119,16 +119,16 @@ If the setup was successful you should see the following message:
 ```bash
 ╷
 │ Warning: Provider development overrides are in effect
-│ 
+│
 │ The following provider development overrides are set in the CLI configuration:
 │  - sap/scc in /go/bin
-│ 
+│
 │ The behavior may therefore not match any released version of the provider and applying changes may cause the state to become incompatible with published releases.
 ╵
 Success! The configuration is valid, but there were some validation warnings as shown above.
 ```
 
-In case of errors, please check first that you executed the previous steps correctly. If you are still stuck, feel free to ask for support by raising a [question](https://github.com/SAP/terraform-provider-for-sap-cloud-connector/discussions/categories/q-a) in the [GitHub Discussions](https://github.com/SAP/terraform-provider-for-sap-cloud-connector/discussions) of this repository.
+In case of errors, please check first that you executed the previous steps correctly. If you are still stuck, feel free to ask for support by raising a [question](https://github.com/SAP/terraform-provider-scc/discussions/categories/q-a) in the [GitHub Discussions](https://github.com/SAP/terraform-provider-scc/discussions) of this repository.
 
 > **Note**: Be aware that when using the development override you must not use the `terraform init`command. It is not necessary and may error unexpectedly.
 

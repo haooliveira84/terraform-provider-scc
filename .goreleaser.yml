@@ -16,7 +16,7 @@ builds:
     flags:
       - -trimpath
     ldflags:
-      - "-s -w -X 'github.com/SAP/terraform-provider-for-sap-cloud-connector/internal/version.ProviderVersion={{.Version}}'"
+      - "-s -w -X 'github.com/SAP/terraform-provider-scc/internal/version.ProviderVersion={{.Version}}'"
     goos:
       - freebsd
       - windows

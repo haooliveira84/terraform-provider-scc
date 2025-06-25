@@ -232,11 +232,14 @@ func testProviderConnection(client *api.RestApiClient) error {
 	if err != nil {
 		return fmt.Errorf("connection test failed: %w", err)
 	}
-	defer resp.Body.Close()
+	if cerr := resp.Body.Close(); cerr != nil {
+		return fmt.Errorf("failed to close response body: %w", cerr)
+	}
 
 	if resp.StatusCode == http.StatusUnauthorized || resp.StatusCode == http.StatusForbidden {
 		return fmt.Errorf("authentication rejected with status: %s", resp.Status)
 	}
+
 	return nil
 }
 

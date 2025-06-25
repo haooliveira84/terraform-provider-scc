@@ -179,15 +179,6 @@ func (c *cloudConnectorProvider) Configure(ctx context.Context, req provider.Con
 		return
 	}
 
-	// if ca_certificate == "" {
-	// 	resp.Diagnostics.AddAttributeError(
-	// 		path.Root("ca_certificate"),
-	// 		"Missing CA Certificate",
-	// 		"A CA certificate is required for secure communication and must be provided.",
-	// 	)
-	// 	return
-	// }
-
 	if resp.Diagnostics.HasError() {
 		return
 	}

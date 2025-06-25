@@ -23,35 +23,6 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
-// func NewRestApiClient(client *http.Client, baseURL *url.URL, username, password string, caCertPEM []byte) (*RestApiClient, error) {
-// 	// Create TLS config only if caCertPEM is provided
-// 	if caCertPEM != nil {
-// 		caCertPool := x509.NewCertPool()
-// 		if ok := caCertPool.AppendCertsFromPEM(caCertPEM); !ok {
-// 			return nil, fmt.Errorf("failed to parse CA certificate: input is not valid PEM-encoded data")
-// 		}
-
-// 		// Initialize transport with custom TLS config
-// 		if client == nil {
-// 			client = &http.Client{}
-// 		}
-// 		client.Transport = &http.Transport{
-// 			TLSClientConfig: &tls.Config{
-// 				RootCAs: caCertPool,
-// 			},
-// 		}
-// 	} else if client == nil {
-// 		client = &http.Client{}
-// 	}
-
-// 	return &RestApiClient{
-// 		BaseURL:  baseURL,
-// 		Client:   client,
-// 		Username: username,
-// 		Password: password,
-// 	}, nil
-// }
-
 func NewRestApiClient(client *http.Client, baseURL *url.URL, username, password string, caCertBytes []byte, clientCertBytes []byte, clientCertKey []byte) (*RestApiClient, error) {
 	useCertAuth := len(clientCertBytes) > 0 && len(clientCertKey) > 0
 	useBasicAuth := username != "" && password != ""

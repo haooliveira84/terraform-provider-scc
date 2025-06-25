@@ -1,6 +1,6 @@
 name: Integration Test - OpenTofu
 
-# Idea: 
+# Idea:
 # 1. Build the provider from the latest pull
 # 2. Setup Terraform
 # 3. Execute the integration test script
@@ -54,7 +54,7 @@ jobs:
       TF_VAR_subaccount: ${{ secrets.SUBACCOUNT_ID }}
       TF_VAR_cloud_user: ${{ secrets.CLOUD_USER }}
       TF_VAR_cloud_password: ${{ secrets.CLOUD_PASSWORD }}
-      
+
 
     steps:
     - name: Check out Git repository
@@ -72,7 +72,7 @@ jobs:
       uses: opentofu/setup-opentofu@v1
       with:
         tofu_wrapper: false
-        tofu_version: 1.9.0
+        tofu_version: latest
 
     - name: Install local Terraform provider
       id: build_provider
@@ -89,7 +89,7 @@ jobs:
       shell: bash
       run: |
         tofu -chdir=${{ env.PATH_TO_TFSCRIPT }} apply -auto-approve -no-color
-    
+
     - name: Tofu Destroy with local provider
       if: always()
       id: tofu_destroy

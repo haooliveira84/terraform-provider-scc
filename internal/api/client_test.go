@@ -20,8 +20,8 @@ import (
 func TestRestApiClient_BasicAuth(t *testing.T) {
 	handler := http.NewServeMux()
 	handler.HandleFunc("/success", func(w http.ResponseWriter, r *http.Request) {
-		u, p, ok := r.BasicAuth()
-		if !ok || u != "testuser" || p != "testpassword" {
+		username, password, ok := r.BasicAuth()
+		if !ok || username != "testuser" || password != "testpassword" {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
@@ -101,12 +101,15 @@ func TestRestApiClient_CertificateAuth(t *testing.T) {
 	})
 }
 
+// generateSelfSignedCert generates a self-signed TLS certificate and its private key.
 func generateSelfSignedCert() (certPEM, keyPEM []byte, cert *x509.Certificate, err error) {
+	// Generate a new RSA private key with 2048-bit length
 	privKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
+	// Create a certificate template with required fields
 	template := x509.Certificate{
 		SerialNumber: big.NewInt(time.Now().UnixNano()),
 		Subject: pkix.Name{
@@ -123,19 +126,24 @@ func generateSelfSignedCert() (certPEM, keyPEM []byte, cert *x509.Certificate, e
 		DNSNames:    []string{"localhost"},
 	}
 
+	// Create a self-signed certificate using the template and the generated private key.
+	// The template is being used for parent issuer certificate and the certificate itself since it is a self-signed certfificate.
 	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &privKey.PublicKey, privKey)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
+	// Encode the certificate & private key to PEM format
 	certPEM = pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: derBytes})
 	keyPEM = pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(privKey)})
 
+	// Parse the DER-encoded certificate into an x509.Certificate object
 	parsedCert, err := x509.ParseCertificate(derBytes)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
+	// Return the PEM-encoded certificate, key, and parsed certificate
 	return certPEM, keyPEM, parsedCert, nil
 }
 

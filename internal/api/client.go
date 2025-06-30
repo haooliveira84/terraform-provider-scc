@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
 	"fmt"
 	"io"
 	"net/http"
@@ -48,6 +49,12 @@ func NewRestApiClient(client *http.Client, baseURL *url.URL, username, password 
 
 	// If certificate auth is used, load the cert/key pair
 	if useCertAuth {
+		if block, _ := pem.Decode(clientCertBytes); block == nil {
+			return nil, fmt.Errorf("client certificate is not valid PEM-encoded data")
+		}
+		if block, _ := pem.Decode(clientCertKey); block == nil {
+			return nil, fmt.Errorf("client key is not valid PEM-encoded data")
+		}
 		cert, err := tls.X509KeyPair(clientCertBytes, clientCertKey)
 		if err != nil {
 			return nil, fmt.Errorf("failed to load client certificate/key: %w", err)

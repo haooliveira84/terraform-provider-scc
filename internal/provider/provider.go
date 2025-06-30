@@ -2,6 +2,8 @@ package provider
 
 import (
 	"context"
+	"encoding/pem"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -97,50 +99,6 @@ func (c *cloudConnectorProvider) Configure(ctx context.Context, req provider.Con
 		return
 	}
 
-	if config.InstanceURL.IsUnknown() {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("instance_url"),
-			"Unknown Cloud Connector Instance URL",
-			"The provider cannot create the Cloud Connector client as the Cloud Connector Instance URL is unknown.",
-		)
-	}
-	if config.Username.IsUnknown() {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("username"),
-			"Unknown Username",
-			"The provider cannot create the Cloud Connector client as the username is unknown.",
-		)
-	}
-	if config.Password.IsUnknown() {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("password"),
-			"Unknown Password",
-			"The provider cannot create the Cloud Connector client as the password is unknown.",
-		)
-	}
-
-	if config.CaCertificate.IsUnknown() {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("ca_certificate"),
-			"Unknown CA Certificate",
-			"The provider cannot create the Cloud Connector client as the CA certificate is unknown.",
-		)
-	}
-	if config.ClientCertificate.IsUnknown() {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("client_certificate"),
-			"Unknown Client Certificate",
-			"The provider cannot create the Cloud Connector client as the client certificate is unknown.",
-		)
-	}
-	if config.ClientKey.IsUnknown() {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("client_key"),
-			"Unknown Client Key",
-			"The provider cannot create the Cloud Connector client as the client key is unknown.",
-		)
-	}
-
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -159,10 +117,44 @@ func (c *cloudConnectorProvider) Configure(ctx context.Context, req provider.Con
 			"Missing Cloud Connector Instance URL",
 			"The provider cannot create the Cloud Connector client because the Cloud Connector Instance URL is empty.",
 		)
+		return
 	}
 
 	basicAuth := username != "" && password != ""
 	certAuth := client_certificate != "" && client_key != ""
+
+	if ca_certificate != "" {
+		if err := validatePEM(ca_certificate); err != nil {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("ca_certificate"),
+				"Invalid CA Certificate",
+				"The provided CA certificate is not a valid PEM-encoded block.",
+			)
+			return
+		}
+	}
+
+	if client_certificate != "" {
+		if err := validatePEM(client_certificate); err != nil {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("client_certificate"),
+				"Invalid Client Certificate",
+				"The provided client certificate is not a valid PEM-encoded block.",
+			)
+			return
+		}
+	}
+
+	if client_key != "" {
+		if err := validatePEM(client_key); err != nil {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("client_key"),
+				"Invalid Client Key",
+				"The provided client key is not a valid PEM-encoded block.",
+			)
+			return
+		}
+	}
 
 	if !basicAuth && !certAuth {
 		resp.Diagnostics.AddError(
@@ -240,6 +232,14 @@ func testProviderConnection(client *api.RestApiClient) error {
 		return fmt.Errorf("authentication rejected with status: %s", resp.Status)
 	}
 
+	return nil
+}
+
+func validatePEM(data string) error {
+	block, _ := pem.Decode([]byte(data))
+	if block == nil {
+		return errors.New("data is not a valid PEM block")
+	}
 	return nil
 }
 

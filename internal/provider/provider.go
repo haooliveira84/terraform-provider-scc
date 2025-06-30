@@ -57,33 +57,33 @@ func (c *cloudConnectorProvider) Schema(_ context.Context, _ provider.SchemaRequ
 		MarkdownDescription: "The Terraform Provider for SAP Cloud Connector allows users to manage and configure SAP Cloud Connector instances within SAP BTP (Business Technology Platform). It enables automation of connectivity between SAP BTP subaccounts and on-premise systems using Terraform.",
 		Attributes: map[string]schema.Attribute{
 			"instance_url": schema.StringAttribute{
-				MarkdownDescription: "The URL of the Cloud Connector instance. This can also be sourced from the `SCC_INSTANCE_URL` environment variable or securely stored in GitHub Secrets.",
+				MarkdownDescription: "The URL of the Cloud Connector instance. This can also be sourced from the `SCC_INSTANCE_URL` environment variable.",
 				Optional:            true,
 				Validators: []validator.String{
 					stringvalidator.RegexMatches(regexp.MustCompile(`^https?://`), "must be a valid URL starting with http:// or https://"),
 				},
 			},
 			"username": schema.StringAttribute{
-				MarkdownDescription: "The username used for Basic Authentication with the Cloud Connector instance. This can also be sourced from the `SCC_USERNAME` environment variable or securely stored in GitHub Secrets.",
+				MarkdownDescription: "The username used for Basic Authentication with the Cloud Connector instance. This can also be sourced from the `SCC_USERNAME` environment variable (useful when storing and retrieving secrets from secure stores).",
 				Optional:            true,
 			},
 			"password": schema.StringAttribute{
-				MarkdownDescription: "The password used for Basic Authentication with the Cloud Connector instance. This can also be sourced from the `SCC_PASSWORD` environment variable or securely stored in GitHub Secrets.",
+				MarkdownDescription: "The password used for Basic Authentication with the Cloud Connector instance. This can also be sourced from the `SCC_PASSWORD` environment variable (useful when storing and retrieving secrets from secure stores).",
 				Optional:            true,
 				Sensitive:           true,
 			},
 			"ca_certificate": schema.StringAttribute{
-				MarkdownDescription: "Contents of a PEM-encoded CA certificate used to verify the Cloud Connector server. Use `file(\"path/to/ca.pem\")` in the provider block to load from a file. This can also be sourced from the `SCC_CA_CERTIFICATE` environment variable or securely stored in GitHub Secrets.",
+				MarkdownDescription: "Contents of a PEM-encoded CA certificate used to verify the Cloud Connector server. Use `file(\"path/to/ca.pem\")` in the provider block to load from a file. This can also be sourced from the `SCC_CA_CERTIFICATE` environment variable (useful when storing and retrieving secrets from secure stores).",
 				Optional:            true,
 				Sensitive:           true,
 			},
 			"client_certificate": schema.StringAttribute{
-				MarkdownDescription: "Contents of a PEM-encoded client certificate used for mutual TLS authentication. Use `file(\"path/to/cert.pem\")` in the provider block to load from a file. This can also be sourced from the `SCC_CLIENT_CERTIFICATE` environment variable or securely stored in GitHub Secrets.",
+				MarkdownDescription: "Contents of a PEM-encoded client certificate used for mutual TLS authentication. Use `file(\"path/to/cert.pem\")` in the provider block to load from a file. This can also be sourced from the `SCC_CLIENT_CERTIFICATE` environment variable (useful when storing and retrieving secrets from secure stores).",
 				Optional:            true,
 				Sensitive:           true,
 			},
 			"client_key": schema.StringAttribute{
-				MarkdownDescription: "Contents of a PEM-encoded client private key used for mutual TLS authentication. Use `file(\"path/to/key.pem\")` in the provider block to load from a file. This can also be sourced from the `SCC_CLIENT_KEY` environment variable or securely stored in GitHub Secrets.",
+				MarkdownDescription: "Contents of a PEM-encoded client private key used for mutual TLS authentication. Use `file(\"path/to/key.pem\")` in the provider block to load from a file. This can also be sourced from the `SCC_CLIENT_KEY` environment variable (useful when storing and retrieving secrets from secure stores).",
 				Optional:            true,
 				Sensitive:           true,
 			},

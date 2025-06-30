@@ -43,10 +43,10 @@ provider "scc" {
 
 ### Optional
 
-- `ca_certificate` (String, Sensitive) Contents of a PEM-encoded CA certificate used to verify the Cloud Connector server. Use `file("path/to/ca.pem")` in the provider block to load from a file. This can also be sourced from the `SCC_CA_CERTIFICATE` environment variable.
-- `client_certificate` (String, Sensitive) Contents of a PEM-encoded client certificate used for mutual TLS authentication. Use `file("path/to/cert.pem")` in the provider block to load from a file. This can also be sourced from the `SCC_CLIENT_CERTIFICATE` environment variable.
-- `client_key` (String, Sensitive) Contents of a PEM-encoded client private key used for mutual TLS authentication. Use `file("path/to/key.pem")` in the provider block to load from a file. This can also be sourced from the `SCC_CLIENT_KEY` environment variable.
-- `instance_url` (String) The URL of the Cloud Connector instance. This can also be sourced from the `SCC_INSTANCE_URL` environment variable.
-- `password` (String, Sensitive) The password used for Basic Authentication with the Cloud Connector instance. This can also be sourced from the `SCC_PASSWORD` environment variable.
-- `username` (String) The username used for Basic Authentication with the Cloud Connector instance. This can also be sourced from the `SCC_USERNAME` environment variable.
+- `ca_certificate` (String, Sensitive) Contents of a PEM-encoded CA certificate used to verify the Cloud Connector server. Use `file("path/to/ca.pem")` in the provider block to load from a file. This can also be sourced from the `SCC_CA_CERTIFICATE` environment variable or securely stored in GitHub Secrets.
+- `client_certificate` (String, Sensitive) Contents of a PEM-encoded client certificate used for mutual TLS authentication. Use `file("path/to/cert.pem")` in the provider block to load from a file. This can also be sourced from the `SCC_CLIENT_CERTIFICATE` environment variable or securely stored in GitHub Secrets.
+- `client_key` (String, Sensitive) Contents of a PEM-encoded client private key used for mutual TLS authentication. Use `file("path/to/key.pem")` in the provider block to load from a file. This can also be sourced from the `SCC_CLIENT_KEY` environment variable or securely stored in GitHub Secrets.
+- `instance_url` (String) The URL of the Cloud Connector instance. This can also be sourced from the `SCC_INSTANCE_URL` environment variable or securely stored in GitHub Secrets.
+- `password` (String, Sensitive) The password used for Basic Authentication with the Cloud Connector instance. This can also be sourced from the `SCC_PASSWORD` environment variable or securely stored in GitHub Secrets.
+- `username` (String) The username used for Basic Authentication with the Cloud Connector instance. This can also be sourced from the `SCC_USERNAME` environment variable or securely stored in GitHub Secrets.
 

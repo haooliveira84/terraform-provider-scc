@@ -168,21 +168,21 @@ func (d *SystemMappingDataSource) Read(ctx context.Context, req datasource.ReadR
 		return
 	}
 
-	regionHost := data.RegionHost.ValueString()
+	region_host := data.RegionHost.ValueString()
 	subaccount := data.Subaccount.ValueString()
-	virtualHost := data.VirtualHost.ValueString()
-	virtualPort := data.VirtualPort.ValueString()
-	endpoint := endpoints.GetSystemMappingEndpoint(regionHost, subaccount, virtualHost, virtualPort)
+	virtual_host := data.VirtualHost.ValueString()
+	virtual_port := data.VirtualPort.ValueString()
+	endpoint := endpoints.GetSystemMappingEndpoint(region_host, subaccount, virtual_host, virtual_port)
 
 	err := requestAndUnmarshal(d.client, &respObj, "GET", endpoint, nil, true)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgFetchSystemMappingFailed, err.Error())
+		resp.Diagnostics.AddError("error fetching the cloud connector system mapping", err.Error())
 		return
 	}
 
 	responseModel, err := SystemMappingValueFrom(ctx, data, respObj)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSystemMappingFailed, fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("error mapping system mapping value", fmt.Sprintf("%s", err))
 		return
 	}
 	diags = resp.State.Set(ctx, &responseModel)

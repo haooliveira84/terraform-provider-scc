@@ -8,7 +8,6 @@ import (
 	"github.com/SAP/terraform-provider-scc/internal/api"
 	apiobjects "github.com/SAP/terraform-provider-scc/internal/api/apiObjects"
 	"github.com/SAP/terraform-provider-scc/internal/api/endpoints"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -218,13 +217,13 @@ func (r *SubaccountResource) Create(ctx context.Context, req resource.CreateRequ
 
 	err := requestAndUnmarshal(r.client, &respObj, "POST", endpoint, planBody, true)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgAddSubaccountFailed, err.Error())
+		resp.Diagnostics.AddError("error creating the cloud connector subaccount.", err.Error())
 		return
 	}
 
 	responseModel, err := SubaccountResourceValueFrom(ctx, plan, respObj)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("error mapping subaccount value", fmt.Sprintf("%s", err))
 		return
 	}
 
@@ -244,19 +243,19 @@ func (r *SubaccountResource) Read(ctx context.Context, req resource.ReadRequest,
 		return
 	}
 
-	regionHost := state.RegionHost.ValueString()
+	region_host := state.RegionHost.ValueString()
 	subaccount := state.Subaccount.ValueString()
-	endpoint := endpoints.GetSubaccountEndpoint(regionHost, subaccount)
+	endpoint := endpoints.GetSubaccountEndpoint(region_host, subaccount)
 
 	err := requestAndUnmarshal(r.client, &respObj, "GET", endpoint, nil, true)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgFetchSubaccountFailed, err.Error())
+		resp.Diagnostics.AddError("error fetching the cloud connector subaccount", err.Error())
 		return
 	}
 
 	responseModel, err := SubaccountResourceValueFrom(ctx, state, respObj)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("error mapping subaccount value", fmt.Sprintf("%s", err))
 		return
 	}
 
@@ -269,24 +268,32 @@ func (r *SubaccountResource) Read(ctx context.Context, req resource.ReadRequest,
 
 func (r *SubaccountResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var plan, state SubaccountConfig
+	var planTunnelData, stateTunnelData SubaccountTunnelData
 	var respObj apiobjects.SubaccountResource
-
-	if diags := req.Plan.Get(ctx, &plan); appendAndCheckErrors(&resp.Diagnostics, diags) {
+	diags := req.Plan.Get(ctx, &plan)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	if diags := req.State.Get(ctx, &state); appendAndCheckErrors(&resp.Diagnostics, diags) {
+	diags = req.State.Get(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	if err := validateUpdateInputs(plan, state); err != nil {
-		resp.Diagnostics.AddError(errMsgUpdateSubaccountFailed, err.Error())
-		return
-	}
-
-	regionHost := plan.RegionHost.ValueString()
+	region_host := plan.RegionHost.ValueString()
 	subaccount := plan.Subaccount.ValueString()
-	endpoint := endpoints.GetSubaccountEndpoint(regionHost, subaccount)
+
+	if (plan.RegionHost.ValueString() != state.RegionHost.ValueString()) ||
+		(plan.Subaccount.ValueString() != state.Subaccount.ValueString()) ||
+		(plan.CloudUser.ValueString() != state.CloudUser.ValueString()) ||
+		(plan.CloudPassword.ValueString() != state.CloudPassword.ValueString()) {
+		resp.Diagnostics.AddError("error updating the cloud connector subaccount.", "Failed to update the cloud connector subaccount due to mismatched configuration values.")
+		return
+	}
+
+	endpoint := endpoints.GetSubaccountEndpoint(region_host, subaccount)
 
 	planBody := map[string]string{
 		"locationID":  plan.LocationID.ValueString(),
@@ -296,113 +303,62 @@ func (r *SubaccountResource) Update(ctx context.Context, req resource.UpdateRequ
 
 	err := requestAndUnmarshal(r.client, &respObj, "PUT", endpoint, planBody, true)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgUpdateSubaccountFailed, err.Error())
+		resp.Diagnostics.AddError("error updating the cloud connector subaccount.", err.Error())
 		return
 	}
 
 	// Update subaccount connection state: defaults to "Connected" (true) when created,
 	// but can be changed to "Disconnected" (false). Updates the "connected" value accordingly.
 
-	// if !plan.Tunnel.IsNull() && !plan.Tunnel.IsUnknown() {
-	// 	diags = state.Tunnel.As(ctx, &stateTunnelData, basetypes.ObjectAsOptions{})
-	// 	resp.Diagnostics.Append(diags...)
-	// 	if resp.Diagnostics.HasError() {
-	// 		return
-	// 	}
-
-	// 	diags = plan.Tunnel.As(ctx, &planTunnelData, basetypes.ObjectAsOptions{})
-	// 	resp.Diagnostics.Append(diags...)
-	// 	if resp.Diagnostics.HasError() {
-	// 		return
-	// 	}
-
-	// 	tunnelState := stateTunnelData.State.ValueString()
-
-	// 	if !planTunnelData.State.IsNull() && !planTunnelData.State.IsUnknown() && planTunnelData.State.ValueString() != tunnelState {
-	// 		connected := true
-	// 		if planTunnelData.State.ValueString() == "Disconnected" {
-	// 			connected = false
-	// 		}
-	// 		planBody := map[string]string{
-	// 			"connected": fmt.Sprintf("%t", connected),
-	// 		}
-
-	// 		err := requestAndUnmarshal(r.client, &respObj, "PUT", endpoint+"/state", planBody, false)
-	// 		if err != nil {
-	// 			resp.Diagnostics.AddError(errMsgUpdateSubaccountFailed, err.Error())
-	// 			return
-	// 		}
-
-	// 		err = requestAndUnmarshal(r.client, &respObj, "GET", endpoint, nil, true)
-	// 		if err != nil {
-	// 			resp.Diagnostics.AddError(errMsgUpdateSubaccountFailed, err.Error())
-	// 			return
-	// 		}
-	// 	}
-	// }
-
-	if shouldUpdateTunnel(plan, state) {
-		if err := r.updateTunnelState(ctx, plan, state, endpoint, &respObj, &resp.Diagnostics); err != nil {
+	if !plan.Tunnel.IsNull() && !plan.Tunnel.IsUnknown() {
+		diags = state.Tunnel.As(ctx, &stateTunnelData, basetypes.ObjectAsOptions{})
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
 			return
+		}
+
+		diags = plan.Tunnel.As(ctx, &planTunnelData, basetypes.ObjectAsOptions{})
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+
+		tunnelState := stateTunnelData.State.ValueString()
+
+		if !planTunnelData.State.IsNull() && !planTunnelData.State.IsUnknown() && planTunnelData.State.ValueString() != tunnelState {
+			connected := true
+			if planTunnelData.State.ValueString() == "Disconnected" {
+				connected = false
+			}
+			planBody := map[string]string{
+				"connected": fmt.Sprintf("%t", connected),
+			}
+
+			err := requestAndUnmarshal(r.client, &respObj, "PUT", endpoint+"/state", planBody, false)
+			if err != nil {
+				resp.Diagnostics.AddError("error updating the cloud connector subaccount.", err.Error())
+				return
+			}
+
+			err = requestAndUnmarshal(r.client, &respObj, "GET", endpoint, nil, true)
+			if err != nil {
+				resp.Diagnostics.AddError("error updating the cloud connector subaccount.", err.Error())
+				return
+			}
 		}
 	}
 
-	if responseModel, err := SubaccountResourceValueFrom(ctx, plan, respObj); err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, err.Error())
-	} else {
-		resp.Diagnostics.Append(resp.State.Set(ctx, responseModel)...)
-	}
-}
-
-func appendAndCheckErrors(diags *diag.Diagnostics, newDiags diag.Diagnostics) bool {
-	*diags = append(*diags, newDiags...)
-	return diags.HasError()
-}
-
-func validateUpdateInputs(plan, state SubaccountConfig) error {
-	if plan.RegionHost.ValueString() != state.RegionHost.ValueString() ||
-		plan.Subaccount.ValueString() != state.Subaccount.ValueString() ||
-		plan.CloudUser.ValueString() != state.CloudUser.ValueString() ||
-		plan.CloudPassword.ValueString() != state.CloudPassword.ValueString() {
-		return fmt.Errorf("failed to update the cloud connector subaccount due to mismatched configuration values")
-	}
-	return nil
-}
-
-func shouldUpdateTunnel(plan, state SubaccountConfig) bool {
-	return !plan.Tunnel.IsNull() && !plan.Tunnel.IsUnknown()
-}
-
-func (r *SubaccountResource) updateTunnelState(ctx context.Context, plan, state SubaccountConfig, endpoint string, respObj *apiobjects.SubaccountResource, diagnostics *diag.Diagnostics) error {
-	var planTunnel, stateTunnel SubaccountTunnelData
-
-	if diags := state.Tunnel.As(ctx, &stateTunnel, basetypes.ObjectAsOptions{}); appendAndCheckErrors(diagnostics, diags) {
-		return fmt.Errorf("error reading state tunnel")
-	}
-	if diags := plan.Tunnel.As(ctx, &planTunnel, basetypes.ObjectAsOptions{}); appendAndCheckErrors(diagnostics, diags) {
-		return fmt.Errorf("error reading plan tunnel")
+	responseModel, err := SubaccountResourceValueFrom(ctx, plan, respObj)
+	if err != nil {
+		resp.Diagnostics.AddError("error mapping subaccount value", fmt.Sprintf("%s", err))
+		return
 	}
 
-	desiredState := planTunnel.State.ValueString()
-	if desiredState == stateTunnel.State.ValueString() {
-		return nil
+	diags = resp.State.Set(ctx, responseModel)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
-
-	connected := desiredState != "Disconnected"
-	patch := map[string]string{"connected": fmt.Sprintf("%t", connected)}
-
-	if err := requestAndUnmarshal(r.client, respObj, "PUT", endpoint+"/state", patch, false); err != nil {
-		diagnostics.AddError(errMsgUpdateSubaccountFailed, err.Error())
-		return err
-	}
-
-	// Re-fetch to update tunnel state
-	if err := requestAndUnmarshal(r.client, respObj, "GET", endpoint, nil, true); err != nil {
-		diagnostics.AddError(errMsgUpdateSubaccountFailed, err.Error())
-		return err
-	}
-
-	return nil
 }
 
 func (r *SubaccountResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
@@ -413,20 +369,20 @@ func (r *SubaccountResource) Delete(ctx context.Context, req resource.DeleteRequ
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	regionHost := state.RegionHost.ValueString()
+	region_host := state.RegionHost.ValueString()
 	subaccount := state.Subaccount.ValueString()
 
-	endpoint := endpoints.GetSubaccountEndpoint(regionHost, subaccount)
+	endpoint := endpoints.GetSubaccountEndpoint(region_host, subaccount)
 
 	err := requestAndUnmarshal(r.client, &respObj, "DELETE", endpoint, nil, false)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgDeleteSubaccountFailed, err.Error())
+		resp.Diagnostics.AddError("error deleting the subaccount", err.Error())
 		return
 	}
 
 	responseModel, err := SubaccountResourceValueFrom(ctx, state, respObj)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("error mapping subaccount value", fmt.Sprintf("%s", err))
 		return
 	}
 

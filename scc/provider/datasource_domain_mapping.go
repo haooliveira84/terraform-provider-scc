@@ -90,27 +90,27 @@ func (d *DomainMappingDataSource) Read(ctx context.Context, req datasource.ReadR
 		return
 	}
 
-	regionHost := data.RegionHost.ValueString()
+	region_host := data.RegionHost.ValueString()
 	subaccount := data.Subaccount.ValueString()
-	internalDomain := data.InternalDomain.ValueString()
+	internal_domain := data.InternalDomain.ValueString()
 
-	endpoint := fmt.Sprintf("/api/v1/configuration/subaccounts/%s/%s/domainMappings", regionHost, subaccount)
+	endpoint := fmt.Sprintf("/api/v1/configuration/subaccounts/%s/%s/domainMappings", region_host, subaccount)
 
 	err := requestAndUnmarshal(d.client, &respObj.DomainMappings, "GET", endpoint, nil, true)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgFetchDomainMappingsFailed, err.Error())
+		resp.Diagnostics.AddError("error fetching the cloud connector domain mapping", err.Error())
 		return
 	}
 
-	mappingRespObj, err := GetDomainMapping(respObj, internalDomain)
+	mappingRespObj, err := GetDomainMapping(respObj, internal_domain)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgFetchDomainMappingFailed, fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("error getting Domain Mapping", fmt.Sprintf("%s", err))
 		return
 	}
 
 	responseModel, err := DomainMappingValueFrom(ctx, data, *mappingRespObj)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapDomainMappingFailed, fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("error mapping domain mapping value", fmt.Sprintf("%s", err))
 		return
 	}
 	diags = resp.State.Set(ctx, &responseModel)

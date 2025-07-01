@@ -7,7 +7,6 @@ import (
 
 	"github.com/SAP/terraform-provider-scc/internal/api"
 	apiobjects "github.com/SAP/terraform-provider-scc/internal/api/apiObjects"
-	"github.com/SAP/terraform-provider-scc/internal/api/endpoints"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -88,10 +87,10 @@ func (r *DomainMappingResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	regionHost := plan.RegionHost.ValueString()
+	region_host := plan.RegionHost.ValueString()
 	subaccount := plan.Subaccount.ValueString()
-	internalDomain := plan.InternalDomain.ValueString()
-	endpoint := endpoints.GetDomainMappingBaseEndpoint(regionHost, subaccount)
+	internal_domain := plan.InternalDomain.ValueString()
+	endpoint := fmt.Sprintf("/api/v1/configuration/subaccounts/%s/%s/domainMappings", region_host, subaccount)
 
 	planBody := map[string]string{
 		"virtualDomain":  plan.VirtualDomain.ValueString(),
@@ -100,25 +99,25 @@ func (r *DomainMappingResource) Create(ctx context.Context, req resource.CreateR
 
 	err := requestAndUnmarshal(r.client, &respObj.DomainMappings, "POST", endpoint, planBody, false)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgAddDomainMappingFailed, err.Error())
+		resp.Diagnostics.AddError("error creating the cloud connector domain mapping", err.Error())
 		return
 	}
 
 	err = requestAndUnmarshal(r.client, &respObj.DomainMappings, "GET", endpoint, nil, true)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgFetchDomainMappingsFailed, err.Error())
+		resp.Diagnostics.AddError("error fetching the cloud connector domain mapping", err.Error())
 		return
 	}
 
-	mappingRespObj, err := GetDomainMapping(respObj, internalDomain)
+	mappingRespObj, err := GetDomainMapping(respObj, internal_domain)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgFetchDomainMappingFailed, fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("error getting Domain Mapping", fmt.Sprintf("%s", err))
 		return
 	}
 
 	responseModel, err := DomainMappingValueFrom(ctx, plan, *mappingRespObj)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapDomainMappingFailed, fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("error mapping domain mapping value", fmt.Sprintf("%s", err))
 		return
 	}
 
@@ -138,18 +137,18 @@ func (r *DomainMappingResource) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 
-	regionHost := state.RegionHost.ValueString()
+	region_host := state.RegionHost.ValueString()
 	subaccount := state.Subaccount.ValueString()
-	internalDomain := state.InternalDomain.ValueString()
-	endpoint := endpoints.GetDomainMappingBaseEndpoint(regionHost, subaccount)
+	internal_domain := state.InternalDomain.ValueString()
+	endpoint := fmt.Sprintf("/api/v1/configuration/subaccounts/%s/%s/domainMappings", region_host, subaccount)
 
 	err := requestAndUnmarshal(r.client, &respObj.DomainMappings, "GET", endpoint, nil, true)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgFetchDomainMappingFailed, err.Error())
+		resp.Diagnostics.AddError("error fetching the cloud connector domain mapping", err.Error())
 		return
 	}
 
-	mappingRespObj, err := GetDomainMapping(respObj, internalDomain)
+	mappingRespObj, err := GetDomainMapping(respObj, internal_domain)
 	if err != nil {
 		resp.Diagnostics.AddError("error getting Domain Mapping", fmt.Sprintf("%s", err))
 		return
@@ -184,16 +183,16 @@ func (r *DomainMappingResource) Update(ctx context.Context, req resource.UpdateR
 		return
 	}
 
-	regionHost := plan.RegionHost.ValueString()
+	region_host := plan.RegionHost.ValueString()
 	subaccount := plan.Subaccount.ValueString()
-	internalDomain := state.InternalDomain.ValueString()
+	internal_domain := state.InternalDomain.ValueString()
 
-	if (plan.RegionHost.ValueString() != regionHost) ||
+	if (plan.RegionHost.ValueString() != region_host) ||
 		(plan.Subaccount.ValueString() != subaccount) {
 		resp.Diagnostics.AddError("error updating the cloud connector domain mapping.", "Failed to update the cloud connector domain mapping due to mismatched configuration values.")
 		return
 	}
-	endpoint := endpoints.GetDomainMappingEndpoint(regionHost, subaccount, internalDomain)
+	endpoint := fmt.Sprintf("/api/v1/configuration/subaccounts/%s/%s/domainMappings/%s", region_host, subaccount, internal_domain)
 
 	planBody := map[string]string{
 		"virtualDomain":  plan.VirtualDomain.ValueString(),
@@ -206,11 +205,11 @@ func (r *DomainMappingResource) Update(ctx context.Context, req resource.UpdateR
 		return
 	}
 
-	endpoint = fmt.Sprintf("/api/v1/configuration/subaccounts/%s/%s/domainMappings", regionHost, subaccount)
+	endpoint = fmt.Sprintf("/api/v1/configuration/subaccounts/%s/%s/domainMappings", region_host, subaccount)
 
 	err = requestAndUnmarshal(r.client, &respObj.DomainMappings, "GET", endpoint, nil, true)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgFetchDomainMappingsFailed, err.Error())
+		resp.Diagnostics.AddError("error fetching the cloud connector domain mapping", err.Error())
 		return
 	}
 
@@ -242,10 +241,10 @@ func (r *DomainMappingResource) Delete(ctx context.Context, req resource.DeleteR
 		return
 	}
 
-	regionHost := state.RegionHost.ValueString()
+	region_host := state.RegionHost.ValueString()
 	subaccount := state.Subaccount.ValueString()
-	internalDomain := state.InternalDomain.ValueString()
-	endpoint := endpoints.GetDomainMappingEndpoint(regionHost, subaccount, internalDomain)
+	internal_domain := state.InternalDomain.ValueString()
+	endpoint := fmt.Sprintf("/api/v1/configuration/subaccounts/%s/%s/domainMappings/%s", region_host, subaccount, internal_domain)
 
 	err := requestAndUnmarshal(r.client, &respObj, "DELETE", endpoint, nil, false)
 	if err != nil {

@@ -14,21 +14,21 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
 
-var _ resource.Resource = &SubaccountK8SServiceChannelResource{}
+var _ resource.Resource = &SubaccountServiceChannelK8SResource{}
 
-func NewSubaccountK8SServiceChannelResource() resource.Resource {
-	return &SubaccountK8SServiceChannelResource{}
+func NewSubaccountServiceChannelK8SResource() resource.Resource {
+	return &SubaccountServiceChannelK8SResource{}
 }
 
-type SubaccountK8SServiceChannelResource struct {
+type SubaccountServiceChannelK8SResource struct {
 	client *api.RestApiClient
 }
 
-func (r *SubaccountK8SServiceChannelResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *SubaccountServiceChannelK8SResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_subaccount_k8s_service_channel"
 }
 
-func (r *SubaccountK8SServiceChannelResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *SubaccountServiceChannelK8SResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: `Cloud Connector Subaccount K8S Service Channel Resource.
 
@@ -106,7 +106,7 @@ __Further documentation:__
 	}
 }
 
-func (r *SubaccountK8SServiceChannelResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *SubaccountServiceChannelK8SResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 
 	if req.ProviderData == nil {
 		return
@@ -126,7 +126,7 @@ func (r *SubaccountK8SServiceChannelResource) Configure(ctx context.Context, req
 	r.client = client
 }
 
-func (r *SubaccountK8SServiceChannelResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *SubaccountServiceChannelK8SResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var plan SubaccountK8SServiceChannelConfig
 	var respObj apiobjects.SubaccountK8SServiceChannels
 	diags := req.Plan.Get(ctx, &plan)
@@ -135,9 +135,9 @@ func (r *SubaccountK8SServiceChannelResource) Create(ctx context.Context, req re
 		return
 	}
 
-	regionHost := plan.RegionHost.ValueString()
+	region_host := plan.RegionHost.ValueString()
 	subaccount := plan.Subaccount.ValueString()
-	endpoint := endpoints.GetSubaccountServiceChannelBaseEndpoint(regionHost, subaccount, "K8S")
+	endpoint := endpoints.GetSubaccountServiceChannelBaseEndpoint(region_host, subaccount, "K8S")
 
 	planBody := map[string]string{
 		"k8sCluster":  plan.K8SCluster.ValueString(),
@@ -147,29 +147,29 @@ func (r *SubaccountK8SServiceChannelResource) Create(ctx context.Context, req re
 		"comment":     plan.Comment.ValueString(),
 	}
 
-	err := requestAndUnmarshal(r.client, &respObj.SubaccountK8SServiceChannels, "POST", endpoint, planBody, false)
+	err := requestAndUnmarshal(r.client, &respObj.SubaccountServiceChannelsK8S, "POST", endpoint, planBody, false)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgAddSubaccountK8SServiceChannelFailed, err.Error())
+		resp.Diagnostics.AddError("error creating the cloud connector subaccount service channel", err.Error())
 		return
 	}
 
-	err = requestAndUnmarshal(r.client, &respObj.SubaccountK8SServiceChannels, "GET", endpoint, nil, true)
+	err = requestAndUnmarshal(r.client, &respObj.SubaccountServiceChannelsK8S, "GET", endpoint, nil, true)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgFetchSubaccountK8SServiceChannelsFailed, err.Error())
+		resp.Diagnostics.AddError("error fetching the cloud connector subaccount service channels", err.Error())
 		return
 	}
 
-	serviceChannelRespObj, err := r.getSubaccountK8SServiceChannel(respObj, plan.K8SCluster.ValueString())
+	serviceChannelRespObj, err := r.getSubaccountServiceChannel(respObj, plan.K8SCluster.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgFetchSubaccountK8SServiceChannelFailed, err.Error())
+		resp.Diagnostics.AddError("error fetching the subaccount service channel", err.Error())
 		return
 	}
 
 	id := serviceChannelRespObj.ID
 
 	if !plan.Enabled.IsNull() {
-		endpoint = endpoints.GetSubaccountServiceChannelEndpoint(regionHost, subaccount, "K8S", id)
-		r.enableSubaccountK8SServiceChannel(plan, *serviceChannelRespObj, (*resource.UpdateResponse)(resp), endpoint+"/state")
+		endpoint = endpoints.GetSubaccountServiceChannelEndpoint(region_host, subaccount, "K8S", id)
+		r.enableSubaccountServiceChannel(plan, *serviceChannelRespObj, (*resource.UpdateResponse)(resp), endpoint+"/state")
 
 		err = requestAndUnmarshal(r.client, &serviceChannelRespObj, "GET", endpoint, nil, true)
 		if err != nil {
@@ -180,7 +180,7 @@ func (r *SubaccountK8SServiceChannelResource) Create(ctx context.Context, req re
 
 	responseModel, err := SubaccountK8SServiceChannelValueFrom(ctx, plan, *serviceChannelRespObj)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountK8SServiceChannelFailed, fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("error mapping subaccount service channel value", fmt.Sprintf("%s", err))
 		return
 	}
 
@@ -191,7 +191,7 @@ func (r *SubaccountK8SServiceChannelResource) Create(ctx context.Context, req re
 	}
 }
 
-func (r *SubaccountK8SServiceChannelResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *SubaccountServiceChannelK8SResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var state SubaccountK8SServiceChannelConfig
 	var respObj apiobjects.SubaccountK8SServiceChannel
 	diags := req.State.Get(ctx, &state)
@@ -200,10 +200,10 @@ func (r *SubaccountK8SServiceChannelResource) Read(ctx context.Context, req reso
 		return
 	}
 
-	regionHost := state.RegionHost.ValueString()
+	region_host := state.RegionHost.ValueString()
 	subaccount := state.Subaccount.ValueString()
 	id := state.ID.ValueInt64()
-	endpoint := endpoints.GetSubaccountServiceChannelEndpoint(regionHost, subaccount, "K8S", id)
+	endpoint := endpoints.GetSubaccountServiceChannelEndpoint(region_host, subaccount, "K8S", id)
 
 	err := requestAndUnmarshal(r.client, &respObj, "GET", endpoint, nil, true)
 	if err != nil {
@@ -213,7 +213,7 @@ func (r *SubaccountK8SServiceChannelResource) Read(ctx context.Context, req reso
 
 	responseModel, err := SubaccountK8SServiceChannelValueFrom(ctx, state, respObj)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountK8SServiceChannelFailed, fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("error mapping subaccount service channel value", fmt.Sprintf("%s", err))
 		return
 	}
 
@@ -224,7 +224,7 @@ func (r *SubaccountK8SServiceChannelResource) Read(ctx context.Context, req reso
 	}
 }
 
-func (r *SubaccountK8SServiceChannelResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *SubaccountServiceChannelK8SResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var plan, state SubaccountK8SServiceChannelConfig
 	var respObj apiobjects.SubaccountK8SServiceChannel
 
@@ -240,25 +240,25 @@ func (r *SubaccountK8SServiceChannelResource) Update(ctx context.Context, req re
 		return
 	}
 
-	regionHost := plan.RegionHost.ValueString()
+	region_host := plan.RegionHost.ValueString()
 	subaccount := plan.Subaccount.ValueString()
 	id := state.ID.ValueInt64()
 
-	if (plan.RegionHost.ValueString() != regionHost) ||
+	if (plan.RegionHost.ValueString() != region_host) ||
 		(plan.Subaccount.ValueString() != subaccount) {
 		resp.Diagnostics.AddError("error updating the cloud connector k8s service channel.", "Failed to update the cloud connector k8s service channel due to mismatched configuration values.")
 		return
 	}
 	// Update Service Channel
-	endpoint := endpoints.GetSubaccountServiceChannelEndpoint(regionHost, subaccount, "K8S", id)
-	r.updateSubaccountK8SServiceChannel(plan, respObj, resp, endpoint)
+	endpoint := endpoints.GetSubaccountServiceChannelEndpoint(region_host, subaccount, "K8S", id)
+	r.updateSubaccountServiceChannel(plan, respObj, resp, endpoint)
 
 	// Enable/Disable Service Channel
 	if plan.Enabled.ValueBool() != state.Enabled.ValueBool() {
-		r.enableSubaccountK8SServiceChannel(plan, respObj, resp, endpoint+"/state")
+		r.enableSubaccountServiceChannel(plan, respObj, resp, endpoint+"/state")
 	}
 
-	endpoint = endpoints.GetSubaccountServiceChannelEndpoint(regionHost, subaccount, "K8S", id)
+	endpoint = endpoints.GetSubaccountServiceChannelEndpoint(region_host, subaccount, "K8S", id)
 
 	err := requestAndUnmarshal(r.client, &respObj, "GET", endpoint, nil, true)
 	if err != nil {
@@ -268,7 +268,7 @@ func (r *SubaccountK8SServiceChannelResource) Update(ctx context.Context, req re
 
 	responseModel, err := SubaccountK8SServiceChannelValueFrom(ctx, plan, respObj)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountK8SServiceChannelFailed, fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("error mapping subaccount service channel value", fmt.Sprintf("%s", err))
 		return
 	}
 
@@ -279,7 +279,7 @@ func (r *SubaccountK8SServiceChannelResource) Update(ctx context.Context, req re
 	}
 }
 
-func (r *SubaccountK8SServiceChannelResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *SubaccountServiceChannelK8SResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state SubaccountK8SServiceChannelConfig
 	var respObj apiobjects.SubaccountK8SServiceChannel
 	diags := req.State.Get(ctx, &state)
@@ -288,21 +288,21 @@ func (r *SubaccountK8SServiceChannelResource) Delete(ctx context.Context, req re
 		return
 	}
 
-	regionHost := state.RegionHost.ValueString()
+	region_host := state.RegionHost.ValueString()
 	subaccount := state.Subaccount.ValueString()
 	id := state.ID.ValueInt64()
 
-	endpoint := endpoints.GetSubaccountServiceChannelEndpoint(regionHost, subaccount, "K8S", id)
+	endpoint := endpoints.GetSubaccountServiceChannelEndpoint(region_host, subaccount, "K8S", id)
 
 	err := requestAndUnmarshal(r.client, &respObj, "DELETE", endpoint, nil, false)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgDeleteSubaccountK8SServiceChannelFailed, err.Error())
+		resp.Diagnostics.AddError("error deleting the subaccount service channel", err.Error())
 		return
 	}
 
 	responseModel, err := SubaccountK8SServiceChannelValueFrom(ctx, state, respObj)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountK8SServiceChannelFailed, fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError("error mapping subaccount service channel value", fmt.Sprintf("%s", err))
 		return
 	}
 
@@ -313,8 +313,8 @@ func (r *SubaccountK8SServiceChannelResource) Delete(ctx context.Context, req re
 	}
 }
 
-func (r *SubaccountK8SServiceChannelResource) getSubaccountK8SServiceChannel(serviceChannels apiobjects.SubaccountK8SServiceChannels, targetK8SCluster string) (*apiobjects.SubaccountK8SServiceChannel, error) {
-	for _, channel := range serviceChannels.SubaccountK8SServiceChannels {
+func (r *SubaccountServiceChannelK8SResource) getSubaccountServiceChannel(serviceChannels apiobjects.SubaccountK8SServiceChannels, targetK8SCluster string) (*apiobjects.SubaccountK8SServiceChannel, error) {
+	for _, channel := range serviceChannels.SubaccountServiceChannelsK8S {
 		if channel.K8SCluster == targetK8SCluster {
 			return &channel, nil
 		}
@@ -322,19 +322,19 @@ func (r *SubaccountK8SServiceChannelResource) getSubaccountK8SServiceChannel(ser
 	return nil, fmt.Errorf("%s", "subaccount service channel doesn't exist")
 }
 
-func (r *SubaccountK8SServiceChannelResource) enableSubaccountK8SServiceChannel(plan SubaccountK8SServiceChannelConfig, respObj apiobjects.SubaccountK8SServiceChannel, resp *resource.UpdateResponse, endpoint string) {
+func (r *SubaccountServiceChannelK8SResource) enableSubaccountServiceChannel(plan SubaccountK8SServiceChannelConfig, respObj apiobjects.SubaccountK8SServiceChannel, resp *resource.UpdateResponse, endpoint string) {
 	planBody := map[string]string{
 		"enabled": fmt.Sprintf("%t", plan.Enabled.ValueBool()),
 	}
 
 	err := requestAndUnmarshal(r.client, &respObj, "PUT", endpoint, planBody, false)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgEnableSubaccountK8SServiceChannelFailed, err.Error())
+		resp.Diagnostics.AddError("error enabling the cloud connector subaccount service channel", err.Error())
 		return
 	}
 }
 
-func (r *SubaccountK8SServiceChannelResource) updateSubaccountK8SServiceChannel(plan SubaccountK8SServiceChannelConfig, respObj apiobjects.SubaccountK8SServiceChannel, resp *resource.UpdateResponse, endpoint string) {
+func (r *SubaccountServiceChannelK8SResource) updateSubaccountServiceChannel(plan SubaccountK8SServiceChannelConfig, respObj apiobjects.SubaccountK8SServiceChannel, resp *resource.UpdateResponse, endpoint string) {
 	planBody := map[string]string{
 		"k8sCluster":  plan.K8SCluster.ValueString(),
 		"k8sService":  plan.K8SService.ValueString(),
@@ -345,12 +345,12 @@ func (r *SubaccountK8SServiceChannelResource) updateSubaccountK8SServiceChannel(
 
 	err := requestAndUnmarshal(r.client, &respObj, "PUT", endpoint, planBody, false)
 	if err != nil {
-		resp.Diagnostics.AddError(errMsgUpdateSubaccountK8SServiceChannelFailed, err.Error())
+		resp.Diagnostics.AddError("error updating the cloud connector subaccount service channel", err.Error())
 		return
 	}
 }
 
-func (rs *SubaccountK8SServiceChannelResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (rs *SubaccountServiceChannelK8SResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	idParts := strings.Split(req.ID, ",")
 
 	if len(idParts) != 3 || idParts[0] == "" || idParts[1] == "" || idParts[2] == "" {

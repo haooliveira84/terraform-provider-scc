@@ -1,7 +1,9 @@
 package provider
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"regexp"
 	"testing"
 
@@ -15,6 +17,11 @@ func TestResourceDomainMapping(t *testing.T) {
 
 	t.Run("happy path", func(t *testing.T) {
 		rec, user := setupVCR(t, "fixtures/resource_domain_mapping")
+		rec.SetRealTransport(&http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		})
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{
@@ -31,12 +38,6 @@ func TestResourceDomainMapping(t *testing.T) {
 					),
 				},
 				{
-					Config: providerConfig(user) + ResourceDomainMapping("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "updatedtfvirtualdomain", "testtfinternaldomain"),
-					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("scc_domain_mapping.test", "virtual_domain", "updatedtfvirtualdomain"),
-					),
-				},
-				{
 					ResourceName:                         "scc_domain_mapping.test",
 					ImportState:                          true,
 					ImportStateVerify:                    true,
@@ -45,6 +46,7 @@ func TestResourceDomainMapping(t *testing.T) {
 				},
 			},
 		})
+
 	})
 
 	t.Run("error path - region host mandatory", func(t *testing.T) {

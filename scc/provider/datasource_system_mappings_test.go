@@ -1,7 +1,9 @@
 package provider
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"regexp"
 	"testing"
 
@@ -14,6 +16,11 @@ func TestDataSourceSystemMappings(t *testing.T) {
 
 	t.Run("happy path", func(t *testing.T) {
 		rec, user := setupVCR(t, "fixtures/datasource_system_mappings")
+		rec.SetRealTransport(&http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		})
 		defer stopQuietly(rec)
 
 		resource.Test(t, resource.TestCase{

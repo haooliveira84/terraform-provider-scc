@@ -1,8 +1,8 @@
-name: Integration Test - Terraform Provider
+name: Integration Test - OpenTofu
 
-# Idea: 
+# Idea:
 # 1. Build the provider from the latest pull
-# 2. Setup Terraform
+# 2. Setup OpenTofu
 # 3. Execute the integration test script
 # 4. All changes must apply
 # 5. Destroy the infrastructure
@@ -43,7 +43,7 @@ jobs:
           skip-cache: true
 
   test:
-    name: Integration Test for Terraform Provider
+    name: Integration Test for OpenTofu
     needs: build
     runs-on: ubuntu-latest
 
@@ -54,7 +54,7 @@ jobs:
       TF_VAR_subaccount: ${{ secrets.SUBACCOUNT_ID }}
       TF_VAR_cloud_user: ${{ secrets.CLOUD_USER }}
       TF_VAR_cloud_password: ${{ secrets.CLOUD_PASSWORD }}
-      
+
 
     steps:
     - name: Check out Git repository
@@ -67,12 +67,12 @@ jobs:
         go-version-file: 'go.mod'
         cache: false
 
-    - name: Setup Terraform
-      id : setup_terraform
-      uses: hashicorp/setup-terraform@v3.1.2
+    - name: Setup OpenTofu
+      id : setup_opentofu
+      uses: opentofu/setup-opentofu@v1
       with:
-        terraform_wrapper: false
-        terraform_version: latest
+        tofu_wrapper: false
+        tofu_version: latest
 
     - name: Install local Terraform provider
       id: build_provider
@@ -84,15 +84,15 @@ jobs:
       shell: bash
       run: |
         rm -rf .terraform && rm -rf .terraform.lock.hcl && cp ${{ env.DEV_OVERRIDE }} ~/.terraformrc
-    - name: Terraform Apply with local provider
-      id: terraform_apply_local
+    - name: Tofu Apply with local provider
+      id: tofu_apply
       shell: bash
       run: |
-        terraform -chdir=${{ env.PATH_TO_TFSCRIPT }} apply -auto-approve -no-color
-    
-    - name: Terraform Destroy with local provider
+        tofu -chdir=${{ env.PATH_TO_TFSCRIPT }} apply -auto-approve -no-color
+
+    - name: Tofu Destroy with local provider
       if: always()
-      id: terraform_destory
+      id: tofu_destroy
       shell: bash
       run: |
-        terraform -chdir=${{ env.PATH_TO_TFSCRIPT }} destroy -auto-approve -no-color
+        tofu -chdir=${{ env.PATH_TO_TFSCRIPT }} destroy -auto-approve -no-color

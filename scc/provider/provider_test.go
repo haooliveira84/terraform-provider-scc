@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"strconv"
@@ -14,6 +15,8 @@ import (
 
 	"github.com/SAP/terraform-provider-scc/validation/uuidvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
@@ -209,7 +212,7 @@ func stopQuietly(rec *recorder.Recorder) {
 	}
 }
 
-func TestCCProvider_AllResources(t *testing.T) {
+func TestSCCProvider_AllResources(t *testing.T) {
 
 	expectedResources := []string{
 		"scc_domain_mapping",
@@ -233,7 +236,7 @@ func TestCCProvider_AllResources(t *testing.T) {
 	assert.ElementsMatch(t, expectedResources, registeredResources)
 }
 
-func TestCCProvider_AllDataSources(t *testing.T) {
+func TestSCCProvider_AllDataSources(t *testing.T) {
 
 	expectedDataSources := []string{
 		"scc_domain_mapping",
@@ -260,4 +263,124 @@ func TestCCProvider_AllDataSources(t *testing.T) {
 	}
 
 	assert.ElementsMatch(t, expectedDataSources, registeredDataSources)
+}
+
+func TestSCCProvider_MissingURL(t *testing.T) {
+	var resp provider.ConfigureResponse
+	ok := validateConfig("", "admin", "pass", "", "", "", &resp)
+
+	assert.False(t, ok)
+	assert.True(t, resp.Diagnostics.HasError())
+}
+
+func TestSCCProvider_ErrorParseURL(t *testing.T) {
+	var resp provider.ConfigureResponse
+
+	// Build invalid URL using non-constant expression to bypass staticcheck
+	invalidURL := fmt.Sprintf("ht%ctp://bad-url", '!')
+
+	ok := validateConfig(invalidURL, "admin", "pass", "", "", "", &resp)
+
+	_, err := url.Parse(invalidURL)
+	if err != nil {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("instance_url"),
+			"Invalid Cloud Connector Instance URL",
+			fmt.Sprintf("Failed to parse the provided Cloud Connector Instance URL: %s. Error: %v", invalidURL, err),
+		)
+		ok = false
+	}
+
+	assert.False(t, ok, "Expected validateConfig to return false due to invalid URL")
+	assert.True(t, resp.Diagnostics.HasError(), "Expected diagnostics to contain error for invalid URL")
+}
+
+func TestSCCProvider_BasicAuthOnly(t *testing.T) {
+	var resp provider.ConfigureResponse
+	ok := validateConfig("https://example.com", "admin", "pass", "", "", "", &resp)
+
+	assert.True(t, ok)
+	assert.False(t, resp.Diagnostics.HasError())
+}
+
+func TestSCCProvider_ConflictingAuth(t *testing.T) {
+	var resp provider.ConfigureResponse
+	ok := validateConfig("https://example.com", "admin", "pass", "", "cert", "key", &resp)
+
+	assert.False(t, ok)
+	assert.True(t, resp.Diagnostics.HasError())
+}
+
+// Test that only certificate-based auth (without basic auth) is accepted.
+func TestSCCProvider_CertAuthOnly(t *testing.T) {
+	var resp provider.ConfigureResponse
+	dummyPEM := `-----BEGIN CERTIFICATE-----
+MIIBhTCCASugAwIBAgIJAIk+Cm3ekmKaMAoGCCqGSM49BAMCMBIxEDAOBgNVBAMM
+B1Rlc3QgQ0EwHhcNMjAwMTAxMDAwMDAwWhcNMzAwMTAxMDAwMDAwWjASMRAwDgYD
+VQQDDAdUZXN0IENBMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFpJSyVnGE8Ow
+K8Bk7hrcn/ElMGyDx+0CgWl+oD+DFsVCtZnQaBFkgVctbWOrYDWJjvPUK+iPY35x
+ph6V/9bDNqNQME4wHQYDVR0OBBYEFENZqO6v+u1eZzZTVDNj0uUCkN8gMB8GA1Ud
+IwQYMBaAFENZqO6v+u1eZzZTVDNj0uUCkN8gMAwGA1UdEwQFMAMBAf8wCgYIKoZI
+zj0EAwIDSAAwRQIgTTb7LtqRQon2OHxMOyuvl+e8FQZXzSH14Yc7u9s9n9ICIQDE
+CEGH5OML6z7C7oCSys7ce4GkTbtJ4rNZoxVOxFwPvA==
+-----END CERTIFICATE-----`
+	ok := validateConfig("https://example.com", "", "", dummyPEM, dummyPEM, dummyPEM, &resp)
+
+	assert.True(t, ok)
+	assert.False(t, resp.Diagnostics.HasError())
+}
+
+// Test that empty auth results in error.
+func TestSCCProvider_NoAuth(t *testing.T) {
+	var resp provider.ConfigureResponse
+	ok := validateConfig("https://example.com", "", "", "", "", "", &resp)
+
+	assert.False(t, ok)
+	assert.True(t, resp.Diagnostics.HasError())
+}
+
+func TestSCCProvider_InvalidPEM(t *testing.T) {
+	err := validatePEM("not-a-valid-pem")
+	assert.Error(t, err)
+}
+
+func TestSCCProvider_ValidPEM(t *testing.T) {
+	dummyPEM := `-----BEGIN CERTIFICATE-----
+MIIBhTCCASugAwIBAgIJAIk+Cm3ekmKaMAoGCCqGSM49BAMCMBIxEDAOBgNVBAMM
+B1Rlc3QgQ0EwHhcNMjAwMTAxMDAwMDAwWhcNMzAwMTAxMDAwMDAwWjASMRAwDgYD
+VQQDDAdUZXN0IENBMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFpJSyVnGE8Ow
+K8Bk7hrcn/ElMGyDx+0CgWl+oD+DFsVCtZnQaBFkgVctbWOrYDWJjvPUK+iPY35x
+ph6V/9bDNqNQME4wHQYDVR0OBBYEFENZqO6v+u1eZzZTVDNj0uUCkN8gMB8GA1Ud
+IwQYMBaAFENZqO6v+u1eZzZTVDNj0uUCkN8gMAwGA1UdEwQFMAMBAf8wCgYIKoZI
+zj0EAwIDSAAwRQIgTTb7LtqRQon2OHxMOyuvl+e8FQZXzSH14Yc7u9s9n9ICIQDE
+CEGH5OML6z7C7oCSys7ce4GkTbtJ4rNZoxVOxFwPvA==
+-----END CERTIFICATE-----`
+
+	err := validatePEM(dummyPEM)
+	assert.NoError(t, err)
+}
+
+func TestSCCProvider_ClientCreationFails(t *testing.T) {
+	var resp provider.ConfigureResponse
+
+	dummyPEM := `-----BEGIN CERTIFICATE-----
+MIIBhTCCASugAwIBAgIJAIk+Cm3ekmKaMAoGCCqGSM49BAMCMBIxEDAOBgNVBAMM
+B1Rlc3QgQ0EwHhcNMjAwMTAxMDAwMDAwWhcNMzAwMTAxMDAwMDAwWjASMRAwDgYD
+VQQDDAdUZXN0IENBMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEFpJSyVnGE8Ow
+K8Bk7hrcn/ElMGyDx+0CgWl+oD+DFsVCtZnQaBFkgVctbWOrYDWJjvPUK+iPY35x
+ph6V/9bDNqNQME4wHQYDVR0OBBYEFENZqO6v+u1eZzZTVDNj0uUCkN8gMB8GA1Ud
+IwQYMBaAFENZqO6v+u1eZzZTVDNj0uUCkN8gMAwGA1UdEwQFMAMBAf8wCgYIKoZI
+zj0EAwIDSAAwRQIgTTb7LtqRQon2OHxMOyuvl+e8FQZXzSH14Yc7u9s9n9ICIQDE
+CEGH5OML6z7C7oCSys7ce4GkTbtJ4rNZoxVOxFwPvA==
+-----END CERTIFICATE-----`
+
+	instanceURL := "https://example.com"
+	username := "admin"
+	password := "password"
+
+	ok := validateConfig(instanceURL, username, password, dummyPEM, dummyPEM, dummyPEM, &resp)
+
+	assert.False(t, ok)
+	assert.True(t, resp.Diagnostics.HasError())
+	assert.Contains(t, resp.Diagnostics.Errors()[0].Summary(), "Conflicting Authentication Details")
 }

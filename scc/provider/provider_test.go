@@ -433,6 +433,21 @@ func Test_ProviderConnection_Unauthorized(t *testing.T) {
 	assert.Contains(t, err.Error(), "unauthorized")
 }
 
+type roundTripFunc func(req *http.Request) *http.Response
+
+func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f(req), nil
+}
+
+func mustParseURL(t *testing.T, raw string) *url.URL {
+	t.Helper()
+	u, err := url.Parse(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return u
+}
+
 func TestSCCProvider_ParseInstanceURL_Valid(t *testing.T) {
 	var resp provider.ConfigureResponse
 	urlStr := "https://valid.example.com"

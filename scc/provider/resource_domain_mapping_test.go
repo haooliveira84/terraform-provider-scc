@@ -30,6 +30,11 @@ func TestResourceDomainMapping(t *testing.T) {
 						resource.TestCheckResourceAttr("scc_domain_mapping.test", "internal_domain", "testtfinternaldomain"),
 					),
 				},
+				// Update with mismatched configuration should throw error
+				{
+					Config:      providerConfig(user) + ResourceDomainMapping("test", "cf.us10.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "updatedtfvirtualdomain", "testtfinternaldomain"),
+					ExpectError: regexp.MustCompile(`(?is)error updating the cloud connector domain mapping.*mismatched\s+configuration values`),
+				},
 				{
 					Config: providerConfig(user) + ResourceDomainMapping("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "updatedtfvirtualdomain", "testtfinternaldomain"),
 					Check: resource.ComposeAggregateTestCheckFunc(
@@ -47,13 +52,13 @@ func TestResourceDomainMapping(t *testing.T) {
 					ResourceName:  "scc_domain_mapping.test",
 					ImportState:   true,
 					ImportStateId: "cf.eu12.hana.ondemand.comd3bbbcd7-d5e0-483b-a524-6dee7205f8e8testtfinternaldomain", // malformed ID
-					ExpectError:   regexp.MustCompile(`(?s)Expected import identifier with format:.*internal_domain.*Got:`),
+					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*internal_domain.*Got:`),
 				},
 				{
 					ResourceName:  "scc_domain_mapping.test",
 					ImportState:   true,
 					ImportStateId: "cf.eu12.hana.ondemand.com,d3bbbcd7-d5e0-483b-a524-6dee7205f8e8,testtfinternaldomain,extra",
-					ExpectError:   regexp.MustCompile(`(?s)Expected import identifier with format:.*internal_domain.*Got:`),
+					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*internal_domain.*Got:`),
 				},
 			},
 		})

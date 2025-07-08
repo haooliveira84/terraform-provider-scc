@@ -110,26 +110,17 @@ func (c *cloudConnectorProvider) Configure(ctx context.Context, req provider.Con
 		return
 	}
 
-	// Parse the base URL
-	parsedURL, err := url.Parse(instanceURL)
-	if err != nil {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("instance_url"),
-			"Invalid Cloud Connector Instance URL",
-			fmt.Sprintf("Failed to parse the provided Cloud Connector Instance URL: %s. Error: %v", instanceURL, err),
-		)
+	// Parse Instance URL
+	parsedURL := parseInstanceURL(instanceURL, resp)
+	if parsedURL == nil {
 		return
 	}
-
-	client, err := api.NewRestApiClient(c.httpClient, parsedURL, username, password, []byte(caCertificate), []byte(clientCertificate), []byte(clientKey))
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client Creation Failed",
-			fmt.Sprintf("Failed to create Cloud Connector client: %v", err),
-		)
+	// Create Client
+	client := createClient(c.httpClient, parsedURL, username, password, caCertificate, clientCertificate, clientKey, resp)
+	if client == nil {
 		return
 	}
-
+	// Test Provider Connection
 	if err := testProviderConnection(client); err != nil {
 		resp.Diagnostics.AddError(
 			"Cloud Connector Authentication Failed",
@@ -198,7 +189,37 @@ func validateConfig(instanceURL, username, password, caCertificate, clientCertif
 
 	return true
 }
-
+func parseInstanceURL(instanceURL string, resp *provider.ConfigureResponse) *url.URL {
+	parsedURL, err := url.Parse(instanceURL)
+	if err != nil {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("instance_url"),
+			"Invalid Cloud Connector Instance URL",
+			fmt.Sprintf("Failed to parse the provided Cloud Connector Instance URL: %s. Error: %v", instanceURL, err),
+		)
+		return nil
+	}
+	return parsedURL
+}
+func createClient(httpClient *http.Client, parsedURL *url.URL, username, password, caCertificate, clientCertificate, clientKey string, resp *provider.ConfigureResponse) *api.RestApiClient {
+	client, err := api.NewRestApiClient(
+		httpClient,
+		parsedURL,
+		username,
+		password,
+		[]byte(caCertificate),
+		[]byte(clientCertificate),
+		[]byte(clientKey),
+	)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client Creation Failed",
+			fmt.Sprintf("Failed to create Cloud Connector client: %v", err),
+		)
+		return nil
+	}
+	return client
+}
 func testProviderConnection(client *api.RestApiClient) error {
 	resp, err := client.GetRequest("/api/v1/connector/version")
 	if err != nil {

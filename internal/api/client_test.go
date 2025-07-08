@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/tls"
@@ -8,6 +9,7 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
+	"io"
 	"math/big"
 	"net"
 	"net/http"
@@ -101,6 +103,47 @@ func TestRestApiClient_CertificateAuth(t *testing.T) {
 	})
 }
 
+func TestRestApiClient_BothAuthProvidedFails(t *testing.T) {
+	baseURL, _ := url.Parse("https://localhost")
+	certPEM, keyPEM, _, _ := generateSelfSignedCert()
+	// Provided both basic authentication(username/password) and certificate based authentication to the function
+	_, err := NewRestApiClient(nil, baseURL, "user", "pass", certPEM, certPEM, keyPEM)
+	if err == nil || err.Error() != "cannot use both certificate-based and basic authentication simultaneously" {
+		t.Fatalf("expected error for both auth methods provided, got: %v", err)
+	}
+}
+
+func TestRestApiClient_NoAuthProvidedFails(t *testing.T) {
+	baseURL, _ := url.Parse("https://localhost")
+	// Provided neither basic authentication(username/password) nor certificate based authentication to the function
+	_, err := NewRestApiClient(nil, baseURL, "", "", nil, nil, nil)
+	if err == nil || err.Error() != "either certificate-based or basic authentication must be provided" {
+		t.Fatalf("expected error for no auth provided, got: %v", err)
+	}
+}
+
+func TestRestApiClient_InvalidClientCertFails(t *testing.T) {
+	baseURL, _ := url.Parse("https://localhost")
+	// Generate invalid client certificate and key and provided to the function
+	invalidPEM := []byte("not a valid pem")
+	_, err := NewRestApiClient(nil, baseURL, "", "", nil, invalidPEM, invalidPEM)
+	if err == nil || err.Error() != "client certificate is not valid PEM-encoded data" {
+		t.Fatalf("expected PEM validation error, got: %v", err)
+	}
+}
+
+func TestRestApiClient_InvalidCACertFails(t *testing.T) {
+	baseURL, _ := url.Parse("https://localhost")
+	// Generate valid client certificate and key
+	certPEM, keyPEM, _, _ := generateSelfSignedCert()
+	// Generate invalid CA Certificate
+	invalidCA := []byte("not valid pem")
+	_, err := NewRestApiClient(nil, baseURL, "", "", invalidCA, certPEM, keyPEM)
+	if err == nil || err.Error() != "failed to parse CA certificate: input is not valid PEM-encoded data" {
+		t.Fatalf("expected CA cert parse error, got: %v", err)
+	}
+}
+
 // generateSelfSignedCert generates a self-signed TLS certificate and its private key.
 func generateSelfSignedCert() (certPEM, keyPEM []byte, cert *x509.Certificate, err error) {
 	// Generate a new RSA private key with 2048-bit length
@@ -145,6 +188,55 @@ func generateSelfSignedCert() (certPEM, keyPEM []byte, cert *x509.Certificate, e
 
 	// Return the PEM-encoded certificate, key, and parsed certificate
 	return certPEM, keyPEM, parsedCert, nil
+}
+
+func TestValidateResponse_SuccessCodes(t *testing.T) {
+	successStatuses := []int{http.StatusOK, http.StatusCreated, http.StatusNoContent}
+
+	for _, code := range successStatuses {
+		resp := &http.Response{
+			StatusCode: code,
+			Body:       io.NopCloser(bytes.NewBuffer(nil)),
+		}
+
+		err := validateResponse(resp)
+		if err != nil {
+			t.Errorf("expected no error for status %d, got %v", code, err)
+		}
+	}
+}
+
+func TestValidateResponse_ErrorWithValidJSON(t *testing.T) {
+	body := `{"type":"BadRequest","message":"Invalid input"}`
+	req, _ := http.NewRequest(http.MethodPost, "http://example.com/api", nil)
+
+	resp := &http.Response{
+		StatusCode: http.StatusBadRequest,
+		Request:    req,
+		Body:       io.NopCloser(bytes.NewBufferString(body)),
+	}
+
+	err := validateResponse(resp)
+	if err == nil || err.Error() != "HTTP POST http://example.com/api failed with status 400: Invalid input" {
+		t.Errorf("unexpected error: %v", err)
+	}
+}
+
+func TestValidateResponse_ErrorWithInvalidJSON(t *testing.T) {
+	body := `<<<garbage>>>`
+	req, _ := http.NewRequest(http.MethodDelete, "http://example.com/delete", nil)
+
+	resp := &http.Response{
+		StatusCode: http.StatusInternalServerError,
+		Request:    req,
+		Body:       io.NopCloser(bytes.NewBufferString(body)),
+	}
+
+	err := validateResponse(resp)
+	expectedStart := "HTTP DELETE http://example.com/delete failed with status 500. Raw response:"
+	if err == nil || err.Error()[:len(expectedStart)] != expectedStart {
+		t.Errorf("unexpected error: %v", err)
+	}
 }
 
 func createBasicAuthClient(serverURL string) (*RestApiClient, error) {

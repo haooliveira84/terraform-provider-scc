@@ -120,7 +120,7 @@ func (r *SystemMappingResourceResource) Create(ctx context.Context, req resource
 	subaccount := plan.Subaccount.ValueString()
 	virtualHost := plan.VirtualHost.ValueString()
 	virtualPort := plan.VirtualPort.ValueString()
-	resource_id := CreateEncodedResourceID(plan.ID.ValueString())
+	resourceID := CreateEncodedResourceID(plan.ID.ValueString())
 	endpoint := endpoints.GetSystemMappingResourceBaseEndpoint(regionHost, subaccount, virtualHost, virtualPort)
 
 	planBody := map[string]string{
@@ -137,7 +137,7 @@ func (r *SystemMappingResourceResource) Create(ctx context.Context, req resource
 		return
 	}
 
-	endpoint = endpoints.GetSystemMappingResourceEndpoint(regionHost, subaccount, virtualHost, virtualPort, resource_id)
+	endpoint = endpoints.GetSystemMappingResourceEndpoint(regionHost, subaccount, virtualHost, virtualPort, resourceID)
 
 	err = requestAndUnmarshal(r.client, &respObj, "GET", endpoint, planBody, true)
 	if err != nil {
@@ -171,8 +171,8 @@ func (r *SystemMappingResourceResource) Read(ctx context.Context, req resource.R
 	subaccount := state.Subaccount.ValueString()
 	virtualHost := state.VirtualHost.ValueString()
 	virtualPort := state.VirtualPort.ValueString()
-	resource_id := CreateEncodedResourceID(state.ID.ValueString())
-	endpoint := endpoints.GetSystemMappingResourceEndpoint(regionHost, subaccount, virtualHost, virtualPort, resource_id)
+	resourceID := CreateEncodedResourceID(state.ID.ValueString())
+	endpoint := endpoints.GetSystemMappingResourceEndpoint(regionHost, subaccount, virtualHost, virtualPort, resourceID)
 
 	err := requestAndUnmarshal(r.client, &respObj, "GET", endpoint, nil, true)
 	if err != nil {
@@ -212,16 +212,16 @@ func (r *SystemMappingResourceResource) Update(ctx context.Context, req resource
 	subaccount := plan.Subaccount.ValueString()
 	virtualHost := plan.VirtualHost.ValueString()
 	virtualPort := plan.VirtualPort.ValueString()
-	resource_id := CreateEncodedResourceID(plan.ID.ValueString())
+	resourceID := CreateEncodedResourceID(plan.ID.ValueString())
 
-	if (plan.RegionHost.ValueString() != regionHost) ||
-		(plan.Subaccount.ValueString() != subaccount) ||
-		(plan.VirtualHost.ValueString() != virtualHost) ||
-		(plan.VirtualPort.ValueString() != virtualPort) {
+	if (state.RegionHost.ValueString() != regionHost) ||
+		(state.Subaccount.ValueString() != subaccount) ||
+		(state.VirtualHost.ValueString() != virtualHost) ||
+		(state.VirtualPort.ValueString() != virtualPort) {
 		resp.Diagnostics.AddError(errMsgUpdateSystemMappingResourceFailed, "Failed to update the cloud connector system mapping resource due to mismatched configuration values.")
 		return
 	}
-	endpoint := fmt.Sprintf("/api/v1/configuration/subaccounts/%s/%s/systemMappings/%s:%s/resources/%s", regionHost, subaccount, virtualHost, virtualPort, resource_id)
+	endpoint := fmt.Sprintf("/api/v1/configuration/subaccounts/%s/%s/systemMappings/%s:%s/resources/%s", regionHost, subaccount, virtualHost, virtualPort, resourceID)
 
 	planBody := map[string]string{
 		"enabled":                 fmt.Sprintf("%t", plan.Enabled.ValueBool()),
@@ -236,7 +236,7 @@ func (r *SystemMappingResourceResource) Update(ctx context.Context, req resource
 		return
 	}
 
-	endpoint = endpoints.GetSystemMappingResourceEndpoint(regionHost, subaccount, virtualHost, virtualPort, resource_id)
+	endpoint = endpoints.GetSystemMappingResourceEndpoint(regionHost, subaccount, virtualHost, virtualPort, resourceID)
 
 	err = requestAndUnmarshal(r.client, &respObj, "GET", endpoint, planBody, true)
 	if err != nil {
@@ -270,8 +270,8 @@ func (r *SystemMappingResourceResource) Delete(ctx context.Context, req resource
 	subaccount := state.Subaccount.ValueString()
 	virtualHost := state.VirtualHost.ValueString()
 	virtualPort := state.VirtualPort.ValueString()
-	resource_id := CreateEncodedResourceID(state.ID.ValueString())
-	endpoint := endpoints.GetSystemMappingResourceEndpoint(regionHost, subaccount, virtualHost, virtualPort, resource_id)
+	resourceID := CreateEncodedResourceID(state.ID.ValueString())
+	endpoint := endpoints.GetSystemMappingResourceEndpoint(regionHost, subaccount, virtualHost, virtualPort, resourceID)
 
 	err := requestAndUnmarshal(r.client, &respObj, "DELETE", endpoint, nil, false)
 	if err != nil {

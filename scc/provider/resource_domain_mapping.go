@@ -151,13 +151,13 @@ func (r *DomainMappingResource) Read(ctx context.Context, req resource.ReadReque
 
 	mappingRespObj, err := GetDomainMapping(respObj, internalDomain)
 	if err != nil {
-		resp.Diagnostics.AddError("error getting Domain Mapping", fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError(errMsgFetchDomainMappingFailed, fmt.Sprintf("%s", err))
 		return
 	}
 
 	responseModel, err := DomainMappingValueFrom(ctx, state, *mappingRespObj)
 	if err != nil {
-		resp.Diagnostics.AddError("error mapping domain mapping value", fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError(errMsgMapDomainMappingFailed, fmt.Sprintf("%s", err))
 		return
 	}
 
@@ -188,9 +188,9 @@ func (r *DomainMappingResource) Update(ctx context.Context, req resource.UpdateR
 	subaccount := plan.Subaccount.ValueString()
 	internalDomain := state.InternalDomain.ValueString()
 
-	if (plan.RegionHost.ValueString() != regionHost) ||
-		(plan.Subaccount.ValueString() != subaccount) {
-		resp.Diagnostics.AddError("error updating the cloud connector domain mapping.", "Failed to update the cloud connector domain mapping due to mismatched configuration values.")
+	if (state.RegionHost.ValueString() != regionHost) ||
+		(state.Subaccount.ValueString() != subaccount) {
+		resp.Diagnostics.AddError(errMsgUpdateDomainMappingFailed, "Failed to update the cloud connector domain mapping due to mismatched configuration values.")
 		return
 	}
 	endpoint := endpoints.GetDomainMappingEndpoint(regionHost, subaccount, internalDomain)
@@ -202,7 +202,7 @@ func (r *DomainMappingResource) Update(ctx context.Context, req resource.UpdateR
 
 	err := requestAndUnmarshal(r.client, &respObj.DomainMappings, "PUT", endpoint, planBody, false)
 	if err != nil {
-		resp.Diagnostics.AddError("error updating the cloud connector domain mapping", err.Error())
+		resp.Diagnostics.AddError(errMsgUpdateDomainMappingFailed, err.Error())
 		return
 	}
 
@@ -216,13 +216,13 @@ func (r *DomainMappingResource) Update(ctx context.Context, req resource.UpdateR
 
 	mappingRespObj, err := GetDomainMapping(respObj, plan.InternalDomain.ValueString())
 	if err != nil {
-		resp.Diagnostics.AddError("error getting Domain Mapping", fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError(errMsgFetchDomainMappingFailed, fmt.Sprintf("%s", err))
 		return
 	}
 
 	responseModel, err := DomainMappingValueFrom(ctx, plan, *mappingRespObj)
 	if err != nil {
-		resp.Diagnostics.AddError("error mapping domain mapping value", fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError(errMsgMapDomainMappingFailed, fmt.Sprintf("%s", err))
 		return
 	}
 
@@ -249,13 +249,13 @@ func (r *DomainMappingResource) Delete(ctx context.Context, req resource.DeleteR
 
 	err := requestAndUnmarshal(r.client, &respObj, "DELETE", endpoint, nil, false)
 	if err != nil {
-		resp.Diagnostics.AddError("error deleting the domain mapping", err.Error())
+		resp.Diagnostics.AddError(errMsgDeleteDomainMappingFailed, err.Error())
 		return
 	}
 
 	responseModel, err := DomainMappingValueFrom(ctx, state, respObj)
 	if err != nil {
-		resp.Diagnostics.AddError("error mapping domain mapping value", fmt.Sprintf("%s", err))
+		resp.Diagnostics.AddError(errMsgMapDomainMappingFailed, fmt.Sprintf("%s", err))
 		return
 	}
 

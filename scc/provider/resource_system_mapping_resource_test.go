@@ -28,6 +28,11 @@ func TestResourceSystemMappingResource(t *testing.T) {
 						resource.TestCheckResourceAttr("scc_system_mapping_resource.test", "enabled", "true"),
 					),
 				},
+				// Update with mismatched configuration should throw error
+				{
+					Config:      providerConfig(user) + ResourceSystemMappingResource("test", "cf.us10.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtualtesting", "90", "/", "create resource", true),
+					ExpectError: regexp.MustCompile(`(?s)error updating the cloud connector system mapping resource.*mismatched\s+configuration values`),
+				},
 				{
 					// 🚀 This is the update step
 					Config: providerConfig(user) + ResourceSystemMappingResource("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtualtesting", "90", "/", "updated resource", false),

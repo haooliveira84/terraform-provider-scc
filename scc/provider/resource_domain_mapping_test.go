@@ -30,6 +30,11 @@ func TestResourceDomainMapping(t *testing.T) {
 						resource.TestCheckResourceAttr("scc_domain_mapping.test", "internal_domain", "testtfinternaldomain"),
 					),
 				},
+				// Update with mismatched configuration should throw error
+				{
+					Config:      providerConfig(user) + ResourceDomainMapping("test", "cf.us10.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "updatedtfvirtualdomain", "testtfinternaldomain"),
+					ExpectError: regexp.MustCompile(`(?s)error updating the cloud connector domain mapping.*mismatched\s+configuration values`),
+				},
 				{
 					Config: providerConfig(user) + ResourceDomainMapping("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "updatedtfvirtualdomain", "testtfinternaldomain"),
 					Check: resource.ComposeAggregateTestCheckFunc(

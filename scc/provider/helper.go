@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
+	"testing"
 
 	"github.com/SAP/terraform-provider-scc/internal/api"
 )
@@ -91,4 +93,19 @@ func requestAndUnmarshal[T any](client *api.RestApiClient, respObj *T, requestTy
 
 	return nil
 
+}
+
+type roundTripFunc func(req *http.Request) *http.Response
+
+func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f(req), nil
+}
+
+func mustParseURL(t *testing.T, raw string) *url.URL {
+	t.Helper()
+	u, err := url.Parse(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return u
 }

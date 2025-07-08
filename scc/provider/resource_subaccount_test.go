@@ -96,6 +96,11 @@ func TestResourceSubaccount(t *testing.T) {
 						resource.TestCheckResourceAttr("scc_subaccount.test", "display_name", "Initial Display Name"),
 					),
 				},
+				// Update with mismatched configuration should throw error
+				{
+					Config:      providerConfig(user) + ResourceSubaccountUpdateWithDisplayName("test", "cf.us10.hana.ondemand.com", subaccountId, user.CloudUsername, user.CloudPassword, "Initial description", "Initial Display Name"),
+					ExpectError: regexp.MustCompile(`(?s)failed to update the cloud connector subaccount due to mismatched\s+configuration values`),
+				},
 				{
 					Config: providerConfig(user) + ResourceSubaccountUpdateWithDisplayName("test", regionHost, subaccountId, user.CloudUsername, user.CloudPassword, "Updated description", "Updated Display Name"),
 					Check: resource.ComposeAggregateTestCheckFunc(
@@ -123,6 +128,11 @@ func TestResourceSubaccount(t *testing.T) {
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttr("scc_subaccount.test", "tunnel.state", "Connected"),
 					),
+				},
+				// Update with mismatched configuration should throw error
+				{
+					Config:      providerConfig(user) + ResourceSubaccountWithTunnelState("test", "cf.us10.hana.ondemand.com", subaccountId, user.CloudUsername, user.CloudPassword, "Testing tunnel disconnected", "Disconnected"),
+					ExpectError: regexp.MustCompile(`(?s)failed to update the cloud connector subaccount due to mismatched\s+configuration values`),
 				},
 				{
 					Config: providerConfig(user) + ResourceSubaccountWithTunnelState("test", regionHost, subaccountId, user.CloudUsername, user.CloudPassword, "Testing tunnel disconnected", "Disconnected"),

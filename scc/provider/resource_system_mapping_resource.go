@@ -214,10 +214,10 @@ func (r *SystemMappingResourceResource) Update(ctx context.Context, req resource
 	virtualPort := plan.VirtualPort.ValueString()
 	resource_id := CreateEncodedResourceID(plan.ID.ValueString())
 
-	if (plan.RegionHost.ValueString() != regionHost) ||
-		(plan.Subaccount.ValueString() != subaccount) ||
-		(plan.VirtualHost.ValueString() != virtualHost) ||
-		(plan.VirtualPort.ValueString() != virtualPort) {
+	if (state.RegionHost.ValueString() != regionHost) ||
+		(state.Subaccount.ValueString() != subaccount) ||
+		(state.VirtualHost.ValueString() != virtualHost) ||
+		(state.VirtualPort.ValueString() != virtualPort) {
 		resp.Diagnostics.AddError(errMsgUpdateSystemMappingResourceFailed, "Failed to update the cloud connector system mapping resource due to mismatched configuration values.")
 		return
 	}

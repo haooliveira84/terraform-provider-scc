@@ -88,6 +88,22 @@ func TestResourceSubaccountK8SServiceChannel(t *testing.T) {
 						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "enabled", "true"),
 					),
 				},
+				// Update with mismatched configuration should throw error
+				{
+					Config: providerConfig(user) + `
+					resource "scc_subaccount_k8s_service_channel" "test" {
+					  region_host = "cf.us10.hana.ondemand.com"
+					  subaccount = "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8"
+					  k8s_cluster = "cp.ace9fb5.stage.kyma.ondemand.com:443"
+					  k8s_service = "29d4e6f6-8e7f-4882-b434-21a52bb75e0f"
+					  port = 3000
+					  connections = 1
+					  comment = "initial"
+					  enabled = true
+					}
+					`,
+					ExpectError: regexp.MustCompile(`(?s)error updating the cloud connector subaccount service channel.*mismatched\s+configuration values`),
+				},
 				{
 					Config: providerConfig(user) + `
 					resource "scc_subaccount_k8s_service_channel" "test" {

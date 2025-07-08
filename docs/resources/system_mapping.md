@@ -52,6 +52,7 @@ resource "scc_system_mapping" "scc_sm" {
   | X509_GENERAL | X.509 certificate-based authentication, system certificate may be sent | 
   | X509_RESTRICTED | X.509 certificate-based authentication, system certificate never sent | 
   | KERBEROS | Kerberos-based authentication | The authentication modes NONE_RESTRICTED and X509_RESTRICTED prevent the Cloud Connector from sending the system certificate in any case, whereas NONE and X509_GENERAL will send the system certificate if the circumstances allow it.
+  
 - `backend_type` (String) Type of the backend system. Valid values are:
   | backend | description | 
   | --- | --- | 
@@ -63,13 +64,16 @@ resource "scc_system_mapping" "scc_sm" {
   | hana | SAP HANA system | 
   | otherSAPsys | Other SAP system | 
   | nonSAPsys | Non-SAP system |
+  
 - `host_in_header` (String) Policy for setting the host in the response header. This property is applicable to HTTP(S) protocols only. If set, it must be one of the following strings:
   | policy | description | 
   | --- | --- | 
   | internal/INTERNAL | Use internal (local) host for HTTP headers | 
   | virtual/VIRTUAL | Use virtual host (default) for HTTP headers | The default is virtual.
+  
 - `local_host` (String) Host on the on-premise side.
 - `local_port` (String) Port on the on-premise side.
+  
 - `protocol` (String) Protocol used when sending requests and receiving responses, which must be one of the following values:
   | protocol | description | 
   | --- | --- | 
@@ -81,6 +85,7 @@ resource "scc_system_mapping" "scc_sm" {
   | LDAPS | Secure LDAP | 
   | TCP | Transmission Control Protocol | 
   | TCPS | Secure TCP |
+  
 - `region_host` (String) Region Host Name.
 - `subaccount` (String) The ID of the subaccount.
 - `virtual_host` (String) Virtual host used on the cloud side. Cannot be updated after creation.

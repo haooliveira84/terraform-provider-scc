@@ -48,19 +48,19 @@ func TestResourceSubaccountK8SServiceChannel(t *testing.T) {
 					ResourceName:  "scc_subaccount_k8s_service_channel.test",
 					ImportState:   true,
 					ImportStateId: "cf.eu12.hana.ondemand.comd3bbbcd7-d5e0-483b-a524-6dee7205f8e81", // malformed ID
-					ExpectError:   regexp.MustCompile(`(?s)Expected import identifier with format:.*id.*Got:`),
+					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*id.*Got:`),
 				},
 				{
 					ResourceName:  "scc_subaccount_k8s_service_channel.test",
 					ImportState:   true,
 					ImportStateId: "cf.eu12.hana.ondemand.com,d3bbbcd7-d5e0-483b-a524-6dee7205f8e8,1,extra",
-					ExpectError:   regexp.MustCompile(`(?s)Expected import identifier with format:.*id.*Got:`),
+					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*id.*Got:`),
 				},
 				{
 					ResourceName:  "scc_subaccount_k8s_service_channel.test",
 					ImportState:   true,
 					ImportStateId: "cf.eu12.hana.ondemand.com,d3bbbcd7-d5e0-483b-a524-6dee7205f8e8,not-an-int",
-					ExpectError:   regexp.MustCompile(`(?s)The 'id' part must be an integer.*Got:.*not-an-int`),
+					ExpectError:   regexp.MustCompile(`(?is)The 'id' part must be an integer.*Got:.*not-an-int`),
 				},
 			},
 		})
@@ -108,7 +108,7 @@ func TestResourceSubaccountK8SServiceChannel(t *testing.T) {
 					  enabled = true
 					}
 					`,
-					ExpectError: regexp.MustCompile(`(?s)error updating the cloud connector subaccount service channel.*mismatched\s+configuration values`),
+					ExpectError: regexp.MustCompile(`(?is)error updating the cloud connector subaccount service channel.*mismatched\s+configuration values`),
 				},
 				{
 					Config: providerConfig(user) + `

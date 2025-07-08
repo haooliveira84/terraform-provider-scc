@@ -433,7 +433,6 @@ func Test_ProviderConnection_Unauthorized(t *testing.T) {
 	assert.Contains(t, err.Error(), "unauthorized")
 }
 
-
 func TestSCCProvider_ParseInstanceURL_Valid(t *testing.T) {
 	var resp provider.ConfigureResponse
 	urlStr := "https://valid.example.com"

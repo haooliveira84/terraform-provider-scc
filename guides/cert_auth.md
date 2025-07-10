@@ -4,7 +4,7 @@ You would require a valid **X.509 Client Certificate** and the corresponding **C
  
 You can only configure the credentials as part of the provider configuration as shown below:
 
- ```hcl
+ ```terraform
 provider "scc" {
     instance_url = <your_instance_url>
     client_certificate = <your_client_certificate>

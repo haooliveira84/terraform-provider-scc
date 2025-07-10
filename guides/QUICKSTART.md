@@ -12,8 +12,8 @@ To follow along with this tutorial, ensure you have already installed and config
 
 In order to run the scripts, you need the credentials of an admin on the instance. Terraform Provider for SAP Cloud Connector supports the following authentication methods:
 
-1. [Basic Authentication](basic_auth.md) 
-2. [X.509 Certificate Authentication](cert_auth.md)
+1. [Basic Authentication](./basic_auth.md) 
+2. [X.509 Certificate Authentication](./cert_auth.md)
 
 Refer to the link corresponding to the chosen authentication method.
 

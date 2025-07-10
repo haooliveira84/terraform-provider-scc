@@ -6,7 +6,7 @@ There are multiple ways to configure your credentials.
 
 1. You can configure them as part of the provider configuration as shown below:
 
-    ```hcl
+    ```terraform
     provider "scc" {
         instance_url = <your_instance_url>
         username = <your_username>

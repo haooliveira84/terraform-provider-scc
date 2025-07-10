@@ -8,7 +8,7 @@
 
 The Terraform provider for SAP Cloud Connector allows the management of resources on the [SAP Cloud Connector](https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/cloud-connector) via [Terraform](https://terraform.io/).
 
-You will find the detailed information about the [provider](https://registry.terraform.io/browse/providers) in the official [documentation](https://registry.terraform.io/browse/providers) in the [Terraform registry](https://registry.terraform.io/).
+You will find the detailed information about the [provider](https://registry.terraform.io/browse/providers) in the official [documentation](https://registry.terraform.io/providers/SAP/scc/latest/docs) in the [Terraform registry](https://registry.terraform.io/).
 
 
 ## Usage of the Provider

@@ -6,13 +6,13 @@ The Terraform provider for SAP Cloud Connector enables you to automate the provi
 
 ## Prerequisites
 
-To follow along with this tutorial, ensure you have already installed and configrued a [SAP Cloud Connector Instance](https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/cloud-connector-initial-configuration) and Terraform installed on your machine. You can download it from the official [Terraform website](https://developer.hashicorp.com/terraform/downloads).
+To follow along with this tutorial, ensure you have already installed and configured a [SAP Cloud Connector Instance](https://help.sap.com/docs/connectivity/sap-btp-connectivity-cf/cloud-connector-initial-configuration) and Terraform installed on your machine. You can download it from the official [Terraform website](https://developer.hashicorp.com/terraform/downloads).
 
 ## Authentication
 
 In order to run the scripts, you need the credentials of an admin on the instance. Terraform Provider for SAP Cloud Connector supports the following authentication methods:
 
-1. [Basic Authentication](./basic_auth.md) 
+1. [Basic Authentication](basic_auth.md) 
 2. [X.509 Certificate Authentication](cert_auth.md)
 
 Refer to the link corresponding to the chosen authentication method.

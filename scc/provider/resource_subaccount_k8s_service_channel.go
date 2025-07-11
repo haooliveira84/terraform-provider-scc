@@ -173,7 +173,7 @@ func (r *SubaccountK8SServiceChannelResource) Create(ctx context.Context, req re
 
 		err = requestAndUnmarshal(r.client, &serviceChannelRespObj, "GET", endpoint, nil, true)
 		if err != nil {
-			resp.Diagnostics.AddError("error fetching the cloud connector subaccount service channel", err.Error())
+			resp.Diagnostics.AddError(errMsgFetchSubaccountK8SServiceChannelFailed, err.Error())
 			return
 		}
 	}
@@ -207,7 +207,7 @@ func (r *SubaccountK8SServiceChannelResource) Read(ctx context.Context, req reso
 
 	err := requestAndUnmarshal(r.client, &respObj, "GET", endpoint, nil, true)
 	if err != nil {
-		resp.Diagnostics.AddError("error fetching the cloud connector subaccount service channel", err.Error())
+		resp.Diagnostics.AddError(errMsgFetchSubaccountK8SServiceChannelFailed, err.Error())
 		return
 	}
 
@@ -244,9 +244,9 @@ func (r *SubaccountK8SServiceChannelResource) Update(ctx context.Context, req re
 	subaccount := plan.Subaccount.ValueString()
 	id := state.ID.ValueInt64()
 
-	if (plan.RegionHost.ValueString() != regionHost) ||
-		(plan.Subaccount.ValueString() != subaccount) {
-		resp.Diagnostics.AddError("error updating the cloud connector k8s service channel.", "Failed to update the cloud connector k8s service channel due to mismatched configuration values.")
+	if (state.RegionHost.ValueString() != regionHost) ||
+		(state.Subaccount.ValueString() != subaccount) {
+		resp.Diagnostics.AddError(errMsgUpdateSubaccountK8SServiceChannelFailed, "Failed to update the cloud connector k8s service channel due to mismatched configuration values.")
 		return
 	}
 	// Update Service Channel
@@ -262,7 +262,7 @@ func (r *SubaccountK8SServiceChannelResource) Update(ctx context.Context, req re
 
 	err := requestAndUnmarshal(r.client, &respObj, "GET", endpoint, nil, true)
 	if err != nil {
-		resp.Diagnostics.AddError("error fetching the cloud connector subaccount service channel", err.Error())
+		resp.Diagnostics.AddError(errMsgFetchSubaccountK8SServiceChannelFailed, err.Error())
 		return
 	}
 

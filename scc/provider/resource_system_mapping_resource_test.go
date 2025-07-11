@@ -28,6 +28,11 @@ func TestResourceSystemMappingResource(t *testing.T) {
 						resource.TestCheckResourceAttr("scc_system_mapping_resource.test", "enabled", "true"),
 					),
 				},
+				// Update with mismatched configuration should throw error
+				{
+					Config:      providerConfig(user) + ResourceSystemMappingResource("test", "cf.us10.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtualtesting", "90", "/", "create resource", true),
+					ExpectError: regexp.MustCompile(`(?is)error updating the cloud connector system mapping resource.*mismatched\s+configuration values`),
+				},
 				{
 					// 🚀 This is the update step
 					Config: providerConfig(user) + ResourceSystemMappingResource("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtualtesting", "90", "/", "updated resource", false),
@@ -46,13 +51,13 @@ func TestResourceSystemMappingResource(t *testing.T) {
 					ResourceName:  "scc_system_mapping_resource.test",
 					ImportState:   true,
 					ImportStateId: "cf.eu12.hana.ondemand.comd3bbbcd7-d5e0-483b-a524-6dee7205f8e8testtfvirtualtesting90/", // malformed ID
-					ExpectError:   regexp.MustCompile(`(?s)Expected import identifier with format:.*id.*Got:`),
+					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*id.*Got:`),
 				},
 				{
 					ResourceName:  "scc_system_mapping_resource.test",
 					ImportState:   true,
 					ImportStateId: "cf.eu12.hana.ondemand.com,d3bbbcd7-d5e0-483b-a524-6dee7205f8e8,testtfvirtualtesting,90,/,extra",
-					ExpectError:   regexp.MustCompile(`(?s)Expected import identifier with format:.*id.*Got:`),
+					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*id.*Got:`),
 				},
 			},
 		})

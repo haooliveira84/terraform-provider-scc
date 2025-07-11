@@ -13,6 +13,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/SAP/terraform-provider-scc/internal/api"
 	"github.com/SAP/terraform-provider-scc/validation/uuidvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -383,4 +384,114 @@ CEGH5OML6z7C7oCSys7ce4GkTbtJ4rNZoxVOxFwPvA==
 	assert.False(t, ok)
 	assert.True(t, resp.Diagnostics.HasError())
 	assert.Contains(t, resp.Diagnostics.Errors()[0].Summary(), "Conflicting Authentication Details")
+}
+
+func Test_ProviderConnection_Success(t *testing.T) {
+	client := &api.RestApiClient{
+		// Simulate a successful response
+		Client: &http.Client{
+			Transport: roundTripFunc(func(req *http.Request) *http.Response {
+				return &http.Response{
+					StatusCode: 200,
+					Status:     "200 OK",
+					Body:       io.NopCloser(strings.NewReader("version info")),
+				}
+			}),
+		},
+		BaseURL:  mustParseURL(t, "https://example.com"),
+		Username: "user",
+		Password: "pass",
+	}
+
+	err := testProviderConnection(client)
+	assert.NoError(t, err)
+}
+
+func Test_ProviderConnection_Unauthorized(t *testing.T) {
+	req, _ := http.NewRequest("GET", "https://example.com/api/version", nil)
+
+	client := &api.RestApiClient{
+		Client: &http.Client{
+			Transport: roundTripFunc(func(_ *http.Request) *http.Response {
+				return &http.Response{
+					StatusCode: http.StatusUnauthorized,
+					Status:     "401 Unauthorized",
+					Body:       io.NopCloser(strings.NewReader("unauthorized")),
+					Request:    req,
+				}
+			}),
+		},
+		BaseURL:  mustParseURL(t, "https://example.com"),
+		Username: "bad-user",
+		Password: "wrong-pass",
+	}
+
+	err := testProviderConnection(client)
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "authentication rejected")
+	assert.Contains(t, err.Error(), "unauthorized")
+}
+
+type roundTripFunc func(req *http.Request) *http.Response
+
+func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f(req), nil
+}
+
+func mustParseURL(t *testing.T, raw string) *url.URL {
+	t.Helper()
+	u, err := url.Parse(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return u
+}
+
+func TestSCCProvider_ParseInstanceURL_Valid(t *testing.T) {
+	var resp provider.ConfigureResponse
+	urlStr := "https://valid.example.com"
+
+	parsed := parseInstanceURL(urlStr, &resp)
+
+	assert.NotNil(t, parsed)
+	assert.Equal(t, "https", parsed.Scheme)
+	assert.Equal(t, "valid.example.com", parsed.Host)
+	assert.False(t, resp.Diagnostics.HasError())
+}
+
+func TestSCCProvider_ParseInstanceURL_Invalid(t *testing.T) {
+	var resp provider.ConfigureResponse
+	invalidURL := "ht!tp://bad-url"
+
+	parsed := parseInstanceURL(invalidURL, &resp)
+
+	assert.Nil(t, parsed)
+	assert.True(t, resp.Diagnostics.HasError())
+	assert.Contains(t, resp.Diagnostics.Errors()[0].Summary(), "Invalid Cloud Connector Instance URL")
+}
+
+func TestSCCProvider_CreateClient_Success(t *testing.T) {
+	var resp provider.ConfigureResponse
+	httpClient := &http.Client{}
+	parsedURL := mustParseURL(t, "https://example.com")
+
+	client := createClient(httpClient, parsedURL, "user", "pass", "", "", "", &resp)
+
+	assert.NotNil(t, client)
+	assert.False(t, resp.Diagnostics.HasError())
+}
+
+func TestSCCProvider_CreateClient_Failure_InvalidCert(t *testing.T) {
+	var resp provider.ConfigureResponse
+	httpClient := &http.Client{}
+	parsedURL := mustParseURL(t, "https://example.com")
+
+	invalidCert := "-----BEGIN BAD-----"
+
+	client := createClient(httpClient, parsedURL, "", "", invalidCert, invalidCert, invalidCert, &resp)
+
+	assert.Nil(t, client)
+	assert.True(t, resp.Diagnostics.HasError())
+	assert.Contains(t, resp.Diagnostics.Errors()[0].Summary(), "Client Creation Failed")
 }

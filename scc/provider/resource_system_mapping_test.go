@@ -37,7 +37,11 @@ func TestResourceSystemMapping(t *testing.T) {
 						resource.TestCheckResourceAttr("scc_system_mapping.test", "authentication_mode", "KERBEROS"),
 					),
 				},
-
+				// Update with mismatched configuration should throw error
+				{
+					Config:      providerConfig(user) + ResourceSystemMapping("test", "cf.us10.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtual", "900", "testtfinternal", "900", "HTTP", "abapSys", "VIRTUAL", "KERBEROS"),
+					ExpectError: regexp.MustCompile(`(?is)error updating the cloud connector system mapping.*mismatched\s+configuration values`),
+				},
 				// UPDATE
 				{
 					Config: providerConfig(user) + ResourceSystemMapping("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtual", "900", "updatedlocal", "905", "HTTPS", "hana", "INTERNAL", "X509_GENERAL"),
@@ -63,13 +67,13 @@ func TestResourceSystemMapping(t *testing.T) {
 					ResourceName:  "scc_system_mapping.test",
 					ImportState:   true,
 					ImportStateId: "cf.eu12.hana.ondemand.comd3bbbcd7-d5e0-483b-a524-6dee7205f8e8testtfvirtual900", // malformed ID
-					ExpectError:   regexp.MustCompile(`(?s)Expected import identifier with format:.*virtual_port.*Got:`),
+					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*virtual_port.*Got:`),
 				},
 				{
 					ResourceName:  "scc_system_mapping.test",
 					ImportState:   true,
 					ImportStateId: "cf.eu12.hana.ondemand.com,d3bbbcd7-d5e0-483b-a524-6dee7205f8e8,testtfvirtual,900,extra",
-					ExpectError:   regexp.MustCompile(`(?s)Expected import identifier with format:.*virtual_port.*Got:`),
+					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*virtual_port.*Got:`),
 				},
 			},
 		})

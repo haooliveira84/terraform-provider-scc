@@ -65,13 +65,13 @@ func TestResourceSubaccount(t *testing.T) {
 					ResourceName:  "scc_subaccount.test",
 					ImportState:   true,
 					ImportStateId: "cf.eu12.hana.ondemand.com7480ee65-e039-41cf-ba72-6aaf56c312df", // malformed ID
-					ExpectError:   regexp.MustCompile(`(?s)Expected import identifier with format:.*subaccount.*Got:`),
+					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*subaccount.*Got:`),
 				},
 				{
 					ResourceName:  "scc_subaccount.test",
 					ImportState:   true,
 					ImportStateId: "cf.eu12.hana.ondemand.com,7480ee65-e039-41cf-ba72-6aaf56c312df,extra",
-					ExpectError:   regexp.MustCompile(`(?s)Expected import identifier with format:.*subaccount.*Got:`),
+					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*subaccount.*Got:`),
 				},
 			},
 		})
@@ -95,6 +95,11 @@ func TestResourceSubaccount(t *testing.T) {
 						resource.TestCheckResourceAttr("scc_subaccount.test", "description", "Initial description"),
 						resource.TestCheckResourceAttr("scc_subaccount.test", "display_name", "Initial Display Name"),
 					),
+				},
+				// Update with mismatched configuration should throw error
+				{
+					Config:      providerConfig(user) + ResourceSubaccountUpdateWithDisplayName("test", "cf.us10.hana.ondemand.com", subaccountId, user.CloudUsername, user.CloudPassword, "Initial description", "Initial Display Name"),
+					ExpectError: regexp.MustCompile(`(?is)failed to update the cloud connector subaccount due to mismatched\s+configuration values`),
 				},
 				{
 					Config: providerConfig(user) + ResourceSubaccountUpdateWithDisplayName("test", regionHost, subaccountId, user.CloudUsername, user.CloudPassword, "Updated description", "Updated Display Name"),
@@ -123,6 +128,11 @@ func TestResourceSubaccount(t *testing.T) {
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttr("scc_subaccount.test", "tunnel.state", "Connected"),
 					),
+				},
+				// Update with mismatched configuration should throw error
+				{
+					Config:      providerConfig(user) + ResourceSubaccountWithTunnelState("test", "cf.us10.hana.ondemand.com", subaccountId, user.CloudUsername, user.CloudPassword, "Testing tunnel disconnected", "Disconnected"),
+					ExpectError: regexp.MustCompile(`(?is)failed to update the cloud connector subaccount due to mismatched\s+configuration values`),
 				},
 				{
 					Config: providerConfig(user) + ResourceSubaccountWithTunnelState("test", regionHost, subaccountId, user.CloudUsername, user.CloudPassword, "Testing tunnel disconnected", "Disconnected"),

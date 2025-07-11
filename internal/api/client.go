@@ -25,51 +25,19 @@ type ErrorResponse struct {
 }
 
 func NewRestApiClient(client *http.Client, baseURL *url.URL, username, password string, caCertBytes []byte, clientCertBytes []byte, clientCertKey []byte) (*RestApiClient, error) {
-	useCertAuth := len(clientCertBytes) > 0 && len(clientCertKey) > 0
-	useBasicAuth := username != "" && password != ""
+	useBasicAuth, useCertAuth := isBasicAuthProvided(username, password), isCertAuthProvided(clientCertBytes, clientCertKey)
 
-	if useBasicAuth && useCertAuth {
-		return nil, fmt.Errorf("cannot use both certificate-based and basic authentication simultaneously")
+	if err := validateAuthMode(useBasicAuth, useCertAuth); err != nil {
+		return nil, err
 	}
 
-	if !useBasicAuth && !useCertAuth {
-		return nil, fmt.Errorf("either certificate-based or basic authentication must be provided")
+	tlsConfig, err := buildTLSConfig(caCertBytes, clientCertBytes, clientCertKey, useCertAuth)
+	if err != nil {
+		return nil, err
 	}
 
-	tlsConfig := &tls.Config{}
-
-	// Create TLS config only if caCertPEM is provided
-	if len(caCertBytes) > 0 {
-		caCertPool := x509.NewCertPool()
-		if ok := caCertPool.AppendCertsFromPEM(caCertBytes); !ok {
-			return nil, fmt.Errorf("failed to parse CA certificate: input is not valid PEM-encoded data")
-		}
-		tlsConfig.RootCAs = caCertPool
-	}
-
-	// If certificate auth is used, load the cert/key pair
-	if useCertAuth {
-		if block, _ := pem.Decode(clientCertBytes); block == nil {
-			return nil, fmt.Errorf("client certificate is not valid PEM-encoded data")
-		}
-		if block, _ := pem.Decode(clientCertKey); block == nil {
-			return nil, fmt.Errorf("client key is not valid PEM-encoded data")
-		}
-		cert, err := tls.X509KeyPair(clientCertBytes, clientCertKey)
-		if err != nil {
-			return nil, fmt.Errorf("failed to load client certificate/key: %w", err)
-		}
-		tlsConfig.Certificates = []tls.Certificate{cert}
-	}
-
-	// Only create a transport if we have a non-default TLS config
-	if tlsConfig.RootCAs != nil || len(tlsConfig.Certificates) > 0 {
-		if client == nil {
-			client = &http.Client{}
-		}
-		client.Transport = &http.Transport{
-			TLSClientConfig: tlsConfig,
-		}
+	if tlsConfig != nil {
+		client = withTLSClient(client, tlsConfig)
 	} else if client == nil {
 		client = &http.Client{}
 	}
@@ -80,6 +48,73 @@ func NewRestApiClient(client *http.Client, baseURL *url.URL, username, password 
 		Username: username,
 		Password: password,
 	}, nil
+}
+
+func isBasicAuthProvided(username, password string) bool {
+	return username != "" && password != ""
+}
+
+func isCertAuthProvided(cert, key []byte) bool {
+	return len(cert) > 0 && len(key) > 0
+}
+
+func validateAuthMode(useBasicAuth, useCertAuth bool) error {
+	switch {
+	case useBasicAuth && useCertAuth:
+		return fmt.Errorf("cannot use both certificate-based and basic authentication simultaneously")
+	case !useBasicAuth && !useCertAuth:
+		return fmt.Errorf("either certificate-based or basic authentication must be provided")
+	default:
+		return nil
+	}
+}
+
+func buildTLSConfig(caCert, clientCert, clientKey []byte, useCertAuth bool) (*tls.Config, error) {
+	// if Certificate based authentication, it is mandatory to provide CA Certificate
+	if len(caCert) == 0 && !useCertAuth {
+		return nil, nil
+	}
+
+	tlsConfig := &tls.Config{}
+
+	if len(caCert) > 0 {
+		caCertPool := x509.NewCertPool()
+		if ok := caCertPool.AppendCertsFromPEM(caCert); !ok {
+			return nil, fmt.Errorf("failed to parse CA certificate: input is not valid PEM-encoded data")
+		}
+		tlsConfig.RootCAs = caCertPool
+	}
+
+	if useCertAuth {
+		if err := validatePEMBlock(clientCert, "client certificate"); err != nil {
+			return nil, err
+		}
+		if err := validatePEMBlock(clientKey, "client key"); err != nil {
+			return nil, err
+		}
+		cert, err := tls.X509KeyPair(clientCert, clientKey)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load client certificate/key: %w", err)
+		}
+		tlsConfig.Certificates = []tls.Certificate{cert}
+	}
+
+	return tlsConfig, nil
+}
+
+func validatePEMBlock(data []byte, label string) error {
+	if block, _ := pem.Decode(data); block == nil {
+		return fmt.Errorf("%s is not valid PEM-encoded data", label)
+	}
+	return nil
+}
+
+func withTLSClient(client *http.Client, tlsConfig *tls.Config) *http.Client {
+	if client == nil {
+		client = &http.Client{}
+	}
+	client.Transport = &http.Transport{TLSClientConfig: tlsConfig}
+	return client
 }
 
 func (c *RestApiClient) DoRequest(method string, endpoint string, body []byte) (*http.Response, error) {
@@ -122,14 +157,23 @@ func validateResponse(response *http.Response) error {
 	}
 
 	bodyBytes, _ := io.ReadAll(response.Body)
-	var errorResp ErrorResponse
-	if err := json.Unmarshal(bodyBytes, &errorResp); err != nil || errorResp.Message == "" {
-		return fmt.Errorf("HTTP %s %s failed with status %d. Raw response: %s",
-			response.Request.Method, response.Request.URL, response.StatusCode, string(bodyBytes))
+
+	// Handle 401 Unauthorized explicitly
+	if response.StatusCode == http.StatusUnauthorized {
+		return fmt.Errorf("authentication rejected: HTTP %d for %s %s. Response: %s",
+			response.StatusCode, response.Request.Method, response.Request.URL, string(bodyBytes))
 	}
 
-	return fmt.Errorf("HTTP %s %s failed with status %d: %s",
-		response.Request.Method, response.Request.URL, response.StatusCode, errorResp.Message)
+	// Attempt to decode a structured error message
+	var errorResp ErrorResponse
+	if err := json.Unmarshal(bodyBytes, &errorResp); err == nil && errorResp.Message != "" {
+		return fmt.Errorf("HTTP %s %s failed with status %d: %s",
+			response.Request.Method, response.Request.URL, response.StatusCode, errorResp.Message)
+	}
+
+	// Fallback to raw body
+	return fmt.Errorf("HTTP %s %s failed with status %d. Raw response: %s",
+		response.Request.Method, response.Request.URL, response.StatusCode, string(bodyBytes))
 }
 
 func (c *RestApiClient) GetRequest(endpoint string) (*http.Response, error) {

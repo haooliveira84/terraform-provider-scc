@@ -280,5 +280,6 @@ func (c *cloudConnectorProvider) Resources(_ context.Context) []func() resource.
 		NewSystemMappingResourceResource,
 		NewDomainMappingResource,
 		NewSubaccountK8SServiceChannelResource,
+		NewSubaccountUsingAuthResource,
 	}
 }

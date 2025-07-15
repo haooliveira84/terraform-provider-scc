@@ -29,7 +29,7 @@ import (
 var (
 	regexpValidUUID        = uuidvalidator.UuidRegexp
 	regexValidTimeStamp    = regexp.MustCompile(`^\d{13}$`)
-	regexValidSerialNumber = regexp.MustCompile(`^(?:[0-9a-fA-F]{2}:){14,}[0-9a-fA-F]{2}$`)
+	regexValidSerialNumber = regexp.MustCompile(`^(?:[0-9a-fA-F]{2}:){14,}[0-9a-fA-F]{1,2}$`)
 )
 
 type User struct {
@@ -37,16 +37,18 @@ type User struct {
 	InstancePassword string
 	InstanceURL      string
 	// For adding subaccount to the cloud connector
-	CloudUsername string
-	CloudPassword string
+	CloudUsername           string
+	CloudPassword           string
+	CloudAuthenticationData string
 }
 
 var redactedTestUser = User{
-	InstanceUsername: "test-user@example.com",
-	InstancePassword: "REDACTED_INSTANCE_PASSWORD",
-	InstanceURL:      "https://redacted.instance.url",
-	CloudUsername:    "cloud-user@example.com",
-	CloudPassword:    "REDACTED_CLOUD_PASSWORD",
+	InstanceUsername:        "test-user@example.com",
+	InstancePassword:        "REDACTED_INSTANCE_PASSWORD",
+	InstanceURL:             "https://redacted.instance.url",
+	CloudUsername:           "cloud-user@example.com",
+	CloudPassword:           "REDACTED_CLOUD_PASSWORD",
+	CloudAuthenticationData: "REDACTED_SUBACCOUNT_AUTHENTICATION_DATA",
 }
 
 func providerConfig(testUser User) string {
@@ -96,6 +98,7 @@ func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 
 		user.CloudUsername = os.Getenv("TF_VAR_cloud_user")
 		user.CloudPassword = os.Getenv("TF_VAR_cloud_password")
+		user.CloudAuthenticationData = os.Getenv("TF_VAR_authentication_data")
 		if len(user.InstanceUsername) == 0 || len(user.InstancePassword) == 0 || len(user.InstanceURL) == 0 {
 			t.Fatal("Env vars SCC_USERNAME, SCC_PASSWORD and SCC_INSTANCE_URL are required when recording test fixtures")
 		}
@@ -169,6 +172,11 @@ func hookRedactSensitiveBody() func(i *cassette.Interaction) error {
 			i.Request.Body = reBindingSecret.ReplaceAllString(i.Request.Body, `"cloudUser":"`+redactedTestUser.CloudUsername+`"`)
 		}
 
+		if strings.Contains(i.Request.Body, "authenticationData") {
+			reBindingSecret := regexp.MustCompile(`"authenticationData":"(.*?)"`)
+			i.Request.Body = reBindingSecret.ReplaceAllString(i.Request.Body, `"authenticationData":"`+redactedTestUser.CloudAuthenticationData+`"`)
+		}
+
 		if strings.Contains(i.Response.Body, "subaccountCertificate") {
 			reNotAfter := regexp.MustCompile(`"notAfterTimeStamp"\s*:\s*\d{13}`)
 			i.Response.Body = reNotAfter.ReplaceAllString(i.Response.Body, `"notAfterTimeStamp": 1111111111111`)
@@ -221,6 +229,7 @@ func TestSCCProvider_AllResources(t *testing.T) {
 		"scc_system_mapping_resource",
 		"scc_system_mapping",
 		"scc_subaccount_k8s_service_channel",
+		"scc_subaccount_using_auth",
 	}
 
 	ctx := context.Background()

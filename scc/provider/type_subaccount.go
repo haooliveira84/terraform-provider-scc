@@ -110,6 +110,16 @@ type SubaccountConfig struct {
 	Tunnel        types.Object `tfsdk:"tunnel"`
 }
 
+type SubaccountUsingAuthConfig struct {
+	RegionHost         types.String `tfsdk:"region_host"`
+	Subaccount         types.String `tfsdk:"subaccount"`
+	AuthenticationData types.String `tfsdk:"authentication_data"`
+	LocationID         types.String `tfsdk:"location_id"`
+	DisplayName        types.String `tfsdk:"display_name"`
+	Description        types.String `tfsdk:"description"`
+	Tunnel             types.Object `tfsdk:"tunnel"`
+}
+
 func SubaccountsDataSourceValueFrom(value apiobjects.SubaccountsDataSource) (SubaccountsConfig, error) {
 	subaccounts := []SubaccountsData{}
 	for _, subaccount := range value.Subaccounts {
@@ -270,6 +280,80 @@ func SubaccountResourceValueFrom(ctx context.Context, plan SubaccountConfig, val
 		CloudUser:     plan.CloudUser,
 		CloudPassword: plan.CloudPassword,
 		Tunnel:        tunnel,
+	}
+	return *model, nil
+}
+
+func SubaccountUsingAuthResourceValueFrom(ctx context.Context, plan SubaccountUsingAuthConfig, value apiobjects.SubaccountUsingAuthResource) (SubaccountUsingAuthConfig, error) {
+	certificateObj := SubaccountCertificateData{
+		NotAfterTimeStamp:  types.Int64Value(value.Tunnel.SubaccountCertificate.NotAfterTimeStamp),
+		NotBeforeTimeStamp: types.Int64Value(value.Tunnel.SubaccountCertificate.NotBeforeTimeStamp),
+		SubjectDN:          types.StringValue(value.Tunnel.SubaccountCertificate.SubjectDN),
+		Issuer:             types.StringValue(value.Tunnel.SubaccountCertificate.Issuer),
+		SerialNumber:       types.StringValue(value.Tunnel.SubaccountCertificate.SerialNumber),
+	}
+
+	certificate, err := types.ObjectValueFrom(ctx, SubaccountCertificateType, certificateObj)
+	if err != nil {
+		return SubaccountUsingAuthConfig{}, ctx.Err()
+	}
+
+	applicationConnectionsValues := []SubaccountApplicationConnectionsData{}
+	for _, connection := range value.Tunnel.ApplicationConnections {
+		ac := SubaccountApplicationConnectionsData{
+			ConnectionCount: types.Int64Value(connection.ConnectionCount),
+			Name:            types.StringValue(connection.Name),
+			Type:            types.StringValue(connection.Type),
+		}
+
+		applicationConnectionsValues = append(applicationConnectionsValues, ac)
+	}
+
+	applicationConnections, err := types.ListValueFrom(ctx, SubaccountApplicationConnectionsType, applicationConnectionsValues)
+	if err != nil {
+		return SubaccountUsingAuthConfig{}, ctx.Err()
+	}
+
+	serviceChannelsValues := []SubaccountServiceChannelsData{}
+	for _, channel := range value.Tunnel.ServiceChannels {
+		sc := SubaccountServiceChannelsData{
+			Type:    types.StringValue(channel.Type),
+			State:   types.StringValue(channel.State),
+			Details: types.StringValue(channel.Details),
+			Comment: types.StringValue(channel.Comment),
+		}
+
+		serviceChannelsValues = append(serviceChannelsValues, sc)
+	}
+
+	serviceChannels, err := types.ListValueFrom(ctx, SubaccountServiceChannelsType, serviceChannelsValues)
+	if err != nil {
+		return SubaccountUsingAuthConfig{}, ctx.Err()
+	}
+
+	tunnelObj := SubaccountTunnelData{
+		State:                   types.StringValue(value.Tunnel.State),
+		ConnectedSinceTimeStamp: types.Int64Value(value.Tunnel.ConnectedSinceTimeStamp),
+		Connections:             types.Int64Value(value.Tunnel.Connections),
+		User:                    types.StringValue(value.Tunnel.User),
+		SubaccountCertificate:   certificate,
+		ApplicationConnections:  applicationConnections,
+		ServiceChannels:         serviceChannels,
+	}
+
+	tunnel, err := types.ObjectValueFrom(ctx, SubaccountTunnelType, tunnelObj)
+	if err != nil {
+		return SubaccountUsingAuthConfig{}, ctx.Err()
+	}
+
+	model := &SubaccountUsingAuthConfig{
+		RegionHost:         types.StringValue(value.RegionHost),
+		Subaccount:         types.StringValue(value.Subaccount),
+		AuthenticationData: plan.AuthenticationData,
+		LocationID:         types.StringValue(value.LocationID),
+		DisplayName:        types.StringValue(value.DisplayName),
+		Description:        types.StringValue(value.Description),
+		Tunnel:             tunnel,
 	}
 	return *model, nil
 }

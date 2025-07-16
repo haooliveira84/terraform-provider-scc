@@ -52,8 +52,12 @@ __Further documentation:__
 				Computed:            true,
 			},
 			"authentication_data": schema.StringAttribute{
-				MarkdownDescription: `Subaccount authentication data, used instead of cloudUser, cloudPassword and regionHost (as of version 2.17.0).
-This value must be downloaded from the subaccount and used within **5 minutes**, as it expires shortly after generation. It is used only during resource creation and is not persisted after apply.`,
+				MarkdownDescription: `Subaccount authentication data, used instead of cloud_user, cloud_password, subaccount and region_host (as of version 2.17.0).
+This value must be downloaded from the subaccount and used within **5 minutes**, as it expires shortly after generation. It is used only during resource creation.  
+
+**Note:**  
+- This value **will be persisted** in the Terraform state file. It is the user's responsibility to keep the state file secure.  
+- If this value is updated, **a new resource will be created and the old one will be destroyed**.`,
 				Required:  true,
 				Sensitive: true,
 				PlanModifiers: []planmodifier.String{

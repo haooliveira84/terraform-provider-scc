@@ -100,9 +100,9 @@ func (d *SubaccountsDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 
-	responseModel, err := SubaccountsDataSourceValueFrom(respObj)
-	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountsFailed, fmt.Sprintf("%s", err))
+	responseModel, diags := SubaccountsDataSourceValueFrom(respObj)
+	if diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountsFailed, fmt.Sprintf("%s", diags))
 		return
 	}
 

@@ -5,6 +5,7 @@ import (
 
 	apiobjects "github.com/SAP/terraform-provider-scc/internal/api/apiObjects"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -120,7 +121,7 @@ type SubaccountUsingAuthConfig struct {
 	Tunnel             types.Object `tfsdk:"tunnel"`
 }
 
-func SubaccountsDataSourceValueFrom(value apiobjects.SubaccountsDataSource) (SubaccountsConfig, error) {
+func SubaccountsDataSourceValueFrom(value apiobjects.SubaccountsDataSource) (SubaccountsConfig, diag.Diagnostics) {
 	subaccounts := []SubaccountsData{}
 	for _, subaccount := range value.Subaccounts {
 		c := SubaccountsData{
@@ -133,10 +134,10 @@ func SubaccountsDataSourceValueFrom(value apiobjects.SubaccountsDataSource) (Sub
 	model := &SubaccountsConfig{
 		Subaccounts: subaccounts,
 	}
-	return *model, nil
+	return *model, diag.Diagnostics{}
 }
 
-func SubaccountDataSourceValueFrom(ctx context.Context, value apiobjects.Subaccount) (SubaccountData, error) {
+func SubaccountDataSourceValueFrom(ctx context.Context, value apiobjects.Subaccount) (SubaccountData, diag.Diagnostics) {
 	certificateObj := SubaccountCertificateData{
 		NotAfterTimeStamp:  types.Int64Value(value.Tunnel.SubaccountCertificate.NotAfterTimeStamp),
 		NotBeforeTimeStamp: types.Int64Value(value.Tunnel.SubaccountCertificate.NotBeforeTimeStamp),
@@ -146,8 +147,8 @@ func SubaccountDataSourceValueFrom(ctx context.Context, value apiobjects.Subacco
 	}
 
 	certificate, err := types.ObjectValueFrom(ctx, SubaccountCertificateType, certificateObj)
-	if err != nil {
-		return SubaccountData{}, ctx.Err()
+	if err.HasError() {
+		return SubaccountData{}, err
 	}
 
 	applicationConnectionsValues := []SubaccountApplicationConnectionsData{}
@@ -162,8 +163,8 @@ func SubaccountDataSourceValueFrom(ctx context.Context, value apiobjects.Subacco
 	}
 
 	applicationConnections, err := types.ListValueFrom(ctx, SubaccountApplicationConnectionsType, applicationConnectionsValues)
-	if err != nil {
-		return SubaccountData{}, ctx.Err()
+	if err.HasError() {
+		return SubaccountData{}, err
 	}
 
 	serviceChannelsValues := []SubaccountServiceChannelsData{}
@@ -179,8 +180,8 @@ func SubaccountDataSourceValueFrom(ctx context.Context, value apiobjects.Subacco
 	}
 
 	serviceChannels, err := types.ListValueFrom(ctx, SubaccountServiceChannelsType, serviceChannelsValues)
-	if err != nil {
-		return SubaccountData{}, ctx.Err()
+	if err.HasError() {
+		return SubaccountData{}, err
 	}
 
 	tunnelObj := SubaccountTunnelData{
@@ -194,8 +195,8 @@ func SubaccountDataSourceValueFrom(ctx context.Context, value apiobjects.Subacco
 	}
 
 	tunnel, err := types.ObjectValueFrom(ctx, SubaccountTunnelType, tunnelObj)
-	if err != nil {
-		return SubaccountData{}, ctx.Err()
+	if err.HasError() {
+		return SubaccountData{}, err
 	}
 
 	model := &SubaccountData{
@@ -206,10 +207,10 @@ func SubaccountDataSourceValueFrom(ctx context.Context, value apiobjects.Subacco
 		Description: types.StringValue(value.Description),
 		Tunnel:      tunnel,
 	}
-	return *model, nil
+	return *model, diag.Diagnostics{}
 }
 
-func SubaccountResourceValueFrom(ctx context.Context, plan SubaccountConfig, value apiobjects.SubaccountResource) (SubaccountConfig, error) {
+func SubaccountResourceValueFrom(ctx context.Context, plan SubaccountConfig, value apiobjects.SubaccountResource) (SubaccountConfig, diag.Diagnostics) {
 	certificateObj := SubaccountCertificateData{
 		NotAfterTimeStamp:  types.Int64Value(value.Tunnel.SubaccountCertificate.NotAfterTimeStamp),
 		NotBeforeTimeStamp: types.Int64Value(value.Tunnel.SubaccountCertificate.NotBeforeTimeStamp),
@@ -219,8 +220,8 @@ func SubaccountResourceValueFrom(ctx context.Context, plan SubaccountConfig, val
 	}
 
 	certificate, err := types.ObjectValueFrom(ctx, SubaccountCertificateType, certificateObj)
-	if err != nil {
-		return SubaccountConfig{}, ctx.Err()
+	if err.HasError() {
+		return SubaccountConfig{}, err
 	}
 
 	applicationConnectionsValues := []SubaccountApplicationConnectionsData{}
@@ -235,8 +236,8 @@ func SubaccountResourceValueFrom(ctx context.Context, plan SubaccountConfig, val
 	}
 
 	applicationConnections, err := types.ListValueFrom(ctx, SubaccountApplicationConnectionsType, applicationConnectionsValues)
-	if err != nil {
-		return SubaccountConfig{}, ctx.Err()
+	if err.HasError() {
+		return SubaccountConfig{}, err
 	}
 
 	serviceChannelsValues := []SubaccountServiceChannelsData{}
@@ -252,8 +253,8 @@ func SubaccountResourceValueFrom(ctx context.Context, plan SubaccountConfig, val
 	}
 
 	serviceChannels, err := types.ListValueFrom(ctx, SubaccountServiceChannelsType, serviceChannelsValues)
-	if err != nil {
-		return SubaccountConfig{}, ctx.Err()
+	if err.HasError() {
+		return SubaccountConfig{}, err
 	}
 
 	tunnelObj := SubaccountTunnelData{
@@ -267,8 +268,8 @@ func SubaccountResourceValueFrom(ctx context.Context, plan SubaccountConfig, val
 	}
 
 	tunnel, err := types.ObjectValueFrom(ctx, SubaccountTunnelType, tunnelObj)
-	if err != nil {
-		return SubaccountConfig{}, ctx.Err()
+	if err.HasError() {
+		return SubaccountConfig{}, err
 	}
 
 	model := &SubaccountConfig{
@@ -281,10 +282,10 @@ func SubaccountResourceValueFrom(ctx context.Context, plan SubaccountConfig, val
 		CloudPassword: plan.CloudPassword,
 		Tunnel:        tunnel,
 	}
-	return *model, nil
+	return *model, diag.Diagnostics{}
 }
 
-func SubaccountUsingAuthResourceValueFrom(ctx context.Context, plan SubaccountUsingAuthConfig, value apiobjects.SubaccountUsingAuthResource) (SubaccountUsingAuthConfig, error) {
+func SubaccountUsingAuthResourceValueFrom(ctx context.Context, plan SubaccountUsingAuthConfig, value apiobjects.SubaccountUsingAuthResource) (SubaccountUsingAuthConfig, diag.Diagnostics) {
 	certificateObj := SubaccountCertificateData{
 		NotAfterTimeStamp:  types.Int64Value(value.Tunnel.SubaccountCertificate.NotAfterTimeStamp),
 		NotBeforeTimeStamp: types.Int64Value(value.Tunnel.SubaccountCertificate.NotBeforeTimeStamp),
@@ -294,8 +295,8 @@ func SubaccountUsingAuthResourceValueFrom(ctx context.Context, plan SubaccountUs
 	}
 
 	certificate, err := types.ObjectValueFrom(ctx, SubaccountCertificateType, certificateObj)
-	if err != nil {
-		return SubaccountUsingAuthConfig{}, ctx.Err()
+	if err.HasError() {
+		return SubaccountUsingAuthConfig{}, err
 	}
 
 	applicationConnectionsValues := []SubaccountApplicationConnectionsData{}
@@ -310,8 +311,8 @@ func SubaccountUsingAuthResourceValueFrom(ctx context.Context, plan SubaccountUs
 	}
 
 	applicationConnections, err := types.ListValueFrom(ctx, SubaccountApplicationConnectionsType, applicationConnectionsValues)
-	if err != nil {
-		return SubaccountUsingAuthConfig{}, ctx.Err()
+	if err.HasError() {
+		return SubaccountUsingAuthConfig{}, err
 	}
 
 	serviceChannelsValues := []SubaccountServiceChannelsData{}
@@ -327,8 +328,8 @@ func SubaccountUsingAuthResourceValueFrom(ctx context.Context, plan SubaccountUs
 	}
 
 	serviceChannels, err := types.ListValueFrom(ctx, SubaccountServiceChannelsType, serviceChannelsValues)
-	if err != nil {
-		return SubaccountUsingAuthConfig{}, ctx.Err()
+	if err.HasError() {
+		return SubaccountUsingAuthConfig{}, err
 	}
 
 	tunnelObj := SubaccountTunnelData{
@@ -342,8 +343,8 @@ func SubaccountUsingAuthResourceValueFrom(ctx context.Context, plan SubaccountUs
 	}
 
 	tunnel, err := types.ObjectValueFrom(ctx, SubaccountTunnelType, tunnelObj)
-	if err != nil {
-		return SubaccountUsingAuthConfig{}, ctx.Err()
+	if err.HasError() {
+		return SubaccountUsingAuthConfig{}, err
 	}
 
 	model := &SubaccountUsingAuthConfig{
@@ -355,5 +356,5 @@ func SubaccountUsingAuthResourceValueFrom(ctx context.Context, plan SubaccountUs
 		Description:        types.StringValue(value.Description),
 		Tunnel:             tunnel,
 	}
-	return *model, nil
+	return *model, diag.Diagnostics{}
 }

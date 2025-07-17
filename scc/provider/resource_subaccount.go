@@ -222,9 +222,9 @@ func (r *SubaccountResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	responseModel, err := SubaccountResourceValueFrom(ctx, plan, respObj)
-	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", err))
+	responseModel, diags := SubaccountResourceValueFrom(ctx, plan, respObj)
+	if diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", diags))
 		return
 	}
 
@@ -254,9 +254,9 @@ func (r *SubaccountResource) Read(ctx context.Context, req resource.ReadRequest,
 		return
 	}
 
-	responseModel, err := SubaccountResourceValueFrom(ctx, state, respObj)
-	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", err))
+	responseModel, diags := SubaccountResourceValueFrom(ctx, state, respObj)
+	if diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", diags))
 		return
 	}
 
@@ -306,8 +306,8 @@ func (r *SubaccountResource) Update(ctx context.Context, req resource.UpdateRequ
 		}
 	}
 
-	if responseModel, err := SubaccountResourceValueFrom(ctx, plan, respObj); err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, err.Error())
+	if responseModel, diags := SubaccountResourceValueFrom(ctx, plan, respObj); diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", diags))
 	} else {
 		resp.Diagnostics.Append(resp.State.Set(ctx, responseModel)...)
 	}
@@ -383,9 +383,9 @@ func (r *SubaccountResource) Delete(ctx context.Context, req resource.DeleteRequ
 		return
 	}
 
-	responseModel, err := SubaccountResourceValueFrom(ctx, state, respObj)
-	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", err))
+	responseModel, diags := SubaccountResourceValueFrom(ctx, state, respObj)
+	if diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", diags))
 		return
 	}
 

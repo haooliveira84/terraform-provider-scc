@@ -227,9 +227,9 @@ func (r *SubaccountUsingAuthResource) Create(ctx context.Context, req resource.C
 		return
 	}
 
-	responseModel, err := SubaccountUsingAuthResourceValueFrom(ctx, plan, respObj)
-	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", err))
+	responseModel, diags := SubaccountUsingAuthResourceValueFrom(ctx, plan, respObj)
+	if diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", diags))
 		return
 	}
 
@@ -259,9 +259,9 @@ func (r *SubaccountUsingAuthResource) Read(ctx context.Context, req resource.Rea
 		return
 	}
 
-	responseModel, err := SubaccountUsingAuthResourceValueFrom(ctx, state, respObj)
-	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", err))
+	responseModel, diags := SubaccountUsingAuthResourceValueFrom(ctx, state, respObj)
+	if diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", diags))
 		return
 	}
 
@@ -306,8 +306,8 @@ func (r *SubaccountUsingAuthResource) Update(ctx context.Context, req resource.U
 		}
 	}
 
-	if responseModel, err := SubaccountUsingAuthResourceValueFrom(ctx, plan, respObj); err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, err.Error())
+	if responseModel, diags := SubaccountUsingAuthResourceValueFrom(ctx, plan, respObj); diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", diags))
 	} else {
 		resp.Diagnostics.Append(resp.State.Set(ctx, responseModel)...)
 	}
@@ -373,9 +373,9 @@ func (r *SubaccountUsingAuthResource) Delete(ctx context.Context, req resource.D
 		return
 	}
 
-	responseModel, err := SubaccountUsingAuthResourceValueFrom(ctx, state, respObj)
-	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", err))
+	responseModel, diags := SubaccountUsingAuthResourceValueFrom(ctx, state, respObj)
+	if diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", diags))
 		return
 	}
 

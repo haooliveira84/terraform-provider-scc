@@ -60,3 +60,13 @@ type SubaccountResource struct {
 	Description   string           `json:"description,omitempty"`
 	Tunnel        SubaccountTunnel `json:"tunnel"`
 }
+
+type SubaccountUsingAuthResource struct {
+	RegionHost         string           `json:"regionHost"`
+	Subaccount         string           `json:"subaccount"`
+	AuthenticationData string           `json:"authenticationData"`
+	LocationID         string           `json:"locationID,omitempty"`
+	DisplayName        string           `json:"displayName,omitempty"`
+	Description        string           `json:"description,omitempty"`
+	Tunnel             SubaccountTunnel `json:"tunnel"`
+}

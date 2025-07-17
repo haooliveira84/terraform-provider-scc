@@ -12,26 +12,28 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
-var _ resource.Resource = &SubaccountResource{}
+var _ resource.Resource = &SubaccountUsingAuthResource{}
 
-func NewSubaccountResource() resource.Resource {
-	return &SubaccountResource{}
+func NewSubaccountUsingAuthResource() resource.Resource {
+	return &SubaccountUsingAuthResource{}
 }
 
-type SubaccountResource struct {
+type SubaccountUsingAuthResource struct {
 	client *api.RestApiClient
 }
 
-func (r *SubaccountResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_subaccount"
+func (r *SubaccountUsingAuthResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_subaccount_using_auth"
 }
 
-func (r *SubaccountResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *SubaccountUsingAuthResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: `Cloud Connector Subaccount resource.
+		MarkdownDescription: `Cloud Connector Subaccount resource using Authentication Data.
 		
 __Tips:__
 * You must be assigned to the following roles:
@@ -43,20 +45,26 @@ __Further documentation:__
 		Attributes: map[string]schema.Attribute{
 			"region_host": schema.StringAttribute{
 				MarkdownDescription: "Region Host Name.",
-				Required:            true,
+				Computed:            true,
 			},
 			"subaccount": schema.StringAttribute{
 				MarkdownDescription: "The ID of the subaccount.",
-				Required:            true,
+				Computed:            true,
 			},
-			"cloud_user": schema.StringAttribute{
-				MarkdownDescription: "User for the specified subaccount and region host.",
-				Required:            true,
-			},
-			"cloud_password": schema.StringAttribute{
-				MarkdownDescription: "Password for the cloud user.",
-				Sensitive:           true,
-				Required:            true,
+			"authentication_data": schema.StringAttribute{
+				MarkdownDescription: `Subaccount authentication data, used instead of cloud_user, cloud_password, subaccount and region_host (as of version 2.17.0).
+This value must be downloaded from the subaccount and used within **5 minutes**, as it expires shortly after generation. It is used only during **resource creation** and 
+is **not required** for updating optional attributes such as location_id, display_name, description or tunnel.  
+
+**Note:**  
+- This value **will be persisted** in the Terraform state file. It is the user's responsibility to keep the state file secure.  
+- If this value is updated, **the resource will be recreated**.`,
+				Required:  true,
+				Sensitive: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.RequiresReplaceIfConfigured(),
+				},
 			},
 			"location_id": schema.StringAttribute{
 				MarkdownDescription: "Location identifier for the Cloud Connector instance.",
@@ -176,7 +184,7 @@ __Further documentation:__
 	}
 }
 
-func (r *SubaccountResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *SubaccountUsingAuthResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -195,9 +203,9 @@ func (r *SubaccountResource) Configure(ctx context.Context, req resource.Configu
 	r.client = client
 }
 
-func (r *SubaccountResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var plan SubaccountConfig
-	var respObj apiobjects.SubaccountResource
+func (r *SubaccountUsingAuthResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	var plan SubaccountUsingAuthConfig
+	var respObj apiobjects.SubaccountUsingAuthResource
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -207,13 +215,10 @@ func (r *SubaccountResource) Create(ctx context.Context, req resource.CreateRequ
 	endpoint := endpoints.GetSubaccountBaseEndpoint()
 
 	planBody := map[string]string{
-		"regionHost":    plan.RegionHost.ValueString(),
-		"subaccount":    plan.Subaccount.ValueString(),
-		"cloudUser":     plan.CloudUser.ValueString(),
-		"cloudPassword": plan.CloudPassword.ValueString(),
-		"description":   plan.Description.ValueString(),
-		"locationID":    plan.LocationID.ValueString(),
-		"displayName":   plan.DisplayName.ValueString(),
+		"authenticationData": plan.AuthenticationData.ValueString(),
+		"description":        plan.Description.ValueString(),
+		"locationID":         plan.LocationID.ValueString(),
+		"displayName":        plan.DisplayName.ValueString(),
 	}
 
 	err := requestAndUnmarshal(r.client, &respObj, "POST", endpoint, planBody, true)
@@ -222,7 +227,7 @@ func (r *SubaccountResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	responseModel, diags := SubaccountResourceValueFrom(ctx, plan, respObj)
+	responseModel, diags := SubaccountUsingAuthResourceValueFrom(ctx, plan, respObj)
 	if diags.HasError() {
 		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", diags))
 		return
@@ -235,9 +240,9 @@ func (r *SubaccountResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 }
 
-func (r *SubaccountResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var state SubaccountConfig
-	var respObj apiobjects.SubaccountResource
+func (r *SubaccountUsingAuthResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	var state SubaccountUsingAuthConfig
+	var respObj apiobjects.SubaccountUsingAuthResource
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -254,7 +259,7 @@ func (r *SubaccountResource) Read(ctx context.Context, req resource.ReadRequest,
 		return
 	}
 
-	responseModel, diags := SubaccountResourceValueFrom(ctx, state, respObj)
+	responseModel, diags := SubaccountUsingAuthResourceValueFrom(ctx, state, respObj)
 	if diags.HasError() {
 		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", diags))
 		return
@@ -267,25 +272,20 @@ func (r *SubaccountResource) Read(ctx context.Context, req resource.ReadRequest,
 	}
 }
 
-func (r *SubaccountResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	var plan, state SubaccountConfig
-	var respObj apiobjects.SubaccountResource
+func (r *SubaccountUsingAuthResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	var plan, state SubaccountUsingAuthConfig
+	var respObj apiobjects.SubaccountUsingAuthResource
 
-	if diags := req.Plan.Get(ctx, &plan); appendAndCheckErrors(&resp.Diagnostics, diags) {
+	if diags := req.Plan.Get(ctx, &plan); appendAndCheckErrorsCopy(&resp.Diagnostics, diags) {
 		return
 	}
 
-	if diags := req.State.Get(ctx, &state); appendAndCheckErrors(&resp.Diagnostics, diags) {
+	if diags := req.State.Get(ctx, &state); appendAndCheckErrorsCopy(&resp.Diagnostics, diags) {
 		return
 	}
 
-	if err := validateUpdateInputs(plan, state); err != nil {
-		resp.Diagnostics.AddError(errMsgUpdateSubaccountFailed, err.Error())
-		return
-	}
-
-	regionHost := plan.RegionHost.ValueString()
-	subaccount := plan.Subaccount.ValueString()
+	regionHost := state.RegionHost.ValueString()
+	subaccount := state.Subaccount.ValueString()
 	endpoint := endpoints.GetSubaccountEndpoint(regionHost, subaccount)
 
 	planBody := map[string]string{
@@ -300,39 +300,29 @@ func (r *SubaccountResource) Update(ctx context.Context, req resource.UpdateRequ
 		return
 	}
 
-	if shouldUpdateTunnel(plan) {
+	if shouldUpdateTunnelCopy(plan) {
 		if err := r.updateTunnelState(ctx, plan, state, endpoint, &respObj, &resp.Diagnostics); err != nil {
 			return
 		}
 	}
 
-	if responseModel, diags := SubaccountResourceValueFrom(ctx, plan, respObj); diags.HasError() {
+	if responseModel, diags := SubaccountUsingAuthResourceValueFrom(ctx, plan, respObj); diags.HasError() {
 		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", diags))
 	} else {
 		resp.Diagnostics.Append(resp.State.Set(ctx, responseModel)...)
 	}
 }
 
-func appendAndCheckErrors(diags *diag.Diagnostics, newDiags diag.Diagnostics) bool {
+func appendAndCheckErrorsCopy(diags *diag.Diagnostics, newDiags diag.Diagnostics) bool {
 	*diags = append(*diags, newDiags...)
 	return diags.HasError()
 }
 
-func validateUpdateInputs(plan, state SubaccountConfig) error {
-	if plan.RegionHost.ValueString() != state.RegionHost.ValueString() ||
-		plan.Subaccount.ValueString() != state.Subaccount.ValueString() ||
-		plan.CloudUser.ValueString() != state.CloudUser.ValueString() ||
-		plan.CloudPassword.ValueString() != state.CloudPassword.ValueString() {
-		return fmt.Errorf("failed to update the cloud connector subaccount due to mismatched configuration values")
-	}
-	return nil
-}
-
-func shouldUpdateTunnel(plan SubaccountConfig) bool {
+func shouldUpdateTunnelCopy(plan SubaccountUsingAuthConfig) bool {
 	return !plan.Tunnel.IsNull() && !plan.Tunnel.IsUnknown()
 }
 
-func (r *SubaccountResource) updateTunnelState(ctx context.Context, plan, state SubaccountConfig, endpoint string, respObj *apiobjects.SubaccountResource, diagnostics *diag.Diagnostics) error {
+func (r *SubaccountUsingAuthResource) updateTunnelState(ctx context.Context, plan, state SubaccountUsingAuthConfig, endpoint string, respObj *apiobjects.SubaccountUsingAuthResource, diagnostics *diag.Diagnostics) error {
 	var planTunnel, stateTunnel SubaccountTunnelData
 
 	if diags := state.Tunnel.As(ctx, &stateTunnel, basetypes.ObjectAsOptions{}); appendAndCheckErrors(diagnostics, diags) {
@@ -364,9 +354,9 @@ func (r *SubaccountResource) updateTunnelState(ctx context.Context, plan, state 
 	return nil
 }
 
-func (r *SubaccountResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state SubaccountConfig
-	var respObj apiobjects.SubaccountResource
+func (r *SubaccountUsingAuthResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	var state SubaccountUsingAuthConfig
+	var respObj apiobjects.SubaccountUsingAuthResource
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -383,7 +373,7 @@ func (r *SubaccountResource) Delete(ctx context.Context, req resource.DeleteRequ
 		return
 	}
 
-	responseModel, diags := SubaccountResourceValueFrom(ctx, state, respObj)
+	responseModel, diags := SubaccountUsingAuthResourceValueFrom(ctx, state, respObj)
 	if diags.HasError() {
 		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", diags))
 		return
@@ -396,7 +386,7 @@ func (r *SubaccountResource) Delete(ctx context.Context, req resource.DeleteRequ
 	}
 }
 
-func (rs *SubaccountResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (rs *SubaccountUsingAuthResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	idParts := strings.Split(req.ID, ",")
 
 	if len(idParts) != 2 || idParts[0] == "" || idParts[1] == "" {

@@ -178,9 +178,9 @@ func (r *SubaccountK8SServiceChannelResource) Create(ctx context.Context, req re
 		}
 	}
 
-	responseModel, err := SubaccountK8SServiceChannelValueFrom(ctx, plan, *serviceChannelRespObj)
-	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountK8SServiceChannelFailed, fmt.Sprintf("%s", err))
+	responseModel, diags := SubaccountK8SServiceChannelValueFrom(ctx, plan, *serviceChannelRespObj)
+	if diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountK8SServiceChannelFailed, fmt.Sprintf("%s", diags))
 		return
 	}
 
@@ -211,9 +211,9 @@ func (r *SubaccountK8SServiceChannelResource) Read(ctx context.Context, req reso
 		return
 	}
 
-	responseModel, err := SubaccountK8SServiceChannelValueFrom(ctx, state, respObj)
-	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountK8SServiceChannelFailed, fmt.Sprintf("%s", err))
+	responseModel, diags := SubaccountK8SServiceChannelValueFrom(ctx, state, respObj)
+	if diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountK8SServiceChannelFailed, fmt.Sprintf("%s", diags))
 		return
 	}
 
@@ -266,9 +266,9 @@ func (r *SubaccountK8SServiceChannelResource) Update(ctx context.Context, req re
 		return
 	}
 
-	responseModel, err := SubaccountK8SServiceChannelValueFrom(ctx, plan, respObj)
-	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountK8SServiceChannelFailed, fmt.Sprintf("%s", err))
+	responseModel, diags := SubaccountK8SServiceChannelValueFrom(ctx, plan, respObj)
+	if diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountK8SServiceChannelFailed, fmt.Sprintf("%s", diags))
 		return
 	}
 
@@ -300,9 +300,9 @@ func (r *SubaccountK8SServiceChannelResource) Delete(ctx context.Context, req re
 		return
 	}
 
-	responseModel, err := SubaccountK8SServiceChannelValueFrom(ctx, state, respObj)
-	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountK8SServiceChannelFailed, fmt.Sprintf("%s", err))
+	responseModel, diags := SubaccountK8SServiceChannelValueFrom(ctx, state, respObj)
+	if diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountK8SServiceChannelFailed, fmt.Sprintf("%s", diags))
 		return
 	}
 

@@ -148,9 +148,9 @@ func (d *SubaccountK8SServiceChannelDataSource) Read(ctx context.Context, req da
 		return
 	}
 
-	responseModel, err := SubaccountK8SServiceChannelValueFrom(ctx, data, respObj)
-	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountK8SServiceChannelFailed, fmt.Sprintf("%s", err))
+	responseModel, diags := SubaccountK8SServiceChannelValueFrom(ctx, data, respObj)
+	if diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountK8SServiceChannelFailed, fmt.Sprintf("%s", diags))
 		return
 	}
 

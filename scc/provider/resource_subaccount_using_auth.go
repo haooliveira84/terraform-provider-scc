@@ -52,8 +52,13 @@ __Further documentation:__
 				Computed:            true,
 			},
 			"authentication_data": schema.StringAttribute{
-				MarkdownDescription: `Subaccount authentication data, used instead of cloudUser, cloudPassword and regionHost (as of version 2.17.0).
-This value must be downloaded from the subaccount and used within **5 minutes**, as it expires shortly after generation. It is used only during resource creation and is not persisted after apply.`,
+				MarkdownDescription: `Subaccount authentication data, used instead of cloud_user, cloud_password, subaccount and region_host (as of version 2.17.0).
+This value must be downloaded from the subaccount and used within **5 minutes**, as it expires shortly after generation. It is used only during **resource creation** and 
+is **not required** for updating optional attributes such as location_id, display_name, description or tunnel.  
+
+**Note:**  
+- This value **will be persisted** in the Terraform state file. It is the user's responsibility to keep the state file secure.  
+- If this value is updated, **the resource will be recreated**.`,
 				Required:  true,
 				Sensitive: true,
 				PlanModifiers: []planmodifier.String{
@@ -222,9 +227,9 @@ func (r *SubaccountUsingAuthResource) Create(ctx context.Context, req resource.C
 		return
 	}
 
-	responseModel, err := SubaccountUsingAuthResourceValueFrom(ctx, plan, respObj)
-	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", err))
+	responseModel, diags := SubaccountUsingAuthResourceValueFrom(ctx, plan, respObj)
+	if diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", diags))
 		return
 	}
 
@@ -254,9 +259,9 @@ func (r *SubaccountUsingAuthResource) Read(ctx context.Context, req resource.Rea
 		return
 	}
 
-	responseModel, err := SubaccountUsingAuthResourceValueFrom(ctx, state, respObj)
-	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", err))
+	responseModel, diags := SubaccountUsingAuthResourceValueFrom(ctx, state, respObj)
+	if diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", diags))
 		return
 	}
 
@@ -301,8 +306,8 @@ func (r *SubaccountUsingAuthResource) Update(ctx context.Context, req resource.U
 		}
 	}
 
-	if responseModel, err := SubaccountUsingAuthResourceValueFrom(ctx, plan, respObj); err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, err.Error())
+	if responseModel, diags := SubaccountUsingAuthResourceValueFrom(ctx, plan, respObj); diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", diags))
 	} else {
 		resp.Diagnostics.Append(resp.State.Set(ctx, responseModel)...)
 	}
@@ -368,9 +373,9 @@ func (r *SubaccountUsingAuthResource) Delete(ctx context.Context, req resource.D
 		return
 	}
 
-	responseModel, err := SubaccountUsingAuthResourceValueFrom(ctx, state, respObj)
-	if err != nil {
-		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", err))
+	responseModel, diags := SubaccountUsingAuthResourceValueFrom(ctx, state, respObj)
+	if diags.HasError() {
+		resp.Diagnostics.AddError(errMsgMapSubaccountFailed, fmt.Sprintf("%s", diags))
 		return
 	}
 

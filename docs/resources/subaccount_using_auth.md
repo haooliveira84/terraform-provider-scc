@@ -37,8 +37,13 @@ resource "scc_subaccount_using_auth" "scc_sa_auth" {
 
 ### Required
 
-- `authentication_data` (String, Sensitive) Subaccount authentication data, used instead of cloudUser, cloudPassword and regionHost (as of version 2.17.0).
-This value must be downloaded from the subaccount and used within **5 minutes**, as it expires shortly after generation. It is used only during resource creation and is not persisted after apply.
+- `authentication_data` (String, Sensitive) Subaccount authentication data, used instead of cloud_user, cloud_password, subaccount and region_host (as of version 2.17.0).
+This value must be downloaded from the subaccount and used within **5 minutes**, as it expires shortly after generation. It is used only during **resource creation** and 
+is **not required** for updating optional attributes such as location_id, display_name, description or tunnel.  
+
+**Note:**  
+- This value **will be persisted** in the Terraform state file. It is the user's responsibility to keep the state file secure.  
+- If this value is updated, **the resource will be recreated**.
 
 ### Optional
 
@@ -111,7 +116,7 @@ Read-Only:
 Import is supported using the following syntax:
 
 ```terraform
-# terraform import scc_subaccount_using_auth.<resource_name> '<region_host>,<subaccount>`
+# terraform import scc_subaccount_using_auth.<resource_name> '<region_host>,<subaccount>'
 
 terraform import scc_subaccount_using_auth.scc_sa_auth 'cf.eu12.hana.ondemand.com,12345678-90ab-cdef-1234-567890abcdef'
 ```

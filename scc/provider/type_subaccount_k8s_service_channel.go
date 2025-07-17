@@ -5,6 +5,7 @@ import (
 
 	apiobjects "github.com/SAP/terraform-provider-scc/internal/api/apiObjects"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -52,14 +53,17 @@ type SubaccountK8SServiceChannelsConfig struct {
 	SubaccountK8SServiceChannels []SubaccountK8SServiceChannel `tfsdk:"subaccount_k8s_service_channels"`
 }
 
-func SubaccountK8SServiceChannelValueFrom(ctx context.Context, plan SubaccountK8SServiceChannelConfig, value apiobjects.SubaccountK8SServiceChannel) (SubaccountK8SServiceChannelConfig, error) {
+func SubaccountK8SServiceChannelValueFrom(ctx context.Context, plan SubaccountK8SServiceChannelConfig, value apiobjects.SubaccountK8SServiceChannel) (SubaccountK8SServiceChannelConfig, diag.Diagnostics) {
 	stateObj := SubaccountK8SServiceChannelStateData{
 		Connected:               types.BoolValue(value.State.Connected),
 		OpenedConnections:       types.Int64Value(value.State.OpenedConnections),
 		ConnectedSinceTimeStamp: types.Int64Value(value.State.ConnectedSinceTimeStamp),
 	}
 
-	state, _ := types.ObjectValueFrom(ctx, SubaccountK8SServiceChannelStateType, stateObj)
+	state, err := types.ObjectValueFrom(ctx, SubaccountK8SServiceChannelStateType, stateObj)
+	if err.HasError() {
+		return SubaccountK8SServiceChannelConfig{}, err
+	}
 
 	model := &SubaccountK8SServiceChannelConfig{
 		RegionHost:  plan.RegionHost,
@@ -78,7 +82,7 @@ func SubaccountK8SServiceChannelValueFrom(ctx context.Context, plan SubaccountK8
 	return *model, nil
 }
 
-func SubaccountK8SServiceChannelsValueFrom(ctx context.Context, plan SubaccountK8SServiceChannelsConfig, value apiobjects.SubaccountK8SServiceChannels) (SubaccountK8SServiceChannelsConfig, error) {
+func SubaccountK8SServiceChannelsValueFrom(ctx context.Context, plan SubaccountK8SServiceChannelsConfig, value apiobjects.SubaccountK8SServiceChannels) (SubaccountK8SServiceChannelsConfig, diag.Diagnostics) {
 	serviceChannels := []SubaccountK8SServiceChannel{}
 	for _, channel := range value.SubaccountK8SServiceChannels {
 		stateObj := SubaccountK8SServiceChannelStateData{
@@ -87,7 +91,10 @@ func SubaccountK8SServiceChannelsValueFrom(ctx context.Context, plan SubaccountK
 			ConnectedSinceTimeStamp: types.Int64Value(channel.State.ConnectedSinceTimeStamp),
 		}
 
-		state, _ := types.ObjectValueFrom(ctx, SubaccountK8SServiceChannelStateType, stateObj)
+		state, err := types.ObjectValueFrom(ctx, SubaccountK8SServiceChannelStateType, stateObj)
+		if err.HasError() {
+			return SubaccountK8SServiceChannelsConfig{}, err
+		}
 
 		c := SubaccountK8SServiceChannel{
 			K8SCluster:  types.StringValue(channel.K8SCluster),

@@ -269,6 +269,8 @@ func (c *cloudConnectorProvider) DataSources(_ context.Context) []func() datasou
 		NewDomainMappingDataSource,
 		NewSubaccountK8SServiceChannelDataSource,
 		NewSubaccountK8SServiceChannelsDataSource,
+		NewSubaccountABAPServiceChannelDataSource,
+		NewSubaccountABAPServiceChannelsDataSource,
 	}
 }
 
@@ -276,10 +278,11 @@ func (c *cloudConnectorProvider) DataSources(_ context.Context) []func() datasou
 func (c *cloudConnectorProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewSubaccountResource,
+		NewSubaccountUsingAuthResource,
 		NewSystemMappingResource,
 		NewSystemMappingResourceResource,
 		NewDomainMappingResource,
 		NewSubaccountK8SServiceChannelResource,
-		NewSubaccountUsingAuthResource,
+		NewSubaccountABAPServiceChannelResource,
 	}
 }

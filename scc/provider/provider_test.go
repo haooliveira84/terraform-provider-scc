@@ -41,8 +41,9 @@ type User struct {
 	CloudPassword           string
 	CloudAuthenticationData string
 	// For adding K8S service channel to subaccount
-	K8SCluster string
-	K8SService string
+	K8SCluster          string
+	K8SService          string
+	ABAPCloudTenantHost string
 }
 
 var redactedTestUser = User{
@@ -54,6 +55,7 @@ var redactedTestUser = User{
 	CloudAuthenticationData: "REDACTED_SUBACCOUNT_AUTHENTICATION_DATA",
 	K8SCluster:              "REDACTED_K8S_CLUSTER",
 	K8SService:              "REDACTED_K8S_SERVICE",
+	ABAPCloudTenantHost:     "REDACTED_ABAP_CLOUD_TENANT_HOST",
 }
 
 func providerConfig(testUser User) string {
@@ -108,6 +110,7 @@ func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 		user.CloudAuthenticationData = os.Getenv("TF_VAR_authentication_data")
 		user.K8SCluster = os.Getenv("TF_VAR_k8s_cluster")
 		user.K8SService = os.Getenv("TF_VAR_k8s_service")
+		user.ABAPCloudTenantHost = os.Getenv("TF_VAR_abap_cloud_tenant_host")
 		if len(user.InstanceUsername) == 0 || len(user.InstancePassword) == 0 || len(user.InstanceURL) == 0 {
 			t.Fatal("Env vars SCC_USERNAME, SCC_PASSWORD and SCC_INSTANCE_URL are required when recording test fixtures")
 		}
@@ -206,6 +209,16 @@ func hookRedactSensitiveBody() func(i *cassette.Interaction) error {
 			i.Response.Body = reBindingSecret.ReplaceAllString(i.Response.Body, `"k8sService":"`+redactedTestUser.K8SService+`"`)
 		}
 
+		if strings.Contains(i.Request.Body, "abapCloudTenantHost") {
+			reBindingSecret := regexp.MustCompile(`"abapCloudTenantHost":"(.*?)"`)
+			i.Request.Body = reBindingSecret.ReplaceAllString(i.Request.Body, `"abapCloudTenantHost":"`+redactedTestUser.ABAPCloudTenantHost+`"`)
+		}
+
+		if strings.Contains(i.Response.Body, "abapCloudTenantHost") {
+			reBindingSecret := regexp.MustCompile(`"abapCloudTenantHost":"(.*?)"`)
+			i.Response.Body = reBindingSecret.ReplaceAllString(i.Response.Body, `"abapCloudTenantHost":"`+redactedTestUser.ABAPCloudTenantHost+`"`)
+		}
+
 		if strings.Contains(i.Response.Body, "subaccountCertificate") {
 			reNotAfter := regexp.MustCompile(`"notAfterTimeStamp"\s*:\s*\d{13}`)
 			i.Response.Body = reNotAfter.ReplaceAllString(i.Response.Body, `"notAfterTimeStamp": 1111111111111`)
@@ -258,6 +271,7 @@ func TestSCCProvider_AllResources(t *testing.T) {
 		"scc_system_mapping_resource",
 		"scc_system_mapping",
 		"scc_subaccount_k8s_service_channel",
+		"scc_subaccount_abap_service_channel",
 		"scc_subaccount_using_auth",
 	}
 
@@ -288,6 +302,8 @@ func TestSCCProvider_AllDataSources(t *testing.T) {
 		"scc_system_mappings",
 		"scc_subaccount_k8s_service_channel",
 		"scc_subaccount_k8s_service_channels",
+		"scc_subaccount_abap_service_channel",
+		"scc_subaccount_abap_service_channels",
 	}
 
 	ctx := context.Background()

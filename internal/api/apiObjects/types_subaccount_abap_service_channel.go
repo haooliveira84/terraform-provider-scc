@@ -19,5 +19,5 @@ type SubaccountABAPServiceChannelState struct {
 }
 
 type SubaccountABAPServiceChannels struct {
-	SubaccountABAPServiceChannels []SubaccountABAPServiceChannel `json:"service_channels_k8s"`
+	SubaccountABAPServiceChannels []SubaccountABAPServiceChannel `json:"service_channels_abap"`
 }

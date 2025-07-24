@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -156,7 +157,6 @@ func (r *SubaccountABAPServiceChannelResource) Create(ctx context.Context, req r
 	planBody := map[string]string{
 		"abapCloudTenantHost": plan.ABAPCloudTenantHost.ValueString(),
 		"instanceNumber":      fmt.Sprintf("%d", plan.InstanceNumber.ValueInt64()),
-		"port":                fmt.Sprintf("%d", plan.Port.ValueInt64()),
 		"connections":         fmt.Sprintf("%d", plan.Connections.ValueInt64()),
 		"comment":             plan.Comment.ValueString(),
 	}
@@ -333,7 +333,7 @@ func (r *SubaccountABAPServiceChannelResource) getSubaccountABAPServiceChannel(s
 			return &channel, nil
 		}
 	}
-	return nil, fmt.Errorf("%s", "subaccount service channel doesn't exist")
+	return nil, errors.New("subaccount service channel doesn't exist")
 }
 
 func (r *SubaccountABAPServiceChannelResource) enableSubaccountABAPServiceChannel(plan SubaccountABAPServiceChannelConfig, respObj apiobjects.SubaccountABAPServiceChannel, resp *resource.UpdateResponse, endpoint string) {

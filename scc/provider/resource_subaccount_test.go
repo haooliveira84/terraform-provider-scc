@@ -10,7 +10,7 @@ import (
 )
 
 func TestResourceSubaccount(t *testing.T) {
-	subaccountId := "7480ee65-e039-41cf-ba72-6aaf56c312df"
+	subaccountId := "4916a705-273c-45a6-a2f0-08c234c7a23d"
 	regionHost := "cf.eu12.hana.ondemand.com"
 	t.Parallel()
 
@@ -64,13 +64,13 @@ func TestResourceSubaccount(t *testing.T) {
 				{
 					ResourceName:  "scc_subaccount.test",
 					ImportState:   true,
-					ImportStateId: "cf.eu12.hana.ondemand.com7480ee65-e039-41cf-ba72-6aaf56c312df", // malformed ID
+					ImportStateId: "cf.eu12.hana.ondemand.com4916a705-273c-45a6-a2f0-08c234c7a23d", // malformed ID
 					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*subaccount.*Got:`),
 				},
 				{
 					ResourceName:  "scc_subaccount.test",
 					ImportState:   true,
-					ImportStateId: "cf.eu12.hana.ondemand.com,7480ee65-e039-41cf-ba72-6aaf56c312df,extra",
+					ImportStateId: "cf.eu12.hana.ondemand.com,4916a705-273c-45a6-a2f0-08c234c7a23d,extra",
 					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*subaccount.*Got:`),
 				},
 			},
@@ -162,7 +162,7 @@ func TestResourceSubaccount(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceSubaccountWoRegionHost("test", "7480ee65-e039-41cf-ba72-6aaf56c312df", user.CloudUsername, user.CloudPassword, "subaccount added via terraform tests"),
+					Config:      ResourceSubaccountWoRegionHost("test", "4916a705-273c-45a6-a2f0-08c234c7a23d", user.CloudUsername, user.CloudPassword, "subaccount added via terraform tests"),
 					ExpectError: regexp.MustCompile(`The argument "region_host" is required, but no definition was found.`),
 				},
 			},
@@ -199,7 +199,7 @@ func TestResourceSubaccount(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceSubaccountWoUsername("test", "cf.eu12.hana.ondemand.com", "7480ee65-e039-41cf-ba72-6aaf56c312df", user.CloudPassword, "subaccount added via terraform tests"),
+					Config:      ResourceSubaccountWoUsername("test", "cf.eu12.hana.ondemand.com", "4916a705-273c-45a6-a2f0-08c234c7a23d", user.CloudPassword, "subaccount added via terraform tests"),
 					ExpectError: regexp.MustCompile(`The argument "cloud_user" is required, but no definition was found.`),
 				},
 			},
@@ -218,7 +218,7 @@ func TestResourceSubaccount(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceSubaccountWoPassword("test", "cf.eu12.hana.ondemand.com", "7480ee65-e039-41cf-ba72-6aaf56c312df", user.CloudUsername, "subaccount added via terraform tests"),
+					Config:      ResourceSubaccountWoPassword("test", "cf.eu12.hana.ondemand.com", "4916a705-273c-45a6-a2f0-08c234c7a23d", user.CloudUsername, "subaccount added via terraform tests"),
 					ExpectError: regexp.MustCompile(`The argument "cloud_password" is required, but no definition was found.`),
 				},
 			},

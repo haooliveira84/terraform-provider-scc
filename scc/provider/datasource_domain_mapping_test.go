@@ -21,7 +21,7 @@ func TestDataSourceDomainMapping(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig(user) + DataSourceDomainMapping("mapping", "cf.eu12.hana.ondemand.com", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8", "testterraforminternaldomain"),
+					Config: providerConfig(user) + DataSourceDomainMapping("mapping", "cf.eu12.hana.ondemand.com", "304492be-5f0f-4bb0-8f59-c982107bc878", "testterraforminternaldomain"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttr("data.scc_domain_mapping.mapping", "region_host", "cf.eu12.hana.ondemand.com"),
 						resource.TestMatchResourceAttr("data.scc_domain_mapping.mapping", "subaccount", regexpValidUUID),
@@ -40,7 +40,7 @@ func TestDataSourceDomainMapping(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      DataSourceDomainMappingWoRegionHost("mapping", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8", "testterraforminternaldomain"),
+					Config:      DataSourceDomainMappingWoRegionHost("mapping", "304492be-5f0f-4bb0-8f59-c982107bc878", "testterraforminternaldomain"),
 					ExpectError: regexp.MustCompile(`The argument "region_host" is required, but no definition was found.`),
 				},
 			},
@@ -66,7 +66,7 @@ func TestDataSourceDomainMapping(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      DataSourceDomainMappingWoInternalDomain("mapping", "cf.eu12.hana.ondemand.com", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8"),
+					Config:      DataSourceDomainMappingWoInternalDomain("mapping", "cf.eu12.hana.ondemand.com", "304492be-5f0f-4bb0-8f59-c982107bc878"),
 					ExpectError: regexp.MustCompile(`The argument "internal_domain" is required, but no definition was found.`),
 				},
 			},

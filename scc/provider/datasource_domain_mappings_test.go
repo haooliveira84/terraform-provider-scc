@@ -21,7 +21,7 @@ func TestDataSourceDomainMappings(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig(user) + DataSourceDomainMappings("mappings", "cf.eu12.hana.ondemand.com", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8"),
+					Config: providerConfig(user) + DataSourceDomainMappings("mappings", "cf.eu12.hana.ondemand.com", "304492be-5f0f-4bb0-8f59-c982107bc878"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttr("data.scc_domain_mappings.mappings", "region_host", "cf.eu12.hana.ondemand.com"),
 						resource.TestMatchResourceAttr("data.scc_domain_mappings.mappings", "subaccount", regexpValidUUID),
@@ -42,7 +42,7 @@ func TestDataSourceDomainMappings(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      DataSourceDomainMappingsWoRegionHost("mappings", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8"),
+					Config:      DataSourceDomainMappingsWoRegionHost("mappings", "304492be-5f0f-4bb0-8f59-c982107bc878"),
 					ExpectError: regexp.MustCompile(`The argument "region_host" is required, but no definition was found.`),
 				},
 			},

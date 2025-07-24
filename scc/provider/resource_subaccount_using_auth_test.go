@@ -58,13 +58,13 @@ func TestResourceSubaccountUsingAuth(t *testing.T) {
 				{
 					ResourceName:  "scc_subaccount_using_auth.test",
 					ImportState:   true,
-					ImportStateId: "cf.eu12.hana.ondemand.com7480ee65-e039-41cf-ba72-6aaf56c312df", // malformed ID
+					ImportStateId: "cf.eu12.hana.ondemand.com4916a705-273c-45a6-a2f0-08c234c7a23d", // malformed ID
 					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*subaccount.*Got:`),
 				},
 				{
 					ResourceName:  "scc_subaccount_using_auth.test",
 					ImportState:   true,
-					ImportStateId: "cf.eu12.hana.ondemand.com,7480ee65-e039-41cf-ba72-6aaf56c312df,extra",
+					ImportStateId: "cf.eu12.hana.ondemand.com,4916a705-273c-45a6-a2f0-08c234c7a23d,extra",
 					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*subaccount.*Got:`),
 				},
 			},

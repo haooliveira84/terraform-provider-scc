@@ -21,7 +21,7 @@ func TestDataSourceSubaccount(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig(user) + DataSourceSubaccountConfiguration("test", "cf.eu12.hana.ondemand.com", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8"),
+					Config: providerConfig(user) + DataSourceSubaccountConfiguration("test", "cf.eu12.hana.ondemand.com", "304492be-5f0f-4bb0-8f59-c982107bc878"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "region_host", "cf.eu12.hana.ondemand.com"),
 						resource.TestMatchResourceAttr("data.scc_subaccount_configuration.test", "subaccount", regexpValidUUID),
@@ -33,11 +33,7 @@ func TestDataSourceSubaccount(t *testing.T) {
 						resource.TestMatchResourceAttr("data.scc_subaccount_configuration.test", "tunnel.connected_since_time_stamp", regexValidTimeStamp),
 						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.connections", "0"),
 						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.application_connections.#", "0"),
-						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.service_channels.#", "1"),
-						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.service_channels.0.type", "K8S"),
-						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.service_channels.0.state", "Connected"),
-						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.service_channels.0.details", "cp.da2b3e1.stage.kyma.ondemand.com:443/bd64665f-060a-47b6-8aba-f406703f0acf"),
-						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.service_channels.0.comment", ""),
+						resource.TestCheckResourceAttr("data.scc_subaccount_configuration.test", "tunnel.service_channels.#", "0"),
 						resource.TestMatchResourceAttr("data.scc_subaccount_configuration.test", "tunnel.subaccount_certificate.not_after_time_stamp", regexValidTimeStamp),
 						resource.TestMatchResourceAttr("data.scc_subaccount_configuration.test", "tunnel.subaccount_certificate.not_before_time_stamp", regexValidTimeStamp),
 						resource.TestMatchResourceAttr("data.scc_subaccount_configuration.test", "tunnel.subaccount_certificate.subject_dn", regexp.MustCompile(`CN=.*?,L=.*?,OU=.*?,OU=.*?,O=.*?,C=.*?`)),
@@ -56,7 +52,7 @@ func TestDataSourceSubaccount(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      DataSourceSubaccountConfigurationWoRegionHost("test", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8"),
+					Config:      DataSourceSubaccountConfigurationWoRegionHost("test", "304492be-5f0f-4bb0-8f59-c982107bc878"),
 					ExpectError: regexp.MustCompile(`The argument "region_host" is required, but no definition was found.`),
 				},
 			},

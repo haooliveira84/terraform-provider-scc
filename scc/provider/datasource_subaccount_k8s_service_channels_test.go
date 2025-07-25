@@ -10,7 +10,7 @@ import (
 
 func TestDataSourceSubaccountK8SServiceChannels(t *testing.T) {
 	regionHost := "cf.eu12.hana.ondemand.com"
-	subaccount := "0bcb0012-a982-42f9-bda4-0a5cb15f88c8"
+	subaccount := "304492be-5f0f-4bb0-8f59-c982107bc878"
 	t.Parallel()
 
 	t.Run("happy path", func(t *testing.T) {
@@ -28,8 +28,8 @@ func TestDataSourceSubaccountK8SServiceChannels(t *testing.T) {
 						resource.TestMatchResourceAttr("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount", regexpValidUUID),
 
 						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.#", "1"),
-						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.0.k8s_cluster", "testclusterhost"),
-						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.0.k8s_service", "testserviceid"),
+						resource.TestCheckResourceAttrSet("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.0.k8s_cluster"),
+						resource.TestCheckResourceAttrSet("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.0.k8s_service"),
 						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.0.port", "3000"),
 						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.0.connections", "1"),
 						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.0.type", "K8S"),

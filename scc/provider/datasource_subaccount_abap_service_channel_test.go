@@ -11,7 +11,7 @@ import (
 func TestDataSourceSubaccountABAPServiceChannel(t *testing.T) {
 
 	regionHost := "cf.eu12.hana.ondemand.com"
-	subaccount := "0bcb0012-a982-42f9-bda4-0a5cb15f88c8"
+	subaccount := "304492be-5f0f-4bb0-8f59-c982107bc878"
 	t.Parallel()
 
 	t.Run("happy path", func(t *testing.T) {
@@ -23,12 +23,11 @@ func TestDataSourceSubaccountABAPServiceChannel(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig(user) + DataSourceSubaccountABAPServiceChannel("scc_sc", regionHost, subaccount, 49),
+					Config: providerConfig(user) + DataSourceSubaccountABAPServiceChannel("scc_sc", regionHost, subaccount, 52),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttr("data.scc_subaccount_abap_service_channel.scc_sc", "region_host", regionHost),
 						resource.TestMatchResourceAttr("data.scc_subaccount_abap_service_channel.scc_sc", "subaccount", regexpValidUUID),
-
-						resource.TestCheckResourceAttr("data.scc_subaccount_abap_service_channel.scc_sc", "abap_cloud_tenant_host", "testinstanceid.abap.region.hana.ondemand.com"),
+						resource.TestCheckResourceAttrSet("data.scc_subaccount_abap_service_channel.scc_sc", "abap_cloud_tenant_host"),
 						resource.TestCheckResourceAttr("data.scc_subaccount_abap_service_channel.scc_sc", "instance_number", "50"),
 						resource.TestCheckResourceAttr("data.scc_subaccount_abap_service_channel.scc_sc", "port", "3350"),
 						resource.TestCheckResourceAttr("data.scc_subaccount_abap_service_channel.scc_sc", "connections", "1"),

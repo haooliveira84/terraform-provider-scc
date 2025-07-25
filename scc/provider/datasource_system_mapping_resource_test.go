@@ -21,7 +21,7 @@ func TestDataSourceSystemMappingResource(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(rec.GetDefaultClient()),
 			Steps: []resource.TestStep{
 				{
-					Config: providerConfig(user) + DataSourceSystemMappingResource("test", "cf.eu12.hana.ondemand.com", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8", "testterraformvirtual", "900", "/"),
+					Config: providerConfig(user) + DataSourceSystemMappingResource("test", "cf.eu12.hana.ondemand.com", "304492be-5f0f-4bb0-8f59-c982107bc878", "testterraformvirtual", "900", "/"),
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttr("data.scc_system_mapping_resource.test", "region_host", "cf.eu12.hana.ondemand.com"),
 						resource.TestMatchResourceAttr("data.scc_system_mapping_resource.test", "subaccount", regexpValidUUID),
@@ -47,7 +47,7 @@ func TestDataSourceSystemMappingResource(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      DataSourceSystemMappingResourceWoRegionHost("test", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8", "testterraformvirtual", "900", "/"),
+					Config:      DataSourceSystemMappingResourceWoRegionHost("test", "304492be-5f0f-4bb0-8f59-c982107bc878", "testterraformvirtual", "900", "/"),
 					ExpectError: regexp.MustCompile(`The argument "region_host" is required, but no definition was found.`),
 				},
 			},
@@ -73,7 +73,7 @@ func TestDataSourceSystemMappingResource(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      DataSourceSystemMappingResourceWoResourceID("test", "cf.eu12.hana.ondemand.com", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8", "testterraformvirtual", "900"),
+					Config:      DataSourceSystemMappingResourceWoResourceID("test", "cf.eu12.hana.ondemand.com", "304492be-5f0f-4bb0-8f59-c982107bc878", "testterraformvirtual", "900"),
 					ExpectError: regexp.MustCompile(`The argument "id" is required, but no definition was found.`),
 				},
 			},
@@ -86,7 +86,7 @@ func TestDataSourceSystemMappingResource(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      DataSourceSystemMappingResourceWoVirtualHost("test", "cf.eu12.hana.ondemand.com", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8", "900", "/"),
+					Config:      DataSourceSystemMappingResourceWoVirtualHost("test", "cf.eu12.hana.ondemand.com", "304492be-5f0f-4bb0-8f59-c982107bc878", "900", "/"),
 					ExpectError: regexp.MustCompile(`The argument "virtual_host" is required, but no definition was found.`),
 				},
 			},
@@ -99,7 +99,7 @@ func TestDataSourceSystemMappingResource(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      DataSourceSystemMappingResourceWoVirtualPort("test", "cf.eu12.hana.ondemand.com", "0bcb0012-a982-42f9-bda4-0a5cb15f88c8", "testterraformvirtual", "/"),
+					Config:      DataSourceSystemMappingResourceWoVirtualPort("test", "cf.eu12.hana.ondemand.com", "304492be-5f0f-4bb0-8f59-c982107bc878", "testterraformvirtual", "/"),
 					ExpectError: regexp.MustCompile(`The argument "virtual_port" is required, but no definition was found.`),
 				},
 			},

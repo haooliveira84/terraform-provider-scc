@@ -45,19 +45,20 @@ func TestResourceSystemMappingResource(t *testing.T) {
 					ResourceName:      "scc_system_mapping_resource.test",
 					ImportState:       true,
 					ImportStateVerify: true,
+					ImportStateVerifyIdentifierAttribute: "region_host", 
 					ImportStateIdFunc: getImportStateForSystemMappingResource("scc_system_mapping_resource.test"),
 				},
 				{
 					ResourceName:  "scc_system_mapping_resource.test",
 					ImportState:   true,
 					ImportStateId: "cf.eu12.hana.ondemand.comd3bbbcd7-d5e0-483b-a524-6dee7205f8e8testtfvirtualtesting90/", // malformed ID
-					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*id.*Got:`),
+					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*url_path.*Got:`),
 				},
 				{
 					ResourceName:  "scc_system_mapping_resource.test",
 					ImportState:   true,
 					ImportStateId: "cf.eu12.hana.ondemand.com,d3bbbcd7-d5e0-483b-a524-6dee7205f8e8,testtfvirtualtesting,90,/,extra",
-					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*id.*Got:`),
+					ExpectError:   regexp.MustCompile(`(?is)Expected import identifier with format:.*url_path.*Got:`),
 				},
 			},
 		})
@@ -121,8 +122,8 @@ func TestResourceSystemMappingResource(t *testing.T) {
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
-					Config:      ResourceSystemMappingResourceWoID("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtualtesting", "90", "create resource", true),
-					ExpectError: regexp.MustCompile(`The argument "id" is required, but no definition was found.`),
+					Config:      ResourceSystemMappingResourceWoURLPath("test", "cf.eu12.hana.ondemand.com", "d3bbbcd7-d5e0-483b-a524-6dee7205f8e8", "testtfvirtualtesting", "90", "create resource", true),
+					ExpectError: regexp.MustCompile(`The argument "url_path" is required, but no definition was found.`),
 				},
 			},
 		})
@@ -131,77 +132,77 @@ func TestResourceSystemMappingResource(t *testing.T) {
 }
 
 func ResourceSystemMappingResource(datasourceName string, regionHost string, subaccount string, virtualHost string, virtualPort string,
-	id string, description string, enabled bool) string {
+	urlPath string, description string, enabled bool) string {
 	return fmt.Sprintf(`
 	resource "scc_system_mapping_resource" "%s" {
 	region_host = "%s"
 	subaccount = "%s"
 	virtual_host = "%s"
 	virtual_port = "%s"
-	id = "%s"
+	url_path = "%s"
 	description = "%s"
 	enabled = "%t"
 	}
-	`, datasourceName, regionHost, subaccount, virtualHost, virtualPort, id, description, enabled)
+	`, datasourceName, regionHost, subaccount, virtualHost, virtualPort, urlPath, description, enabled)
 }
 
 func ResourceSystemMappingResourceWoRegionHost(datasourceName string, subaccount string, virtualHost string, virtualPort string,
-	id string, description string, enabled bool) string {
+	urlPath string, description string, enabled bool) string {
 	return fmt.Sprintf(`
 	resource "scc_system_mapping_resource" "%s" {
 	subaccount = "%s"
 	virtual_host = "%s"
 	virtual_port = "%s"
-	id = "%s"
+	url_path = "%s"
 	description = "%s"
 	enabled = "%t"
 	}
-	`, datasourceName, subaccount, virtualHost, virtualPort, id, description, enabled)
+	`, datasourceName, subaccount, virtualHost, virtualPort, urlPath, description, enabled)
 }
 
 func ResourceSystemMappingResourceWoSubaccount(datasourceName string, regionHost string, virtualHost string, virtualPort string,
-	id string, description string, enabled bool) string {
+	urlPath string, description string, enabled bool) string {
 	return fmt.Sprintf(`
 	resource "scc_system_mapping_resource" "%s" {
 	region_host = "%s"
 	virtual_host = "%s"
 	virtual_port = "%s"
-	id = "%s"
+	url_path = "%s"
 	description = "%s"
 	enabled = "%t"
 	}
-	`, datasourceName, regionHost, virtualHost, virtualPort, id, description, enabled)
+	`, datasourceName, regionHost, virtualHost, virtualPort, urlPath, description, enabled)
 }
 
 func ResourceSystemMappingResourceWoVirtualHost(datasourceName string, regionHost string, subaccount string, virtualPort string,
-	id string, description string, enabled bool) string {
+	urlPath string, description string, enabled bool) string {
 	return fmt.Sprintf(`
 	resource "scc_system_mapping_resource" "%s" {
 	region_host = "%s"
 	subaccount = "%s"
 	virtual_port = "%s"
-	id = "%s"
+	url_path = "%s"
 	description = "%s"
 	enabled = "%t"
 	}
-	`, datasourceName, regionHost, subaccount, virtualPort, id, description, enabled)
+	`, datasourceName, regionHost, subaccount, virtualPort, urlPath, description, enabled)
 }
 
 func ResourceSystemMappingResourceWoVirtualPort(datasourceName string, regionHost string, subaccount string, virtualHost string,
-	id string, description string, enabled bool) string {
+	urlPath string, description string, enabled bool) string {
 	return fmt.Sprintf(`
 	resource "scc_system_mapping_resource" "%s" {
 	region_host = "%s"
 	subaccount = "%s"
 	virtual_host = "%s"
-	id = "%s"
+	url_path = "%s"
 	description = "%s"
 	enabled = "%t"
 	}
-	`, datasourceName, regionHost, subaccount, virtualHost, id, description, enabled)
+	`, datasourceName, regionHost, subaccount, virtualHost, urlPath, description, enabled)
 }
 
-func ResourceSystemMappingResourceWoID(datasourceName string, regionHost string, subaccount string, virtualHost string, virtualPort string,
+func ResourceSystemMappingResourceWoURLPath(datasourceName string, regionHost string, subaccount string, virtualHost string, virtualPort string,
 	description string, enabled bool) string {
 	return fmt.Sprintf(`
 	resource "scc_system_mapping_resource" "%s" {
@@ -225,7 +226,7 @@ func getImportStateForSystemMappingResource(resourceName string) resource.Import
 			rs.Primary.Attributes["subaccount"],
 			rs.Primary.Attributes["virtual_host"],
 			rs.Primary.Attributes["virtual_port"],
-			rs.Primary.Attributes["id"],
+			rs.Primary.Attributes["url_path"],
 		), nil
 	}
 }

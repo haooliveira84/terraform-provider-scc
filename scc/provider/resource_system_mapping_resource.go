@@ -60,7 +60,7 @@ __Further documentation:__
 				MarkdownDescription: "Virtual port used on the cloud side.",
 				Required:            true,
 			},
-			"id": schema.StringAttribute{
+			"url_path": schema.StringAttribute{
 				MarkdownDescription: "The resource itself, which, depending on the owning system mapping, is either a URL path (or the leading section of it), or a RFC function name.",
 				Required:            true,
 			},
@@ -69,10 +69,15 @@ __Further documentation:__
 				Computed:            true,
 				Optional:            true,
 			},
-			"exact_match_only": schema.BoolAttribute{
-				MarkdownDescription: "Boolean flag determining whether access is granted only if the requested resource is an exact match.",
-				Computed:            true,
-				Optional:            true,
+			"path_only": schema.BoolAttribute{
+				MarkdownDescription: `Boolean flag determining whether access is granted only if the requested resource is an exact match.
+				
+__UI Equivalent:__ *Access Policy*
+
+- true → *Path Only (Sub-Paths Are Excluded)*
+- false → *Path And All Sub-Paths*`,
+				Computed: true,
+				Optional: true,
 			},
 			"websocket_upgrade_allowed": schema.BoolAttribute{
 				MarkdownDescription: "Boolean flag indicating whether websocket upgrade is allowed. This property is of relevance only if the owning system mapping employs protocol HTTP or HTTPS.",
@@ -125,13 +130,13 @@ func (r *SystemMappingResourceResource) Create(ctx context.Context, req resource
 	subaccount := plan.Subaccount.ValueString()
 	virtualHost := plan.VirtualHost.ValueString()
 	virtualPort := plan.VirtualPort.ValueString()
-	resourceID := CreateEncodedResourceID(plan.ID.ValueString())
+	resourceID := CreateEncodedResourceID(plan.URLPath.ValueString())
 	endpoint := endpoints.GetSystemMappingResourceBaseEndpoint(regionHost, subaccount, virtualHost, virtualPort)
 
 	planBody := map[string]string{
-		"id":                      plan.ID.ValueString(),
+		"id":                      plan.URLPath.ValueString(),
 		"enabled":                 fmt.Sprintf("%t", plan.Enabled.ValueBool()),
-		"exactMatchOnly":          fmt.Sprintf("%t", plan.ExactMatchOnly.ValueBool()),
+		"exactMatchOnly":          fmt.Sprintf("%t", plan.PathOnly.ValueBool()),
 		"websocketUpgradeAllowed": fmt.Sprintf("%t", plan.WebsocketUpgradeAllowed.ValueBool()),
 		"description":             plan.Description.ValueString(),
 	}
@@ -176,7 +181,7 @@ func (r *SystemMappingResourceResource) Read(ctx context.Context, req resource.R
 	subaccount := state.Subaccount.ValueString()
 	virtualHost := state.VirtualHost.ValueString()
 	virtualPort := state.VirtualPort.ValueString()
-	resourceID := CreateEncodedResourceID(state.ID.ValueString())
+	resourceID := CreateEncodedResourceID(state.URLPath.ValueString())
 	endpoint := endpoints.GetSystemMappingResourceEndpoint(regionHost, subaccount, virtualHost, virtualPort, resourceID)
 
 	err := requestAndUnmarshal(r.client, &respObj, "GET", endpoint, nil, true)
@@ -217,7 +222,7 @@ func (r *SystemMappingResourceResource) Update(ctx context.Context, req resource
 	subaccount := plan.Subaccount.ValueString()
 	virtualHost := plan.VirtualHost.ValueString()
 	virtualPort := plan.VirtualPort.ValueString()
-	resourceID := CreateEncodedResourceID(plan.ID.ValueString())
+	resourceID := CreateEncodedResourceID(plan.URLPath.ValueString())
 
 	if (state.RegionHost.ValueString() != regionHost) ||
 		(state.Subaccount.ValueString() != subaccount) ||
@@ -230,7 +235,7 @@ func (r *SystemMappingResourceResource) Update(ctx context.Context, req resource
 
 	planBody := map[string]string{
 		"enabled":                 fmt.Sprintf("%t", plan.Enabled.ValueBool()),
-		"exactMatchOnly":          fmt.Sprintf("%t", plan.ExactMatchOnly.ValueBool()),
+		"exactMatchOnly":          fmt.Sprintf("%t", plan.PathOnly.ValueBool()),
 		"websocketUpgradeAllowed": fmt.Sprintf("%t", plan.WebsocketUpgradeAllowed.ValueBool()),
 		"description":             plan.Description.ValueString(),
 	}
@@ -275,7 +280,7 @@ func (r *SystemMappingResourceResource) Delete(ctx context.Context, req resource
 	subaccount := state.Subaccount.ValueString()
 	virtualHost := state.VirtualHost.ValueString()
 	virtualPort := state.VirtualPort.ValueString()
-	resourceID := CreateEncodedResourceID(state.ID.ValueString())
+	resourceID := CreateEncodedResourceID(state.URLPath.ValueString())
 	endpoint := endpoints.GetSystemMappingResourceEndpoint(regionHost, subaccount, virtualHost, virtualPort, resourceID)
 
 	err := requestAndUnmarshal(r.client, &respObj, "DELETE", endpoint, nil, false)
@@ -303,7 +308,7 @@ func (rs *SystemMappingResourceResource) ImportState(ctx context.Context, req re
 	if len(idParts) != 5 || idParts[0] == "" || idParts[1] == "" || idParts[2] == "" || idParts[3] == "" || idParts[4] == "" {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
-			fmt.Sprintf("Expected import identifier with format: region_host, subaccount, virtual_host, virtual_port, id. Got: %q", req.ID),
+			fmt.Sprintf("Expected import identifier with format: region_host, subaccount, virtual_host, virtual_port, url_path. Got: %q", req.ID),
 		)
 		return
 	}
@@ -312,5 +317,5 @@ func (rs *SystemMappingResourceResource) ImportState(ctx context.Context, req re
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("subaccount"), idParts[1])...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("virtual_host"), idParts[2])...)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("virtual_port"), idParts[3])...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), idParts[4])...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("url_path"), idParts[4])...)
 }

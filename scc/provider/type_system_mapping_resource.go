@@ -9,9 +9,9 @@ import (
 )
 
 type SystemMappingResourceData struct {
-	ID                      types.String `tfsdk:"id"`
+	URLPath                 types.String `tfsdk:"url_path"`
 	Enabled                 types.Bool   `tfsdk:"enabled"`
-	ExactMatchOnly          types.Bool   `tfsdk:"exact_match_only"`
+	PathOnly                types.Bool   `tfsdk:"path_only"`
 	WebsocketUpgradeAllowed types.Bool   `tfsdk:"websocket_upgrade_allowed"`
 	CreationDate            types.String `tfsdk:"creation_date"`
 	Description             types.String `tfsdk:"description"`
@@ -22,9 +22,9 @@ type SystemMappingResourceConfig struct {
 	Subaccount              types.String `tfsdk:"subaccount"`
 	VirtualHost             types.String `tfsdk:"virtual_host"`
 	VirtualPort             types.String `tfsdk:"virtual_port"`
-	ID                      types.String `tfsdk:"id"`
+	URLPath                 types.String `tfsdk:"url_path"`
 	Enabled                 types.Bool   `tfsdk:"enabled"`
-	ExactMatchOnly          types.Bool   `tfsdk:"exact_match_only"`
+	PathOnly                types.Bool   `tfsdk:"path_only"`
 	WebsocketUpgradeAllowed types.Bool   `tfsdk:"websocket_upgrade_allowed"`
 	CreationDate            types.String `tfsdk:"creation_date"`
 	Description             types.String `tfsdk:"description"`
@@ -44,9 +44,9 @@ func SystemMappingResourceValueFrom(ctx context.Context, plan SystemMappingResou
 		Subaccount:              plan.Subaccount,
 		VirtualHost:             plan.VirtualHost,
 		VirtualPort:             plan.VirtualPort,
-		ID:                      types.StringValue(value.ID),
+		URLPath:                 types.StringValue(value.URLPath),
 		Enabled:                 types.BoolValue(value.Enabled),
-		ExactMatchOnly:          types.BoolValue(value.ExactMatchOnly),
+		PathOnly:                types.BoolValue(value.PathOnly),
 		WebsocketUpgradeAllowed: types.BoolValue(value.WebsocketUpgradeAllowed),
 		CreationDate:            types.StringValue(value.CreationDate),
 		Description:             types.StringValue(value.Description),
@@ -59,9 +59,9 @@ func SystemMappingResourcesValueFrom(ctx context.Context, plan SystemMappingReso
 	system_mapping_resources := []SystemMappingResourceData{}
 	for _, smr := range value.SystemMappingResources {
 		r := SystemMappingResourceData{
-			ID:                      types.StringValue(smr.ID),
+			URLPath:                 types.StringValue(smr.URLPath),
 			Enabled:                 types.BoolValue(smr.Enabled),
-			ExactMatchOnly:          types.BoolValue(smr.ExactMatchOnly),
+			PathOnly:                types.BoolValue(smr.PathOnly),
 			WebsocketUpgradeAllowed: types.BoolValue(smr.WebsocketUpgradeAllowed),
 			CreationDate:            types.StringValue(smr.CreationDate),
 			Description:             types.StringValue(smr.Description),

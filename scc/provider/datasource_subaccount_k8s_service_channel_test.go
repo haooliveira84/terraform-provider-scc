@@ -26,9 +26,9 @@ func TestDataSourceSubaccountK8SServiceChannel(t *testing.T) {
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channel.scc_sc", "region_host", regionHost),
 						resource.TestMatchResourceAttr("data.scc_subaccount_k8s_service_channel.scc_sc", "subaccount", regexpValidUUID),
-						resource.TestCheckResourceAttrSet("data.scc_subaccount_k8s_service_channel.scc_sc", "k8s_cluster"),
-						resource.TestCheckResourceAttrSet("data.scc_subaccount_k8s_service_channel.scc_sc", "k8s_service"),
-						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channel.scc_sc", "port", "3000"),
+						resource.TestCheckResourceAttrSet("data.scc_subaccount_k8s_service_channel.scc_sc", "k8s_cluster_host"),
+						resource.TestCheckResourceAttrSet("data.scc_subaccount_k8s_service_channel.scc_sc", "k8s_service_id"),
+						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channel.scc_sc", "local_port", "3000"),
 						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channel.scc_sc", "connections", "1"),
 						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channel.scc_sc", "type", "K8S"),
 						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channel.scc_sc", "enabled", "false"),

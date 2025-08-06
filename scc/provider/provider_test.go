@@ -53,8 +53,8 @@ var redactedTestUser = User{
 	CloudUsername:           "cloud-user@example.com",
 	CloudPassword:           "REDACTED_CLOUD_PASSWORD",
 	CloudAuthenticationData: "REDACTED_SUBACCOUNT_AUTHENTICATION_DATA",
-	K8SCluster:              "REDACTED_K8S_CLUSTER",
-	K8SService:              "REDACTED_K8S_SERVICE",
+	K8SCluster:              "REDACTED_K8S_CLUSTER_HOST",
+	K8SService:              "REDACTED_K8S_SERVICE_ID",
 	ABAPCloudTenantHost:     "REDACTED_ABAP_CLOUD_TENANT_HOST",
 }
 
@@ -108,8 +108,8 @@ func setupVCR(t *testing.T, cassetteName string) (*recorder.Recorder, User) {
 		user.CloudUsername = os.Getenv("TF_VAR_cloud_user")
 		user.CloudPassword = os.Getenv("TF_VAR_cloud_password")
 		user.CloudAuthenticationData = os.Getenv("TF_VAR_authentication_data")
-		user.K8SCluster = os.Getenv("TF_VAR_k8s_cluster")
-		user.K8SService = os.Getenv("TF_VAR_k8s_service")
+		user.K8SCluster = os.Getenv("TF_VAR_k8s_cluster_host")
+		user.K8SService = os.Getenv("TF_VAR_k8s_service_id")
 		user.ABAPCloudTenantHost = os.Getenv("TF_VAR_abap_cloud_tenant_host")
 		if len(user.InstanceUsername) == 0 || len(user.InstancePassword) == 0 || len(user.InstanceURL) == 0 {
 			t.Fatal("Env vars SCC_USERNAME, SCC_PASSWORD and SCC_INSTANCE_URL are required when recording test fixtures")

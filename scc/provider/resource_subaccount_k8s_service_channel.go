@@ -54,12 +54,12 @@ __Further documentation:__
 					uuidvalidator.ValidUUID(),
 				},
 			},
-			"k8s_cluster": schema.StringAttribute{
+			"k8s_cluster_host": schema.StringAttribute{
 				MarkdownDescription: "Host name to access the Kubernetes cluster.",
 				Required:            true,
 			},
 
-			"k8s_service": schema.StringAttribute{
+			"k8s_service_id": schema.StringAttribute{
 				MarkdownDescription: "Host name providing the service inside of Kubernetes cluster.",
 				Required:            true,
 			},
@@ -72,7 +72,7 @@ __Further documentation:__
 				MarkdownDescription: "Type of Subaccount Service Channel.",
 				Computed:            true,
 			},
-			"port": schema.Int64Attribute{
+			"local_port": schema.Int64Attribute{
 				MarkdownDescription: "Port of the subaccount service channel for the Kubernetes Cluster.",
 				Required:            true,
 				Validators: []validator.Int64{
@@ -88,7 +88,7 @@ __Further documentation:__
 				MarkdownDescription: "Maximal number of open connections.",
 				Required:            true,
 			},
-			"comment": schema.StringAttribute{
+			"description": schema.StringAttribute{
 				MarkdownDescription: "Comment or short description. This property is not supplied if no comment was provided.",
 				Optional:            true,
 				Computed:            true,
@@ -149,11 +149,11 @@ func (r *SubaccountK8SServiceChannelResource) Create(ctx context.Context, req re
 	endpoint := endpoints.GetSubaccountServiceChannelBaseEndpoint(regionHost, subaccount, "K8S")
 
 	planBody := map[string]string{
-		"k8sCluster":  plan.K8SCluster.ValueString(),
-		"k8sService":  plan.K8SService.ValueString(),
-		"port":        fmt.Sprintf("%d", plan.Port.ValueInt64()),
+		"k8sCluster":  plan.K8SClusterHost.ValueString(),
+		"k8sService":  plan.K8SServiceID.ValueString(),
+		"port":        fmt.Sprintf("%d", plan.LocalPort.ValueInt64()),
 		"connections": fmt.Sprintf("%d", plan.Connections.ValueInt64()),
-		"comment":     plan.Comment.ValueString(),
+		"comment":     plan.Description.ValueString(),
 	}
 
 	err := requestAndUnmarshal(r.client, &respObj.SubaccountK8SServiceChannels, "POST", endpoint, planBody, false)
@@ -168,7 +168,7 @@ func (r *SubaccountK8SServiceChannelResource) Create(ctx context.Context, req re
 		return
 	}
 
-	serviceChannelRespObj, err := r.getSubaccountK8SServiceChannel(respObj, plan.K8SCluster.ValueString())
+	serviceChannelRespObj, err := r.getSubaccountK8SServiceChannel(respObj, plan.K8SClusterHost.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(errMsgFetchSubaccountK8SServiceChannelFailed, err.Error())
 		return
@@ -324,7 +324,7 @@ func (r *SubaccountK8SServiceChannelResource) Delete(ctx context.Context, req re
 
 func (r *SubaccountK8SServiceChannelResource) getSubaccountK8SServiceChannel(serviceChannels apiobjects.SubaccountK8SServiceChannels, targetK8SCluster string) (*apiobjects.SubaccountK8SServiceChannel, error) {
 	for _, channel := range serviceChannels.SubaccountK8SServiceChannels {
-		if channel.K8SCluster == targetK8SCluster {
+		if channel.K8SClusterHost == targetK8SCluster {
 			return &channel, nil
 		}
 	}
@@ -345,11 +345,11 @@ func (r *SubaccountK8SServiceChannelResource) enableSubaccountK8SServiceChannel(
 
 func (r *SubaccountK8SServiceChannelResource) updateSubaccountK8SServiceChannel(plan SubaccountK8SServiceChannelConfig, respObj apiobjects.SubaccountK8SServiceChannel, resp *resource.UpdateResponse, endpoint string) {
 	planBody := map[string]string{
-		"k8sCluster":  plan.K8SCluster.ValueString(),
-		"k8sService":  plan.K8SService.ValueString(),
-		"port":        fmt.Sprintf("%d", plan.Port.ValueInt64()),
+		"k8sCluster":  plan.K8SClusterHost.ValueString(),
+		"k8sService":  plan.K8SServiceID.ValueString(),
+		"port":        fmt.Sprintf("%d", plan.LocalPort.ValueInt64()),
 		"connections": fmt.Sprintf("%d", plan.Connections.ValueInt64()),
-		"comment":     plan.Comment.ValueString(),
+		"comment":     plan.Description.ValueString(),
 	}
 
 	err := requestAndUnmarshal(r.client, &respObj, "PUT", endpoint, planBody, false)

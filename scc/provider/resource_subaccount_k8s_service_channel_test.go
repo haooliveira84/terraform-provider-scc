@@ -17,7 +17,7 @@ func TestResourceSubaccountK8SServiceChannel(t *testing.T) {
 	t.Run("happy path", func(t *testing.T) {
 		rec, user := setupVCR(t, "fixtures/resource_subaccount_k8s_service_channel")
 		if len(user.K8SCluster) == 0 || len(user.K8SService) == 0 {
-			t.Fatalf("Missing TF_VAR_k8s_cluster or TF_VAR_k8s_service for recording test fixtures")
+			t.Fatalf("Missing TF_VAR_k8s_cluster_host or TF_VAR_k8s_service_id for recording test fixtures")
 		}
 		defer stopQuietly(rec)
 
@@ -30,9 +30,9 @@ func TestResourceSubaccountK8SServiceChannel(t *testing.T) {
 					Check: resource.ComposeAggregateTestCheckFunc(
 						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "region_host", regionHost),
 						resource.TestMatchResourceAttr("scc_subaccount_k8s_service_channel.test", "subaccount", regexpValidUUID),
-						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "k8s_cluster", user.K8SCluster),
-						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "k8s_service", user.K8SService),
-						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "port", "3000"),
+						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "k8s_cluster_host", user.K8SCluster),
+						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "k8s_service_id", user.K8SService),
+						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "local_port", "3000"),
 						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "connections", "1"),
 						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "type", "K8S"),
 						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "enabled", "true"),
@@ -71,7 +71,7 @@ func TestResourceSubaccountK8SServiceChannel(t *testing.T) {
 
 	})
 
-	t.Run("update path - comment and connections update", func(t *testing.T) {
+	t.Run("update path - description and connections update", func(t *testing.T) {
 		rec, user := setupVCR(t, "fixtures/resource_subaccount_k8s_service_channel_update")
 		defer stopQuietly(rec)
 
@@ -82,7 +82,7 @@ func TestResourceSubaccountK8SServiceChannel(t *testing.T) {
 				{
 					Config: providerConfig(user) + ResourceSubaccountK8SServiceChannel("test", regionHost, subaccount, user.K8SCluster, user.K8SService, 3000, 1, true, "Created"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "comment", "Created"),
+						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "description", "Created"),
 						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "connections", "1"),
 						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "enabled", "true"),
 					),
@@ -95,7 +95,7 @@ func TestResourceSubaccountK8SServiceChannel(t *testing.T) {
 				{
 					Config: providerConfig(user) + ResourceSubaccountK8SServiceChannel("test", regionHost, subaccount, user.K8SCluster, user.K8SService, 3000, 2, false, "Updated"),
 					Check: resource.ComposeAggregateTestCheckFunc(
-						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "comment", "Updated"),
+						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "description", "Updated"),
 						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "connections", "2"),
 						resource.TestCheckResourceAttr("scc_subaccount_k8s_service_channel.test", "enabled", "false"),
 					),
@@ -137,7 +137,7 @@ func TestResourceSubaccountK8SServiceChannel(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceSubaccountK8SServiceChannelWoCluster("test", regionHost, subaccount, "testserviceid", 3000, 1, true),
-					ExpectError: regexp.MustCompile(`The argument "k8s_cluster" is required, but no definition was found.`),
+					ExpectError: regexp.MustCompile(`The argument "k8s_cluster_host" is required, but no definition was found.`),
 				},
 			},
 		})
@@ -150,20 +150,20 @@ func TestResourceSubaccountK8SServiceChannel(t *testing.T) {
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceSubaccountK8SServiceChannelWoService("test", regionHost, subaccount, "testclusterhost", 3000, 1, true),
-					ExpectError: regexp.MustCompile(`The argument "k8s_service" is required, but no definition was found.`),
+					ExpectError: regexp.MustCompile(`The argument "k8s_service_id" is required, but no definition was found.`),
 				},
 			},
 		})
 	})
 
-	t.Run("error path - port mandatory", func(t *testing.T) {
+	t.Run("error path - local port mandatory", func(t *testing.T) {
 		resource.Test(t, resource.TestCase{
 			IsUnitTest:               true,
 			ProtoV6ProviderFactories: getTestProviders(nil),
 			Steps: []resource.TestStep{
 				{
 					Config:      ResourceSubaccountK8SServiceChannelWoPort("test", regionHost, subaccount, "testclusterhost", "testserviceid", 1, true),
-					ExpectError: regexp.MustCompile(`The argument "port" is required, but no definition was found.`),
+					ExpectError: regexp.MustCompile(`The argument "local_port" is required, but no definition was found.`),
 				},
 			},
 		})
@@ -184,71 +184,71 @@ func TestResourceSubaccountK8SServiceChannel(t *testing.T) {
 
 }
 
-func ResourceSubaccountK8SServiceChannel(datasourceName string, regionHost string, subaccount string, k8sCluster string, k8sService string, port int64, connections int64, enabled bool, comment string) string {
+func ResourceSubaccountK8SServiceChannel(datasourceName string, regionHost string, subaccount string, k8sCluster string, k8sService string, localPort int64, connections int64, enabled bool, description string) string {
 	return fmt.Sprintf(`
 	resource "scc_subaccount_k8s_service_channel" "%s" {
 	region_host = "%s"
 	subaccount = "%s"
-	k8s_cluster =  "%s"
-	k8s_service =  "%s"
-	port = "%d"
+	k8s_cluster_host =  "%s"
+	k8s_service_id =  "%s"
+	local_port = "%d"
 	connections = "%d"
 	enabled= "%t"
-	comment = "%s"
+	description = "%s"
 	}
-	`, datasourceName, regionHost, subaccount, k8sCluster, k8sService, port, connections, enabled, comment)
+	`, datasourceName, regionHost, subaccount, k8sCluster, k8sService, localPort, connections, enabled, description)
 }
 
-func ResourceSubaccountK8SServiceChannelWoRegionHost(datasourceName string, subaccount string, k8sCluster string, k8sService string, port int64, connections int64, enabled bool) string {
+func ResourceSubaccountK8SServiceChannelWoRegionHost(datasourceName string, subaccount string, k8sCluster string, k8sService string, localPort int64, connections int64, enabled bool) string {
 	return fmt.Sprintf(`
 	resource "scc_subaccount_k8s_service_channel" "%s" {
 	subaccount = "%s"
-	k8s_cluster =  "%s"
-	k8s_service =  "%s"
-	port = "%d"
+	k8s_cluster_host =  "%s"
+	k8s_service_id =  "%s"
+	local_port = "%d"
 	connections = "%d"
 	enabled= "%t"
 	}
-	`, datasourceName, subaccount, k8sCluster, k8sService, port, connections, enabled)
+	`, datasourceName, subaccount, k8sCluster, k8sService, localPort, connections, enabled)
 }
 
-func ResourceSubaccountK8SServiceChannelWoSubaccount(datasourceName string, regionHost string, k8sCluster string, k8sService string, port int64, connections int64, enabled bool) string {
+func ResourceSubaccountK8SServiceChannelWoSubaccount(datasourceName string, regionHost string, k8sCluster string, k8sService string, localPort int64, connections int64, enabled bool) string {
 	return fmt.Sprintf(`
 	resource "scc_subaccount_k8s_service_channel" "%s" {
 	region_host = "%s"
-	k8s_cluster =  "%s"
-	k8s_service =  "%s"
-	port = "%d"
+	k8s_cluster_host =  "%s"
+	k8s_service_id =  "%s"
+	local_port = "%d"
 	connections = "%d"
 	enabled= "%t"
 	}
-	`, datasourceName, regionHost, k8sCluster, k8sService, port, connections, enabled)
+	`, datasourceName, regionHost, k8sCluster, k8sService, localPort, connections, enabled)
 }
 
-func ResourceSubaccountK8SServiceChannelWoCluster(datasourceName string, regionHost string, subaccount string, k8sService string, port int64, connections int64, enabled bool) string {
-	return fmt.Sprintf(`
-	resource "scc_subaccount_k8s_service_channel" "%s" {
-	region_host = "%s"
-	subaccount = "%s"
-	k8s_service =  "%s"
-	port = "%d"
-	connections = "%d"
-	enabled= "%t"
-	}
-	`, datasourceName, regionHost, subaccount, k8sService, port, connections, enabled)
-}
-
-func ResourceSubaccountK8SServiceChannelWoService(datasourceName string, regionHost string, subaccount string, k8sCluster string, port int64, connections int64, enabled bool) string {
+func ResourceSubaccountK8SServiceChannelWoCluster(datasourceName string, regionHost string, subaccount string, k8sService string, localPort int64, connections int64, enabled bool) string {
 	return fmt.Sprintf(`
 	resource "scc_subaccount_k8s_service_channel" "%s" {
 	region_host = "%s"
 	subaccount = "%s"
-	k8s_cluster =  "%s"
-	port = "%d"
+	k8s_service_id =  "%s"
+	local_port = "%d"
 	connections = "%d"
 	enabled= "%t"
 	}
-	`, datasourceName, regionHost, subaccount, k8sCluster, port, connections, enabled)
+	`, datasourceName, regionHost, subaccount, k8sService, localPort, connections, enabled)
+}
+
+func ResourceSubaccountK8SServiceChannelWoService(datasourceName string, regionHost string, subaccount string, k8sCluster string, localPort int64, connections int64, enabled bool) string {
+	return fmt.Sprintf(`
+	resource "scc_subaccount_k8s_service_channel" "%s" {
+	region_host = "%s"
+	subaccount = "%s"
+	k8s_cluster_host =  "%s"
+	local_port = "%d"
+	connections = "%d"
+	enabled= "%t"
+	}
+	`, datasourceName, regionHost, subaccount, k8sCluster, localPort, connections, enabled)
 }
 
 func ResourceSubaccountK8SServiceChannelWoPort(datasourceName string, regionHost string, subaccount string, k8sCluster string, k8sService string, connections int64, enabled bool) string {
@@ -256,25 +256,25 @@ func ResourceSubaccountK8SServiceChannelWoPort(datasourceName string, regionHost
 	resource "scc_subaccount_k8s_service_channel" "%s" {
 	region_host = "%s"
 	subaccount = "%s"
-	k8s_cluster =  "%s"
-	k8s_service =  "%s"
+	k8s_cluster_host =  "%s"
+	k8s_service_id =  "%s"
 	connections = "%d"
 	enabled= "%t"
 	}
 	`, datasourceName, regionHost, subaccount, k8sCluster, k8sService, connections, enabled)
 }
 
-func ResourceSubaccountK8SServiceChannelWoConnections(datasourceName string, regionHost string, subaccount string, k8sCluster string, k8sService string, port int64, enabled bool) string {
+func ResourceSubaccountK8SServiceChannelWoConnections(datasourceName string, regionHost string, subaccount string, k8sCluster string, k8sService string, localPort int64, enabled bool) string {
 	return fmt.Sprintf(`
 	resource "scc_subaccount_k8s_service_channel" "%s" {
 	region_host = "%s"
 	subaccount = "%s"
-	k8s_cluster =  "%s"
-	k8s_service =  "%s"
-	port = "%d"
+	k8s_cluster_host =  "%s"
+	k8s_service_id =  "%s"
+	local_port = "%d"
 	enabled= "%t"
 	}
-	`, datasourceName, regionHost, subaccount, k8sCluster, k8sService, port, enabled)
+	`, datasourceName, regionHost, subaccount, k8sCluster, k8sService, localPort, enabled)
 }
 
 func getImportStateForSubaccountK8SServiceChannel(resourceName string) resource.ImportStateIdFunc {

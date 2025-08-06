@@ -28,9 +28,9 @@ __Further documentation:__
 resource "scc_subaccount_k8s_service_channel" "scc_sc" {
   region_host = "cf.eu12.hana.ondemand.com"
   subaccount = "12345678-90ab-cdef-1234-567890abcdef"
-  k8s_cluster =  "cp.app.cluster.kyma.ondemand.com"
-  k8s_service =  "12345678-90ab-cdef-1234-567890abcdef"
-  port = 3000
+  k8s_cluster_host =  "cp.app.cluster.kyma.ondemand.com"
+  k8s_service_id =  "12345678-90ab-cdef-1234-567890abcdef"
+  local_port = 3000
   connections = 1
   enabled = true
 }
@@ -42,15 +42,15 @@ resource "scc_subaccount_k8s_service_channel" "scc_sc" {
 ### Required
 
 - `connections` (Number) Maximal number of open connections.
-- `k8s_cluster` (String) Host name to access the Kubernetes cluster.
-- `k8s_service` (String) Host name providing the service inside of Kubernetes cluster.
-- `port` (Number) Port of the subaccount service channel for the Kubernetes Cluster.
+- `k8s_cluster_host` (String) Host name to access the Kubernetes cluster.
+- `k8s_service_id` (String) Host name providing the service inside of Kubernetes cluster.
+- `local_port` (Number) Port of the subaccount service channel for the Kubernetes Cluster.
 - `region_host` (String) Region Host Name.
 - `subaccount` (String) The ID of the subaccount.
 
 ### Optional
 
-- `comment` (String) Comment or short description. This property is not supplied if no comment was provided.
+- `description` (String) Comment or short description. This property is not supplied if no comment was provided.
 - `enabled` (Boolean) Boolean flag indicating whether the channel is enabled and therefore should be open.
 - `id` (Number) Unique identifier for the subaccount service channel (a positive integer number, starting with 1). This identifier is unique across all types of service channels.
 

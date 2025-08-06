@@ -73,19 +73,33 @@ func (c *cloudConnectorProvider) Schema(_ context.Context, _ provider.SchemaRequ
 				Sensitive:           true,
 			},
 			"ca_certificate": schema.StringAttribute{
-				MarkdownDescription: "Contents of a PEM-encoded CA certificate used to verify the Cloud Connector server. Use `file(\"path/to/ca.pem\")` in the provider block to load from a file. This can also be sourced from the `SCC_CA_CERTIFICATE` environment variable (useful when storing and retrieving secrets from secure stores).",
-				Optional:            true,
-				Sensitive:           true,
+				MarkdownDescription: `Contents of a PEM-encoded CA certificate used to verify the **UI Certificate** of the Cloud Connector server.
+Use **file(\"path/to/ca_cert.pem\")** in the provider block to load from a file. This can also be sourced from the **SCC_CA_CERTIFICATE** environment variable (useful when storing and retrieving secrets from secure stores).
+
+**Note:** 
+- This should match the UI certificate presented by the Cloud Connector.
+- If the certificate chain involves intermediate certificates, ensure they are included to complete the trust chain.`,
+				Optional:  true,
+				Sensitive: true,
 			},
 			"client_certificate": schema.StringAttribute{
-				MarkdownDescription: "Contents of a PEM-encoded client certificate used for mutual TLS authentication. Use `file(\"path/to/cert.pem\")` in the provider block to load from a file. This can also be sourced from the `SCC_CLIENT_CERTIFICATE` environment variable (useful when storing and retrieving secrets from secure stores).",
-				Optional:            true,
-				Sensitive:           true,
+				MarkdownDescription: `Contents of a PEM-encoded **client certificate** used for **mutual TLS (mTLS) authentication** with the Cloud Connector.
+Use **file(\"path/to/client_cert.pem\")** in the provider block to load from a file. This can also be sourced from the **SCC_CLIENT_CERTIFICATE** environment variable (useful when storing and retrieving secrets from secure stores).
+
+**Note:** 
+- This must be the client certificate associated with the private key provided in client_key attribute.
+- If the certificate chain includes intermediate certificates, ensure they are included in the PEM file (with the client cert first, followed by intermediates) to complete the trust chain.`,
+				Optional:  true,
+				Sensitive: true,
 			},
 			"client_key": schema.StringAttribute{
-				MarkdownDescription: "Contents of a PEM-encoded client private key used for mutual TLS authentication. Use `file(\"path/to/key.pem\")` in the provider block to load from a file. This can also be sourced from the `SCC_CLIENT_KEY` environment variable (useful when storing and retrieving secrets from secure stores).",
-				Optional:            true,
-				Sensitive:           true,
+				MarkdownDescription: `Contents of a PEM-encoded **client private key** used for **mutual TLS (mTLS) authentication** with the Cloud Connector.
+Use **file(\"path/to/client_key.pem\")** in the provider block to load from a file. This can also be sourced from the **SCC_CLIENT_KEY** environment variable (useful when storing and retrieving secrets from secure stores).
+
+**Note:**
+- This key must match the client certificate provided in client_certificate attribute.`,
+				Optional:  true,
+				Sensitive: true,
 			},
 		},
 	}

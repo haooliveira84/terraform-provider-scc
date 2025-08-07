@@ -65,7 +65,7 @@ __Further documentation:__
 				Computed:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
-						"id": schema.StringAttribute{
+						"url_path": schema.StringAttribute{
 							MarkdownDescription: "The resource itself, which, depending on the owning system mapping, is either a URL path (or the leading section of it), or a RFC function name.",
 							Required:            true,
 						},
@@ -73,9 +73,14 @@ __Further documentation:__
 							MarkdownDescription: "Boolean flag indicating whether the resource is enabled.",
 							Computed:            true,
 						},
-						"exact_match_only": schema.BoolAttribute{
-							MarkdownDescription: "Boolean flag determining whether access is granted only if the requested resource is an exact match.",
-							Computed:            true,
+						"path_only": schema.BoolAttribute{
+							MarkdownDescription: `Boolean flag determining whether access is granted only if the requested resource is an exact match.
+				
+__UI Equivalent:__ *Access Policy*
+
+- true → *Path Only (Sub-Paths Are Excluded)*
+- false → *Path And All Sub-Paths*`,
+							Computed: true,
 						},
 						"websocket_upgrade_allowed": schema.BoolAttribute{
 							MarkdownDescription: "Boolean flag indicating whether websocket upgrade is allowed. This property is of relevance only if the owning system mapping employs protocol HTTP or HTTPS.",

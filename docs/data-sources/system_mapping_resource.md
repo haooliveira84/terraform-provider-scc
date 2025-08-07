@@ -40,9 +40,9 @@ data "scc_system_mapping_resource" "by_resource_id" {
 
 ### Required
 
-- `id` (String) The resource itself, which, depending on the owning system mapping, is either a URL path (or the leading section of it), or a RFC function name.
 - `region_host` (String) Region Host Name.
 - `subaccount` (String) The ID of the subaccount.
+- `url_path` (String) The resource itself, which, depending on the owning system mapping, is either a URL path (or the leading section of it), or a RFC function name.
 - `virtual_host` (String) Virtual host used on the cloud side.
 - `virtual_port` (String) Virtual port used on the cloud side.
 
@@ -51,5 +51,10 @@ data "scc_system_mapping_resource" "by_resource_id" {
 - `creation_date` (String) Date of creation of system mapping resource.
 - `description` (String) Description. This property is not available unless explicitly set.
 - `enabled` (Boolean) Boolean flag indicating whether the resource is enabled.
-- `exact_match_only` (Boolean) Boolean flag determining whether access is granted only if the requested resource is an exact match.
+- `path_only` (Boolean) Boolean flag determining whether access is granted only if the requested resource is an exact match.
+				
+__UI Equivalent:__ *Access Policy*
+
+- true → *Path Only (Sub-Paths Are Excluded)*
+- false → *Path And All Sub-Paths*
 - `websocket_upgrade_allowed` (Boolean) Boolean flag indicating whether websocket upgrade is allowed. This property is of relevance only if the owning system mapping employs protocol HTTP or HTTPS.

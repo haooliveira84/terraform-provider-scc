@@ -1,9 +1,9 @@
 package apiobjects
 
 type SystemMappingResource struct {
-	ID                      string `json:"id"`
+	URLPath                 string `json:"id"`
 	Enabled                 bool   `json:"enabled"`
-	ExactMatchOnly          bool   `json:"exactMatchOnly"`
+	PathOnly                bool   `json:"exactMatchOnly"`
 	WebsocketUpgradeAllowed bool   `json:"websocketUpgradeAllowed"`
 	CreationDate            string `json:"creationDate"`
 	Description             string `json:"description"`
@@ -14,9 +14,9 @@ type SystemMappingResourceDataSource struct {
 	Subaccount              string `json:"subaccount"`
 	VirtualHost             string `json:"virtual_host"`
 	VirtualPort             string `json:"virtual_port"`
-	ID                      string `json:"id"`
+	URLPath                 string `json:"id"`
 	Enabled                 bool   `json:"enabled"`
-	ExactMatchOnly          bool   `json:"exactMatchOnly"`
+	PathOnly                bool   `json:"exactMatchOnly"`
 	WebsocketUpgradeAllowed bool   `json:"websocketUpgradeAllowed"`
 	CreationDate            string `json:"creationDate"`
 	Description             string `json:"description"`

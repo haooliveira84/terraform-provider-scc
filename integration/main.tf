@@ -17,8 +17,8 @@ resource "scc_system_mapping" "scc_sm" {
   subaccount = scc_subaccount.scc_sa.subaccount
   virtual_host = var.virtual_host
   virtual_port = var.virtual_port
-  local_host = var.local_host
-  local_port = var.local_port
+  internal_host = var.internal_host
+  internal_port = var.internal_port
   protocol = "HTTP"
   backend_type = "abapSys"
   authentication_mode = "KERBEROS"
@@ -30,7 +30,7 @@ resource "scc_system_mapping_resource" "scc_smr" {
     subaccount = scc_subaccount.scc_sa.subaccount
     virtual_host = scc_system_mapping.scc_sm.virtual_host
     virtual_port = scc_system_mapping.scc_sm.virtual_port
-    id = "/"
+    url_path = "/"
     enabled = true
 }
 

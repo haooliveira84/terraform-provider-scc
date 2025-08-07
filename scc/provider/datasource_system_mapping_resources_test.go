@@ -29,9 +29,9 @@ func TestDataSourceSystemMappingResources(t *testing.T) {
 						resource.TestCheckResourceAttr("data.scc_system_mapping_resources.test", "virtual_port", "900"),
 
 						resource.TestCheckResourceAttr("data.scc_system_mapping_resources.test", "system_mapping_resources.#", "1"),
-						resource.TestCheckResourceAttr("data.scc_system_mapping_resources.test", "system_mapping_resources.0.id", "/"),
+						resource.TestCheckResourceAttr("data.scc_system_mapping_resources.test", "system_mapping_resources.0.url_path", "/"),
 						resource.TestCheckResourceAttr("data.scc_system_mapping_resources.test", "system_mapping_resources.0.enabled", "true"),
-						resource.TestCheckResourceAttr("data.scc_system_mapping_resources.test", "system_mapping_resources.0.exact_match_only", "true"),
+						resource.TestCheckResourceAttr("data.scc_system_mapping_resources.test", "system_mapping_resources.0.path_only", "true"),
 						resource.TestCheckResourceAttr("data.scc_system_mapping_resources.test", "system_mapping_resources.0.websocket_upgrade_allowed", "false"),
 						resource.TestMatchResourceAttr("data.scc_system_mapping_resources.test", "system_mapping_resources.0.creation_date", regexValidTimeStamp),
 						resource.TestCheckResourceAttr("data.scc_system_mapping_resources.test", "system_mapping_resources.0.description", ""),

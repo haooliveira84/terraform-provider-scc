@@ -56,12 +56,12 @@ __Further documentation:__
 				Computed: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
-						"k8s_cluster": schema.StringAttribute{
+						"k8s_cluster_host": schema.StringAttribute{
 							MarkdownDescription: "Host name to access the Kubernetes cluster.",
 							Computed:            true,
 						},
 
-						"k8s_service": schema.StringAttribute{
+						"k8s_service_id": schema.StringAttribute{
 							MarkdownDescription: "Host name providing the service inside of Kubernetes cluster.",
 							Computed:            true,
 						},
@@ -73,7 +73,7 @@ __Further documentation:__
 							MarkdownDescription: "Type of Subaccount Service Channel.",
 							Computed:            true,
 						},
-						"port": schema.Int64Attribute{
+						"local_port": schema.Int64Attribute{
 							MarkdownDescription: "Port of the subaccount service channel for the Kubernetes Cluster.",
 							Computed:            true,
 						},
@@ -85,7 +85,7 @@ __Further documentation:__
 							MarkdownDescription: "Maximal number of open connections.",
 							Computed:            true,
 						},
-						"comment": schema.StringAttribute{
+						"description": schema.StringAttribute{
 							MarkdownDescription: "Comment or short description; this property is not supplied if no comment was provided.",
 							Computed:            true,
 						},

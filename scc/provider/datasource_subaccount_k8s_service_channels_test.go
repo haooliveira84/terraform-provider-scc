@@ -28,9 +28,9 @@ func TestDataSourceSubaccountK8SServiceChannels(t *testing.T) {
 						resource.TestMatchResourceAttr("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount", regexpValidUUID),
 
 						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.#", "1"),
-						resource.TestCheckResourceAttrSet("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.0.k8s_cluster"),
-						resource.TestCheckResourceAttrSet("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.0.k8s_service"),
-						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.0.port", "3000"),
+						resource.TestCheckResourceAttrSet("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.0.k8s_cluster_host"),
+						resource.TestCheckResourceAttrSet("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.0.k8s_service_id"),
+						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.0.local_port", "3000"),
 						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.0.connections", "1"),
 						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.0.type", "K8S"),
 						resource.TestCheckResourceAttr("data.scc_subaccount_k8s_service_channels.scc_scs", "subaccount_k8s_service_channels.0.enabled", "false"),
